@@ -153,9 +153,7 @@
   .back:hover, .back:focus-visible, .close:hover { background: rgba(255,255,255,.24); border-color: rgba(255,255,255,.42); }
   form { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; overflow-y: auto; scrollbar-width: none; padding: 4px 5px 1px; margin: -4px -5px 0; }
   .copy-flight-field { padding: 10px; border: 1px solid rgba(255,255,255,.18); border-radius: 18px; background: rgba(255,255,255,.10); }
-  .copy-flight-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; align-items: center; }
-  .copy-flight-button { border: 1px solid white; background: white; color: var(--ink); border-radius: 999px; min-height: 34px; padding: 0 12px; font-size: 13px; font-weight: 400; cursor: pointer; white-space: nowrap; }
-  .copy-flight-button:disabled { opacity: .48; cursor: default; }
+  .copy-flight-row { display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; align-items: center; }
   .auth-pane { display: grid; gap: 12px; }
   .auth-pane[hidden] { display: none; }
   .claim-form { grid-template-columns: 1fr; overflow: visible; padding: 0; margin: 0; }
@@ -189,7 +187,7 @@
   .dashboard.open { opacity: 1; pointer-events: auto; }
   .dashboard[hidden] { display: none; }
   .dashboard-card {
-    width: min(920px, 100%);
+    width: min(1040px, 100%);
     max-height: min(88svh, 760px);
     overflow: hidden;
     display: flex;
@@ -230,6 +228,26 @@
   .arrival-notes { grid-column: 1 / -1; margin-top: 2px; padding: 8px 10px; border-radius: 11px; border: 1px solid rgba(255,255,255,.18); background: rgba(255,255,255,.10); color: rgba(255,255,255,.70); line-height: 1.35; }
   .arrival-notes[hidden], .notes-toggle[hidden] { display: none; }
   .dashboard-actions { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-start; }
+  .dashboard-hero { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(220px, .9fr); gap: 10px; margin-bottom: 10px; }
+  .personal-card, .dinner-card { border: 1px solid rgba(255,255,255,.22); border-radius: 17px; background: rgba(255,255,255,.12); padding: 14px; }
+  .personal-card { display: grid; gap: 8px; align-content: start; }
+  .dashboard-kicker { margin: 0; color: rgba(255,255,255,.62); font-size: 13px; line-height: 1.2; }
+  .dashboard-name { margin: 0; font-size: 24px; line-height: 1.04; font-weight: 400; }
+  .dashboard-status { display: flex; flex-wrap: wrap; gap: 7px; }
+  .status-chip { border: 1px solid rgba(255,255,255,.20); border-radius: 999px; padding: 5px 8px; color: rgba(255,255,255,.78); background: rgba(255,255,255,.10); font-size: 13px; }
+  .dinner-layout { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(260px, .9fr); gap: 10px; overflow-y: auto; min-height: 0; padding: 1px; }
+  .dinner-board { display: grid; gap: 8px; }
+  .dinner-night { display: grid; grid-template-columns: 74px minmax(0, 1fr); gap: 10px; align-items: stretch; border: 1px solid rgba(255,255,255,.20); border-radius: 16px; background: rgba(255,255,255,.12); padding: 10px; }
+  .dinner-date { display: grid; place-items: center; border-radius: 13px; background: rgba(255,255,255,.16); color: white; font-size: 13px; line-height: 1.15; text-align: center; }
+  .dinner-date strong { display: block; font-size: 20px; font-weight: 400; }
+  .dinner-main { display: grid; gap: 5px; min-width: 0; }
+  .dinner-title { color: white; font-size: 14px; line-height: 1.2; }
+  .dinner-owners, .dinner-plan { color: rgba(255,255,255,.70); font-size: 13px; line-height: 1.28; overflow-wrap: anywhere; }
+  .dinner-card { display: grid; gap: 10px; align-content: start; }
+  .dinner-card h3 { margin: 0; font-size: 20px; line-height: 1.08; font-weight: 400; }
+  .dinner-card p { margin: 0; }
+  .dinner-form { display: grid; grid-template-columns: 1fr; gap: 9px; overflow: visible; padding: 0; margin: 0; }
+  .dinner-form .submit { display: grid; gap: 8px; margin-top: 2px; }
   .toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%) translateY(20px); opacity: 0; z-index: 22; background: rgba(255,255,255,.92); color: var(--ink); border-radius: 999px; padding: 7px 10px; font-size: 13px; font-weight: 400; transition: .22s ease; }
   .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
   .fallback { position: fixed; inset: 0; display: grid; place-items: center; padding: 30px; color: rgba(255,255,255,.8); text-align: center; background: #061923; visibility: hidden; z-index: 30; }
@@ -257,7 +275,6 @@
     .field { min-width: 0; }
     .copy-flight-field { padding: 12px; }
     .copy-flight-row { grid-template-columns: minmax(0, 1fr); gap: 10px; }
-    .copy-flight-button { min-height: 44px; width: 100%; padding: 0 16px; font-size: 16px; }
     input, select, textarea { min-width: 0; height: 44px; padding: 0 12px; font-size: 16px; border-radius: 18px; }
     select { padding-right: 36px; background-position: calc(100% - 20px) 19px, calc(100% - 15px) 19px; }
     input[type="date"], input[type="time"] { -webkit-appearance: none; appearance: none; padding-right: 10px; }
@@ -282,6 +299,10 @@
     .arrival-notes { padding: 10px 12px; border-radius: 13px; }
     .dashboard-actions { display: grid; }
     .dashboard-actions .pill { width: 100%; }
+    .dashboard-hero, .dinner-layout { grid-template-columns: 1fr; }
+    .dashboard-name { font-size: 22px; }
+    .dinner-night { grid-template-columns: 62px minmax(0, 1fr); padding: 10px; }
+    .dinner-date strong { font-size: 18px; }
     .toast { bottom: max(16px, env(safe-area-inset-bottom)); max-width: calc(100vw - 32px); text-align: center; }
   }
   @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
@@ -290,7 +311,7 @@
 <body>
 <div id="stage">
   <img class="poster-img" src="assets/hero-water-3-poster.jpg" alt="" aria-hidden="true">
-  <video id="waterVideo" data-src="assets/hero-water-3-browser.mp4" poster="assets/hero-water-3-poster.jpg" muted playsinline loop preload="auto"></video>
+  <video id="waterVideo" data-src="assets/hero-water-3-browser.mp4" poster="assets/hero-water-3-poster.jpg" muted playsinline autoplay loop preload="auto"></video>
   <canvas id="gl"></canvas>
 </div>
 <div class="shade"></div>
@@ -319,7 +340,7 @@
     <form id="tripForm" hidden>
       <div class="field"><label for="name">Name</label><select id="name" required><option value="">Choose your name</option></select></div>
       <div class="field"><label for="flightStatus">Flight status</label><select id="flightStatus" required><option value="">Choose status</option><option>Booked</option><option>Not booked yet</option><option>Partially booked</option></select></div>
-      <div class="field full copy-flight-field"><label for="copyFlightsFrom">Copy flight details from someone else</label><div class="copy-flight-row"><select id="copyFlightsFrom"><option value="">Choose a person with saved flights</option></select><button class="copy-flight-button" id="copyFlightsButton" type="button" disabled>Copy</button></div></div>
+      <div class="field full copy-flight-field"><label for="copyFlightsFrom">Copy flight details from someone else</label><div class="copy-flight-row"><select id="copyFlightsFrom"><option value="">Choose a person with saved flights</option></select></div></div>
       <div class="field"><label for="arrivalDate">Arrival date</label><input id="arrivalDate" type="date" required></div>
       <div class="field"><label for="arrivalAirport">Arrival airport</label><input id="arrivalAirport" placeholder="DBV, SPU, ZAG…" required></div>
       <div class="field"><label for="arrivalTime">Arrival time</label><input id="arrivalTime" type="time"></div>
@@ -335,7 +356,34 @@
 </div>
 <div class="dashboard" id="tripInfo" role="dialog" aria-modal="true" aria-labelledby="tripInfoTitle" hidden>
   <section class="dashboard-card">
-    <header><div><h2 id="tripInfoTitle">Trip info</h2><p>Keep coming back for more info and tasks to complete before the trip.</p></div></header>
+    <header><div><h2 id="tripInfoTitle">Trip dashboard</h2><p>Your home base for flights, dinner responsibilities, tasks, and the useful trip stuff.</p></div><button class="close" id="closeTripInfo" aria-label="Close">×</button></header>
+    <div class="dashboard-hero">
+      <section class="personal-card" aria-label="Personal trip summary">
+        <p class="dashboard-kicker">Signed in as</p>
+        <h3 class="dashboard-name" id="dashboardGuestName">Your dashboard</h3>
+        <div class="dashboard-status"><span class="status-chip" id="flightStatusChip">Flights pending</span><span class="status-chip" id="dinnerStatusChip">Dinner unclaimed</span></div>
+      </section>
+      <section class="personal-card" id="myDinnerCard" aria-label="Your dinner responsibility">
+        <p class="dashboard-kicker">Your dinner night</p>
+        <h3 class="dashboard-name" id="myDinnerTitle">Pick a night with a co-lead</h3>
+        <p id="myDinnerMeta">Each dinner gets two decision makers. Choose whether you’re cooking or booking a reservation.</p>
+      </section>
+    </div>
+    <div class="dinner-layout">
+      <section class="dinner-board" id="dinnerBoard" aria-label="Dinner decision maker board"></section>
+      <section class="dinner-card">
+        <h3>Claim a dinner</h3>
+        <p>Pick a night and a co-lead. You two are responsible for deciding: reservation or cooking for the group.</p>
+        <form class="dinner-form" id="dinnerForm">
+          <div class="field"><label for="dinnerDate">Dinner night</label><select id="dinnerDate" required></select></div>
+          <div class="field"><label for="dinnerPartner">Co-lead</label><select id="dinnerPartner" required></select></div>
+          <div class="field"><label for="dinnerPlanType">Plan</label><select id="dinnerPlanType" required><option value="">Choose one</option><option value="reservation">Book a reservation</option><option value="cook">Cook for the group</option><option value="undecided">Decide later</option></select></div>
+          <div class="field"><label for="dinnerTitle">Dinner idea</label><input id="dinnerTitle" placeholder="Seafood night, konoba reservation…"></div>
+          <div class="field"><label for="dinnerNotes">Notes</label><textarea id="dinnerNotes" placeholder="Restaurant ideas, groceries, ferry timing, dietary notes…"></textarea></div>
+          <div class="submit"><small>This is visible to everyone on the dinner board.</small><button type="submit">Save dinner night</button></div>
+        </form>
+      </section>
+    </div>
     <div class="trip-info-grid" aria-label="Trip info sections">
       <button class="info-card" id="openFlights" type="button"><span>Flights</span><span>View the arrivals and departures board.</span></button>
       <button class="info-card" id="tripInfoEditFlights" type="button"><span>My flight details</span><span>Add or update your own plans.</span></button>
@@ -372,7 +420,7 @@
   const claimNameSelect=document.getElementById('claimName');
   const crewAlphabetical=[...crew].sort((a,b)=>a.localeCompare(b, undefined, { sensitivity:'base' }));
   crewAlphabetical.forEach(n=>{const o=document.createElement('option');o.textContent=n;o.value=n;nameSelect.appendChild(o); const c=o.cloneNode(true); claimNameSelect.appendChild(c);});
-  const gate=document.getElementById('gate'), openGate=document.getElementById('openGate'), closeGate=document.getElementById('closeGate'), form=document.getElementById('tripForm'), claimForm=document.getElementById('claimForm'), authPane=document.getElementById('authPane'), claimEmail=document.getElementById('claimEmail'), claimMessage=document.getElementById('claimMessage'), gateTitle=document.getElementById('gateTitle'), gateSubtitle=document.getElementById('gateSubtitle'), heroTitle=document.getElementById('heroTitle'), toast=document.getElementById('toast'), tripInfo=document.getElementById('tripInfo'), closeTripInfo=document.getElementById('closeTripInfo'), openFlights=document.getElementById('openFlights'), tripInfoEditFlights=document.getElementById('tripInfoEditFlights'), tripInfoCalendar=document.getElementById('tripInfoCalendar'), dashboard=document.getElementById('dashboard'), closeDashboard=document.getElementById('closeDashboard'), editFlights=document.getElementById('editFlights'), arrivalsBoard=document.getElementById('arrivalsBoard'), arrivalsTab=document.getElementById('arrivalsTab'), departuresTab=document.getElementById('departuresTab'), copyFlightsFrom=document.getElementById('copyFlightsFrom'), copyFlightsButton=document.getElementById('copyFlightsButton');
+  const gate=document.getElementById('gate'), openGate=document.getElementById('openGate'), closeGate=document.getElementById('closeGate'), form=document.getElementById('tripForm'), claimForm=document.getElementById('claimForm'), authPane=document.getElementById('authPane'), claimEmail=document.getElementById('claimEmail'), claimMessage=document.getElementById('claimMessage'), gateTitle=document.getElementById('gateTitle'), gateSubtitle=document.getElementById('gateSubtitle'), heroTitle=document.getElementById('heroTitle'), toast=document.getElementById('toast'), tripInfo=document.getElementById('tripInfo'), closeTripInfo=document.getElementById('closeTripInfo'), openFlights=document.getElementById('openFlights'), tripInfoEditFlights=document.getElementById('tripInfoEditFlights'), tripInfoCalendar=document.getElementById('tripInfoCalendar'), dashboard=document.getElementById('dashboard'), closeDashboard=document.getElementById('closeDashboard'), editFlights=document.getElementById('editFlights'), arrivalsBoard=document.getElementById('arrivalsBoard'), arrivalsTab=document.getElementById('arrivalsTab'), departuresTab=document.getElementById('departuresTab'), copyFlightsFrom=document.getElementById('copyFlightsFrom'), dashboardGuestName=document.getElementById('dashboardGuestName'), flightStatusChip=document.getElementById('flightStatusChip'), dinnerStatusChip=document.getElementById('dinnerStatusChip'), myDinnerTitle=document.getElementById('myDinnerTitle'), myDinnerMeta=document.getElementById('myDinnerMeta'), dinnerBoard=document.getElementById('dinnerBoard'), dinnerForm=document.getElementById('dinnerForm'), dinnerDate=document.getElementById('dinnerDate'), dinnerPartner=document.getElementById('dinnerPartner'), dinnerPlanType=document.getElementById('dinnerPlanType'), dinnerTitle=document.getElementById('dinnerTitle'), dinnerNotes=document.getElementById('dinnerNotes');
   let boardMode='arrivals';
   const fields={ name:document.getElementById('name'), flightStatus:document.getElementById('flightStatus'), arrivalDate:document.getElementById('arrivalDate'), arrivalAirport:document.getElementById('arrivalAirport'), arrivalTime:document.getElementById('arrivalTime'), arrivalFlight:document.getElementById('arrivalFlight'), departureDate:document.getElementById('departureDate'), departureAirport:document.getElementById('departureAirport'), departureTime:document.getElementById('departureTime'), departureFlight:document.getElementById('departureFlight'), flightNotes:document.getElementById('flightNotes') };
   const airportCities={ DBV:'Dubrovnik', SPU:'Split', ZAG:'Zagreb', ZAD:'Zadar', PUY:'Pula', RJK:'Rijeka', BWK:'Brač', SJJ:'Sarajevo', TIV:'Tivat', TGD:'Podgorica', VIE:'Vienna', FRA:'Frankfurt', MUC:'Munich', LHR:'London Heathrow', LGW:'London Gatwick', CDG:'Paris Charles de Gaulle', AMS:'Amsterdam', FCO:'Rome', BCN:'Barcelona', MAD:'Madrid', JFK:'New York JFK', EWR:'Newark', LAX:'Los Angeles', SFO:'San Francisco', ORD:'Chicago O’Hare', ATL:'Atlanta' };
@@ -391,19 +439,23 @@
   let guestToken=localStorage.getItem(TOKEN_KEY) || '';
   let cachedFlights=null;
   let cachedBoard={};
+  let cachedDinner={slots:[]};
   let authToken='';
   let currentGuest=null;
   const PENDING_CLAIM_KEY='korculaPendingClaimName';
   function readLocalFlights(){ try { return JSON.parse(localStorage.getItem('korculaFlightDetails') || 'null'); } catch { return null; } }
   function readLocalBoard(){ try { return JSON.parse(localStorage.getItem('korculaFlightBoard') || '{}'); } catch { return {}; } }
+  function readLocalDinner(){ try { return JSON.parse(localStorage.getItem('korculaDinnerPlan') || '{"slots":[]}'); } catch { return {slots:[]}; } }
   function rememberedName(){ return fields.name.value || localStorage.getItem(NAME_KEY) || readLocalFlights()?.name || ''; }
-  cachedFlights=readLocalFlights(); cachedBoard=readLocalBoard();
+  cachedFlights=readLocalFlights(); cachedBoard=readLocalBoard(); cachedDinner=readLocalDinner();
   if(rememberedName()) fields.name.value=rememberedName();
   function savedFlights(){ return cachedFlights || readLocalFlights(); }
   function authHeaders(){ return authToken ? { authorization:`Bearer ${authToken}` } : {}; }
   function friendlyTitle(){ heroTitle.textContent = currentGuest?.name ? `${currentGuest.name}, your week on Korčula awaits.` : 'Your week on Korčula begins here.'; }
   function setClaimMessage(text){ claimMessage.textContent=text; claimMessage.hidden = !text; }
   function flightBoard(){ return cachedBoard || readLocalBoard(); }
+  function dinnerPlan(){ return cachedDinner || readLocalDinner(); }
+  function cacheDinnerPlan(plan){ cachedDinner=plan && Array.isArray(plan.slots) ? plan : {slots:[]}; localStorage.setItem('korculaDinnerPlan', JSON.stringify(cachedDinner)); }
   function cacheFlightState(data, board){ if(data){ cachedFlights=data; localStorage.setItem('korculaFlightDetails', JSON.stringify(data)); if(data.name) localStorage.setItem(NAME_KEY, data.name); } if(board){ cachedBoard=board; localStorage.setItem('korculaFlightBoard', JSON.stringify(board)); } }
   function clearSavedFlights(){ cachedFlights=null; localStorage.removeItem('korculaFlightDetails'); }
   async function loadRemoteState(nameOverride){
@@ -419,7 +471,8 @@
       if(payload.flights){ cacheFlightState(payload.flights, payload.board || flightBoard()); fillForm(payload.flights); }
       else if(currentGuest){ clearSavedFlights(); }
       setPrimaryCta();
-      if(dashboard.classList.contains('open')) renderDashboard(); refreshCopyFlightOptions();
+      await loadDinnerPlan();
+      if(dashboard.classList.contains('open')) renderDashboard(); refreshCopyFlightOptions(); renderTripDashboard();
     } catch(err) { console.warn('Using this browser’s saved trip info until backend is reachable.', err); setPrimaryCta(); }
   }
   async function saveFlightRecord(data){
@@ -431,12 +484,22 @@
     cacheFlightState(payload.flights || data, payload.board || localBoard);
     return { remote:true };
   }
-  function setPrimaryCta(){ friendlyTitle(); openGate.textContent = currentGuest ? (savedFlights() ? 'View trip info' : 'Enter flight details') : 'Let’s go'; }
+  function setPrimaryCta(){ friendlyTitle(); openGate.textContent = currentGuest ? 'View trip dashboard' : 'Let’s go'; }
   function fillForm(data){ if(!data) return; Object.entries(fields).forEach(([k,el])=>{ if(data[k] !== undefined) el.value=data[k]; }); }
-  const copyFlightKeys=['flightStatus','arrivalDate','arrivalAirport','arrivalTime','arrivalFlight','departureDate','departureAirport','departureTime','departureFlight','flightNotes'];
+  const copyFlightKeys=['flightStatus','arrivalDate','arrivalAirport','arrivalTime','arrivalFlight','departureDate','departureAirport','departureTime','departureFlight'];
   function hasCopyableFlights(d){ return !!d && copyFlightKeys.some(key=>String(d[key] || '').trim()); }
-  function refreshCopyFlightOptions(){ const board=flightBoard(); const currentName=currentGuest?.name || fields.name.value; const people=crewAlphabetical.filter(person=>person !== currentName && hasCopyableFlights(board[person])); copyFlightsFrom.innerHTML='<option value="">Choose a person with saved flights</option>'; people.forEach(person=>{ const option=document.createElement('option'); option.value=person; option.textContent=person; copyFlightsFrom.appendChild(option); }); const disabled=!people.length; copyFlightsFrom.disabled=disabled; copyFlightsButton.disabled=disabled; if(disabled) copyFlightsFrom.innerHTML='<option value="">No saved flights to copy yet</option>'; }
+  function refreshCopyFlightOptions(){ const board=flightBoard(); const currentName=currentGuest?.name || fields.name.value; const people=crewAlphabetical.filter(person=>person !== currentName && hasCopyableFlights(board[person])); copyFlightsFrom.innerHTML='<option value="">Choose a person with saved flights</option>'; people.forEach(person=>{ const option=document.createElement('option'); option.value=person; option.textContent=person; copyFlightsFrom.appendChild(option); }); const disabled=!people.length; copyFlightsFrom.disabled=disabled; if(disabled) copyFlightsFrom.innerHTML='<option value="">No saved flights to copy yet</option>'; }
   function copyFlightDetailsFrom(name){ const source=flightBoard()[name]; if(!hasCopyableFlights(source)) return; copyFlightKeys.forEach(key=>{ if(source[key] !== undefined) fields[key].value=source[key]; }); copyFlightsFrom.value=name; showToast(`Copied ${name}’s flight details`); }
+  const dinnerDates=['2026-06-27','2026-06-28','2026-06-29','2026-06-30','2026-07-01','2026-07-02','2026-07-03','2026-07-04'];
+  function niceDinnerDate(date){ const d=new Date(`${date}T12:00:00`); return { weekday:d.toLocaleDateString(undefined,{weekday:'short'}), day:d.toLocaleDateString(undefined,{month:'short', day:'numeric'}) }; }
+  function populateDinnerSelectors(){ dinnerDate.innerHTML='<option value="">Choose a night</option>'; dinnerDates.forEach(date=>{ const n=niceDinnerDate(date); const option=document.createElement('option'); option.value=date; option.textContent=`${n.weekday}, ${n.day}`; dinnerDate.appendChild(option); }); dinnerPartner.innerHTML='<option value="">Choose your co-lead</option>'; crewAlphabetical.filter(person=>person !== currentGuest?.name).forEach(person=>{ const option=document.createElement('option'); option.value=person; option.textContent=person; dinnerPartner.appendChild(option); }); }
+  function planLabel(value){ return value==='reservation' ? 'Booking a reservation' : value==='cook' ? 'Cooking for the group' : 'Deciding later'; }
+  function findMyDinner(){ const name=currentGuest?.name; if(!name) return null; return dinnerPlan().slots.find(slot=>(slot.leads || []).includes(name)) || null; }
+  function renderTripDashboard(){ const name=currentGuest?.name || rememberedName() || 'Your'; dashboardGuestName.textContent=name ? `${name}’s dashboard` : 'Your dashboard'; const flights=savedFlights(); flightStatusChip.textContent=flights ? 'Flights saved' : 'Flights pending'; const myDinner=findMyDinner(); dinnerStatusChip.textContent=myDinner ? 'Dinner claimed' : 'Dinner unclaimed'; if(myDinner){ const n=niceDinnerDate(myDinner.date); myDinnerTitle.textContent=`${n.weekday}, ${n.day}`; myDinnerMeta.textContent=`${(myDinner.leads || []).join(' + ')} · ${planLabel(myDinner.planType)}${myDinner.title ? ` · ${myDinner.title}` : ''}`; dinnerDate.value=myDinner.date; dinnerPartner.value=(myDinner.leads || []).find(person=>person !== currentGuest?.name) || ''; dinnerPlanType.value=myDinner.planType || ''; dinnerTitle.value=myDinner.title || ''; dinnerNotes.value=myDinner.notes || ''; } else { myDinnerTitle.textContent='Pick a night with a co-lead'; myDinnerMeta.textContent='Each dinner gets two decision makers. Choose whether you’re cooking or booking a reservation.'; }
+    dinnerBoard.innerHTML=dinnerDates.map(date=>{ const slot=dinnerPlan().slots.find(s=>s.date===date) || {date, leads:[]}; const n=niceDinnerDate(date); const leads=(slot.leads || []).length ? slot.leads.join(' + ') : 'Open'; const title=slot.title || (slot.leads?.length ? 'Dinner plan pending' : 'Needs decision makers'); return `<article class="dinner-night"><div class="dinner-date"><span>${escapeHtml(n.weekday)}</span><strong>${escapeHtml(n.day.replace(' ', '<br>'))}</strong></div><div class="dinner-main"><div class="dinner-title">${escapeHtml(title)}</div><div class="dinner-owners">${escapeHtml(leads)}</div><div class="dinner-plan">${escapeHtml(planLabel(slot.planType || 'undecided'))}${slot.notes ? ` · ${escapeHtml(slot.notes)}` : ''}</div></div></article>`; }).join('').replace(/&lt;br&gt;/g,'<br>'); }
+  async function loadDinnerPlan(){ try { const res=await fetch('/api/meals', { cache:'no-store', headers:authHeaders() }); if(!res.ok) throw new Error(`meals ${res.status}`); const payload=await res.json(); cacheDinnerPlan(payload.meals || {slots:[]}); } catch(err){ console.warn('Using saved dinner plan until backend is reachable.', err); cacheDinnerPlan(readLocalDinner()); } populateDinnerSelectors(); renderTripDashboard(); }
+  async function saveDinnerPlan(){ const payload={ date:dinnerDate.value, partner:dinnerPartner.value, planType:dinnerPlanType.value, title:dinnerTitle.value.trim(), notes:dinnerNotes.value.trim(), token:guestToken }; const local=dinnerPlan(); const currentName=currentGuest?.name || fields.name.value; const nextSlots=dinnerDates.map(date=>({date, leads:[...(local.slots.find(s=>s.date===date)?.leads || [])], ...(local.slots.find(s=>s.date===date) || {})})); nextSlots.forEach(slot=>{ slot.leads=(slot.leads || []).filter(person=>person !== currentName && person !== payload.partner); }); const slot=nextSlots.find(s=>s.date===payload.date); if(slot){ slot.leads=[currentName,payload.partner].filter(Boolean); slot.planType=payload.planType; slot.title=payload.title; slot.notes=payload.notes; } cacheDinnerPlan({slots:nextSlots}); renderTripDashboard(); const res=await fetch('/api/meals', { method:'POST', headers:{'content-type':'application/json', ...authHeaders()}, body:JSON.stringify(payload) }); if(!res.ok) throw new Error(`meals ${res.status}`); const data=await res.json(); cacheDinnerPlan(data.meals || dinnerPlan()); renderTripDashboard(); }
+
   let gateBackTarget='home';
   function setGateNav(mode){ closeGate.className = mode === 'back' ? 'back' : 'close'; closeGate.setAttribute('aria-label', mode === 'back' ? 'Back to trip info' : 'Close'); closeGate.textContent = mode === 'back' ? 'Back' : '×'; }
   function openDialog(backTarget='home'){ gateBackTarget=backTarget; setGateNav(backTarget==='tripInfo' ? 'back' : 'close'); hideHomeContent(); dashboard.classList.remove('open'); dashboard.hidden=true; tripInfo.classList.remove('open'); tripInfo.hidden=true; gate.hidden=false; gate.classList.add('open'); if(!currentGuest){ setGateNav('close'); gateTitle.textContent='Hi, tell us who you are.'; gateSubtitle.textContent='You only have to do this once.'; authPane.hidden=false; form.hidden=true; setTimeout(()=>claimNameSelect.focus(),60); return; } gateTitle.textContent='Flight details'; gateSubtitle.textContent='Add your flight information so we can keep track of you.'; authPane.hidden=true; form.hidden=false; fields.name.value=currentGuest.name; fields.name.disabled=true; const current=savedFlights(); if(current) fillForm(current); refreshCopyFlightOptions(); setTimeout(()=>fields.flightStatus.focus(),60); }
@@ -448,11 +511,11 @@
   function timeValue(d,mode=boardMode){ const date=mode==='departures'?d?.departureDate:d?.arrivalDate; const time=mode==='departures'?d?.departureTime:d?.arrivalTime; if(!date) return Infinity; const when=new Date(`${date}T${time || '12:00'}`); return Number.isNaN(when.getTime()) ? Infinity : when.getTime(); }
   function orderedPeople(board){ return crew.map((person,index)=>({person,index,d:board[person]})).sort((a,b)=>{ const av=timeValue(a.d,'arrivals'), bv=timeValue(b.d,'arrivals'); if(av!==bv) return av-bv; return a.index-b.index; }); }
   function renderDashboard(){ const board=flightBoard(); const latest=savedFlights(); if(latest?.name && !board[latest.name]) board[latest.name]=latest; arrivalsBoard.innerHTML=orderedPeople(board).map(({person,d},i)=>{ const has=!!d; const isDepart=boardMode==='departures'; const main=has ? [isDepart?d.departureDate:d.arrivalDate, isDepart?d.departureTime:d.arrivalTime, isDepart?d.departureAirport:d.arrivalAirport].filter(Boolean).join(' · ') : 'Not added yet'; const flight=has ? (isDepart?d.departureFlight:d.arrivalFlight) || d.flightStatus || 'Flight details saved' : 'Waiting'; const noteText=has && d.flightNotes ? d.flightNotes : 'No flight notes yet.'; const notes=escapeHtml(noteText); return `<div class="arrival-row ${has?'':'is-empty'}"><div class="arrival-name">${escapeHtml(person)}</div><div class="arrival-meta">${escapeHtml(main)}</div><div class="arrival-flight">${escapeHtml(flight)}</div><div class="arrival-countdown">${escapeHtml(countdownFor(d,boardMode))}</div><button class="notes-toggle" data-note="note-${boardMode}-${i}" title="Show notes" aria-label="Show notes for ${escapeHtml(person)}">${noteIcon()}</button><div class="arrival-notes" id="note-${boardMode}-${i}" hidden>${notes}</div></div>`; }).join(''); arrivalsBoard.querySelectorAll('.notes-toggle').forEach(btn=>btn.addEventListener('click',()=>{ const note=document.getElementById(btn.dataset.note); note.hidden=!note.hidden; })); }
-  function openTripInfo(){ hideHomeContent(); if(!currentGuest || !savedFlights()){ openDialog(); return; } closeDialog(); closeDash(); tripInfo.hidden=false; tripInfo.classList.add('open'); }
+  function openTripInfo(){ hideHomeContent(); if(!currentGuest){ openDialog(); return; } closeDialog(); closeDash(); populateDinnerSelectors(); renderTripDashboard(); loadDinnerPlan(); tripInfo.hidden=false; tripInfo.classList.add('open'); }
   function closeTripInfoModal(){ tripInfo.classList.remove('open'); setTimeout(()=>{ if(!tripInfo.classList.contains('open')) tripInfo.hidden=true; syncHomeVisibility(); },240); }
   function openDashboard(){ hideHomeContent(); if(!currentGuest || !savedFlights()){ openDialog(); return; } closeDialog(); closeTripInfoModal(); renderDashboard(); dashboard.hidden=false; dashboard.classList.add('open'); }
   function closeDash(){ dashboard.classList.remove('open'); setTimeout(()=>{ if(!dashboard.classList.contains('open')) dashboard.hidden=true; syncHomeVisibility(); },240); }
-  openGate.addEventListener('click', () => savedFlights() ? openTripInfo() : openDialog()); closeGate.addEventListener('click', closeGateAction); gate.addEventListener('click', e=>{ if(e.target===gate) closeDialog(); }); if(closeTripInfo) closeTripInfo.addEventListener('click', closeTripInfoModal); tripInfo.addEventListener('click', e=>{ if(e.target===tripInfo) closeTripInfoModal(); }); openFlights.addEventListener('click', openDashboard); tripInfoEditFlights.addEventListener('click',()=>openDialog('tripInfo')); tripInfoCalendar.addEventListener('click',()=>document.getElementById('addCalendar').click()); closeDashboard.addEventListener('click',()=>{ closeDash(); openTripInfo(); }); dashboard.addEventListener('click', e=>{ if(e.target===dashboard) closeDash(); }); editFlights.addEventListener('click',()=>openDialog('tripInfo')); arrivalsTab.addEventListener('click',()=>setBoardMode('arrivals')); departuresTab.addEventListener('click',()=>setBoardMode('departures')); copyFlightsFrom.addEventListener('change',()=>copyFlightDetailsFrom(copyFlightsFrom.value)); copyFlightsButton.addEventListener('click',()=>copyFlightDetailsFrom(copyFlightsFrom.value)); fields.name.addEventListener('change',()=>{ const selected=fields.name.value; if(selected) localStorage.setItem(NAME_KEY, selected); const local=flightBoard()[selected]; if(local) fillForm(local); loadRemoteState(selected); });
+  openGate.addEventListener('click', () => savedFlights() ? openTripInfo() : openDialog()); closeGate.addEventListener('click', closeGateAction); gate.addEventListener('click', e=>{ if(e.target===gate) closeDialog(); }); if(closeTripInfo) closeTripInfo.addEventListener('click', closeTripInfoModal); tripInfo.addEventListener('click', e=>{ if(e.target===tripInfo) closeTripInfoModal(); }); openFlights.addEventListener('click', openDashboard); tripInfoEditFlights.addEventListener('click',()=>openDialog('tripInfo')); tripInfoCalendar.addEventListener('click',()=>document.getElementById('addCalendar').click()); dinnerForm.addEventListener('submit', async e=>{ e.preventDefault(); if(!dinnerForm.reportValidity()) return; try{ await saveDinnerPlan(); showToast('Dinner night saved'); } catch(err){ console.error(err); showToast('Saved here — backend unreachable'); } }); closeDashboard.addEventListener('click',()=>{ closeDash(); openTripInfo(); }); dashboard.addEventListener('click', e=>{ if(e.target===dashboard) closeDash(); }); editFlights.addEventListener('click',()=>openDialog('tripInfo')); arrivalsTab.addEventListener('click',()=>setBoardMode('arrivals')); departuresTab.addEventListener('click',()=>setBoardMode('departures')); copyFlightsFrom.addEventListener('change',()=>copyFlightDetailsFrom(copyFlightsFrom.value)); fields.name.addEventListener('change',()=>{ const selected=fields.name.value; if(selected) localStorage.setItem(NAME_KEY, selected); const local=flightBoard()[selected]; if(local) fillForm(local); loadRemoteState(selected); });
   function tokenFromUrlHash(){
     const hash=new URLSearchParams((window.location.hash || '').replace(/^#/, ''));
     return hash.get('access_token') || '';
@@ -530,7 +593,7 @@
   let ready=false, posterReady=false, posterUploaded=false;
   poster.onload = () => { posterReady = true; };
   const sourceUrl = video.dataset.src;
-  function nudgeVideo(){ video.play().catch(()=>{}); }
+  function nudgeVideo(){ video.muted=true; video.playsInline=true; video.autoplay=true; video.play().catch(()=>{}); }
   function attachVideoSource(){
     video.src = sourceUrl;
     video.load();
@@ -539,7 +602,7 @@
   video.addEventListener('canplay',()=>{ready=true; video.classList.add('video-ready'); nudgeVideo();});
   video.addEventListener('loadedmetadata',()=>{ready=true; video.classList.add('video-ready'); nudgeVideo();});
   document.addEventListener('visibilitychange',()=>{ if(!document.hidden) nudgeVideo(); });
-  window.addEventListener('click',nudgeVideo,{once:true});
+  window.addEventListener('click',nudgeVideo,{once:true}); window.addEventListener('load',nudgeVideo,{once:true});
   attachVideoSource();
   function frame(now){ const t=now*.001; fadeDisturbance(); addImpulse(); gl.useProgram(prog); gl.uniform2f(loc.resolution,width,height); gl.uniform2f(loc.videoSize,video.videoWidth||poster.naturalWidth||3324,video.videoHeight||poster.naturalHeight||2492); gl.uniform1f(loc.distortion,Number(controls.distortion.value)); gl.uniform1f(loc.shimmer,Number(controls.shimmer.value)); gl.uniform1f(loc.warmth,Number(controls.warmth.value)); gl.uniform1f(loc.waterline,Number(controls.waterline.value)); gl.uniform1f(loc.time,t); gl.uniform1f(loc.mobileShift, mobileQuery.matches ? 0.16 : 0.0); gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,false); gl.activeTexture(gl.TEXTURE1); gl.bindTexture(gl.TEXTURE_2D,disturbTex); gl.texImage2D(gl.TEXTURE_2D,0,gl.LUMINANCE,gl.LUMINANCE,gl.UNSIGNED_BYTE,dCanvas); gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,true); gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D,videoTex); if(ready && video.readyState>=2){ try{ gl.texImage2D(gl.TEXTURE_2D,0,gl.RGB,gl.RGB,gl.UNSIGNED_BYTE,video); posterUploaded=true; canvas.classList.add('webgl-ready'); }catch(err){} } else if(posterReady && !posterUploaded){ try{ gl.texImage2D(gl.TEXTURE_2D,0,gl.RGB,gl.RGB,gl.UNSIGNED_BYTE,poster); posterUploaded=true; }catch(err){} } gl.drawArrays(gl.TRIANGLES,0,6); requestAnimationFrame(frame); } requestAnimationFrame(frame);
 })();
