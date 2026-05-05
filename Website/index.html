@@ -426,9 +426,9 @@
     <form class="dinner-form" id="dinnerForm">
       <div class="field"><label for="dinnerDate">Dinner night</label><select id="dinnerDate" required></select></div>
       <div class="field"><label for="dinnerPartner">Co-lead</label><select id="dinnerPartner" required></select></div>
-      <div class="field"><label for="dinnerPlanType">Plan</label><select id="dinnerPlanType" required><option value="">Choose one</option><option value="reservation">Book a reservation</option><option value="cook">Cook for the group</option><option value="undecided">Decide later</option></select></div>
+      <div class="field"><label for="dinnerPlanType">Plan</label><select id="dinnerPlanType" required><option value="">Choose one</option><option value="reservation">Book a reservation</option><option value="cook">Cook for the group</option><option value="undecided">Decide later</option><option value="other">Other</option></select></div>
       <div class="field"><label for="dinnerTitle">Dinner idea</label><input id="dinnerTitle" placeholder="Seafood night, konoba reservation…"></div>
-      <div class="submit"><small>This is visible to everyone on the dinner board.</small><button type="submit">Save dinner night</button></div>
+      <div class="submit"><small>This is visible to everyone on the dinner board.</small><button type="submit">Save</button></div>
     </form>
   </section>
 </div>
@@ -550,7 +550,7 @@
   function ordinalDay(day){ const mod100=day%100; if(mod100>=11 && mod100<=13) return `${day}th`; return `${day}${day%10===1?'st':day%10===2?'nd':day%10===3?'rd':'th'}`; }
   function longDinnerDate(date){ const d=new Date(`${date}T12:00:00`); return `${d.toLocaleDateString(undefined,{weekday:'long'})}, ${d.toLocaleDateString(undefined,{month:'long'})} ${ordinalDay(d.getDate())}`; }
   function populateDinnerSelectors(){ dinnerDate.innerHTML='<option value="">Choose a night</option>'; dinnerDates.forEach(date=>{ const n=niceDinnerDate(date); const option=document.createElement('option'); option.value=date; option.textContent=`${n.weekday}, ${n.day}`; dinnerDate.appendChild(option); }); dinnerPartner.innerHTML='<option value="">Choose your co-lead</option>'; crewAlphabetical.filter(person=>person !== currentGuest?.name).forEach(person=>{ const option=document.createElement('option'); option.value=person; option.textContent=person; dinnerPartner.appendChild(option); }); }
-  function planLabel(value){ return value==='reservation' ? 'Booking a reservation' : value==='cook' ? 'Cooking for the group' : 'Deciding later'; }
+  function planLabel(value){ return value==='reservation' ? 'Booking a reservation' : value==='cook' ? 'Cooking for the group' : value==='other' ? 'Other' : 'Deciding later'; }
   function dinnerIdeaSummary(slot, partner){ const idea=(slot.title || planLabel(slot.planType || 'undecided')).trim(); return `${idea} with ${partner}.`; }
   function findMyDinner(){ const name=currentGuest?.name; if(!name) return null; return dinnerPlan().slots.find(slot=>(slot.leads || []).includes(name)) || null; }
   function dinnerAssignmentError(currentName, partner){ const slots=dinnerPlan().slots || []; if(currentName && slots.some(slot=>(slot.leads || []).includes(currentName))) return 'You have already been assigned to a dinner.'; if(partner && slots.some(slot=>(slot.leads || []).includes(partner))) return `${partner} has already been assigned to a dinner.`; return ''; }

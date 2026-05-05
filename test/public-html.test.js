@@ -230,15 +230,21 @@ test('flight board shows edit button only on the logged-in user row', () => {
   assert.match(html, /openDialog\('dashboard'\)/);
 });
 
-test('dinner claiming excludes checkout day and has no notes field', () => {
+test('dinner claiming excludes checkout day and keeps dinner plan choices simple', () => {
   assert.match(html, /id="dinnerForm"/);
   assert.match(html, /id="dinnerDate"/);
   assert.match(html, /id="dinnerPartner"/);
   assert.match(html, /id="dinnerPlanType"/);
+  assert.match(html, /<option value="other">Other<\/option>/);
+  assert.match(html, /function planLabel\(value\)\{[^}]*value==='other' \? 'Other'/);
+  assert.match(html, /<button type="submit">Save<\/button>/);
+  assert.doesNotMatch(html, /Save dinner night/);
   assert.doesNotMatch(html, /id="dinnerNotes"/);
+  assert.doesNotMatch(html, /id="dinnerOther"/);
   const dinnerDatesDecl = html.match(/const dinnerDates=\[[^\]]+\]/)?.[0] || '';
   assert.doesNotMatch(dinnerDatesDecl, /'2026-07-04'/);
   assert.doesNotMatch(html, /dinnerNotes/);
+  assert.doesNotMatch(html, /dinnerOther/);
 });
 
 test('dinner plans cards use clear hierarchy, fixed date tiles, and contextual actions', () => {
