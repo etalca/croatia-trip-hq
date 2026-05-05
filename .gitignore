@@ -10,3 +10,5 @@ Website/index-video2-test-start24-not-working-backup.html
 Website/index-video2-test-before-start24.html
 Outputs/Launch/croatia-trip-hq-render-bundle/
 Outputs/Launch/croatia-trip-hq-render-bundle.zip
+.vercel
+.env*.local

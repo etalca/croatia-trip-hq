@@ -277,7 +277,7 @@
 <a class="address" href="https://www.google.com/maps/place/Villa+Darinka/@42.9343666,16.6551014,15.4z/data=!4m9!3m8!1s0x134a73c92d0ce117:0x3fd1fdd80b1a9ee7!5m2!4m1!1i2!8m2!3d42.929621!4d16.6681103!16s%2Fg%2F11c5qpstxg?entry=ttu&g_ep=EgoyMDI2MDQyOS4wIKXMDSoASAFQAw%3D%3D" target="_blank" rel="noreferrer">Villa Darinka<br>Triporte 32, 20270 Vela Luka, Croatia</a>
 <main class="hero-content">
   <section class="center" aria-label="Trip invitation">
-    <h1 id="heroTitle">Your week on Korčula awaits.</h1>
+    <h1 id="heroTitle">Your week on Korcula begins here.</h1>
     <div class="actions">
       <button class="pill primary" id="openGate">Let’s go</button>
       <button class="pill secondary" id="addCalendar">Add to calendar</button>
@@ -286,14 +286,14 @@
 </main>
 <div class="gate" id="gate" role="dialog" aria-modal="true" aria-labelledby="gateTitle" hidden>
   <section class="panel">
-    <header><div><h2 id="gateTitle">Hi, let’s confirm who you are first!</h2><p id="gateSubtitle">Pick your name, add your email, and we’ll send you a magic link. No password needed.</p></div><button class="close" id="closeGate" aria-label="Close">×</button></header>
+    <header><div><h2 id="gateTitle">Hi, let’s confirm who you are first!</h2><p id="gateSubtitle">Don't worry. No password needed.</p></div><button class="close" id="closeGate" aria-label="Close">×</button></header>
     <div class="auth-pane" id="authPane">
       <form id="claimForm" class="claim-form">
         <div class="field full"><label for="claimName">Who are you?</label><select id="claimName" required><option value="">Choose your name</option></select></div>
         <div class="field full"><label for="claimEmail">Email</label><input id="claimEmail" type="email" autocomplete="email" placeholder="you@example.com" required></div>
-        <div class="submit"><small>We’ll use this once to confirm it’s you next time.</small><button type="submit">Send magic link</button></div>
+        <div class="submit"><small>You only have to do this once.</small><button type="submit">Send magic link</button></div>
       </form>
-      <p class="claim-note" id="claimMessage">Once you click the link in your email, this page will turn into your trip page.</p>
+      <p class="claim-note" id="claimMessage" hidden></p>
     </div>
     <form id="tripForm" hidden>
       <div class="field"><label for="name">Name</label><select id="name" required><option value="">Choose your name</option></select></div>
@@ -388,8 +388,8 @@
   if(rememberedName()) fields.name.value=rememberedName();
   function savedFlights(){ return cachedFlights || readLocalFlights(); }
   function authHeaders(){ return authToken ? { authorization:`Bearer ${authToken}` } : {}; }
-  function friendlyTitle(){ heroTitle.textContent = currentGuest?.name ? `${currentGuest.name}, your week on Korčula awaits.` : 'Your week on Korčula awaits.'; }
-  function setClaimMessage(text){ claimMessage.textContent=text; }
+  function friendlyTitle(){ heroTitle.textContent = currentGuest?.name ? `${currentGuest.name}, your week on korcula awaits` : 'Your week on Korcula begins here.'; }
+  function setClaimMessage(text){ claimMessage.textContent=text; claimMessage.hidden = !text; }
   function flightBoard(){ return cachedBoard || readLocalBoard(); }
   function cacheFlightState(data, board){ if(data){ cachedFlights=data; localStorage.setItem('korculaFlightDetails', JSON.stringify(data)); if(data.name) localStorage.setItem(NAME_KEY, data.name); } if(board){ cachedBoard=board; localStorage.setItem('korculaFlightBoard', JSON.stringify(board)); } }
   function clearSavedFlights(){ cachedFlights=null; localStorage.removeItem('korculaFlightDetails'); }
@@ -418,9 +418,9 @@
     cacheFlightState(payload.flights || data, payload.board || localBoard);
     return { remote:true };
   }
-  function setPrimaryCta(){ friendlyTitle(); openGate.textContent = currentGuest ? (savedFlights() ? 'View trip info' : 'Enter flight info') : 'Let’s go'; }
+  function setPrimaryCta(){ friendlyTitle(); openGate.textContent = currentGuest ? (savedFlights() ? 'View trip info' : 'Enter flight details') : 'Let’s go'; }
   function fillForm(data){ if(!data) return; Object.entries(fields).forEach(([k,el])=>{ if(data[k] !== undefined) el.value=data[k]; }); }
-  function openDialog(){ hideHomeContent(); dashboard.classList.remove('open'); dashboard.hidden=true; tripInfo.classList.remove('open'); tripInfo.hidden=true; gate.hidden=false; gate.classList.add('open'); if(!currentGuest){ gateTitle.textContent='Hi, let’s confirm who you are first!'; gateSubtitle.textContent='Pick your name, add your email, and we’ll send you a magic link. No password needed.'; authPane.hidden=false; form.hidden=true; setTimeout(()=>claimNameSelect.focus(),60); return; } gateTitle.textContent='Flight details'; gateSubtitle.textContent='Add your flight information so we can keep track of you.'; authPane.hidden=true; form.hidden=false; fields.name.value=currentGuest.name; fields.name.disabled=true; const current=savedFlights(); if(current) fillForm(current); setTimeout(()=>fields.flightStatus.focus(),60); }
+  function openDialog(){ hideHomeContent(); dashboard.classList.remove('open'); dashboard.hidden=true; tripInfo.classList.remove('open'); tripInfo.hidden=true; gate.hidden=false; gate.classList.add('open'); if(!currentGuest){ gateTitle.textContent='Hi, let’s confirm who you are first!'; gateSubtitle.textContent="Don't worry. No password needed."; authPane.hidden=false; form.hidden=true; setTimeout(()=>claimNameSelect.focus(),60); return; } gateTitle.textContent='Flight details'; gateSubtitle.textContent='Add your flight information so we can keep track of you.'; authPane.hidden=true; form.hidden=false; fields.name.value=currentGuest.name; fields.name.disabled=true; const current=savedFlights(); if(current) fillForm(current); setTimeout(()=>fields.flightStatus.focus(),60); }
   function closeDialog(){ gate.classList.remove('open'); setTimeout(()=>{ if(!gate.classList.contains('open')) gate.hidden=true; syncHomeVisibility(); },240); }
   function countdownFor(d,mode=boardMode){ const date=mode==='departures'?d?.departureDate:d?.arrivalDate; const time=mode==='departures'?d?.departureTime:d?.arrivalTime; if(!date) return 'awaiting flights'; const when=new Date(`${date}T${time || '12:00'}`); if(Number.isNaN(when.getTime())) return 'awaiting flights'; const ms=when-new Date(); if(ms<=0) return mode==='departures' ? 'departed' : 'arrived'; const days=Math.floor(ms/86400000); const hours=Math.floor((ms%86400000)/3600000); return days>0 ? `${days}d ${hours}h` : `${Math.max(1,hours)}h`; }
   function setBoardMode(mode){ boardMode=mode; arrivalsTab.classList.toggle('active',mode==='arrivals'); departuresTab.classList.toggle('active',mode==='departures'); arrivalsTab.setAttribute('aria-selected',mode==='arrivals'); departuresTab.setAttribute('aria-selected',mode==='departures'); renderDashboard(); }
