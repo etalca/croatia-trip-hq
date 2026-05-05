@@ -93,13 +93,24 @@ test('dinner summary card is a clickable dinner picker shortcut', () => {
   assert.match(html, /myDinnerCard=document\.getElementById\('myDinnerCard'\)/);
 });
 
-test('main dashboard summarizes only the current guest dinner and replaces Calendar card with Dinner plans', () => {
+test('main dashboard summarizes only dinner and dinner plans, not flight details or villa cards', () => {
   const tripInfoBlock = html.slice(html.indexOf('id="tripInfo"'), html.indexOf('id="dinnerPicker"'));
   assert.match(tripInfoBlock, /id="myDinnerMeta"/);
   assert.match(html, /You’re responsible for dinner plans on/);
   assert.match(tripInfoBlock, /<button class="info-card" id="openDinnerPlans" type="button"><span>Dinner plans<\/span>/);
+  assert.doesNotMatch(tripInfoBlock, /id="tripInfoEditFlights"/);
+  assert.doesNotMatch(tripInfoBlock, /<span>My flight details<\/span>/);
+  assert.doesNotMatch(tripInfoBlock, /<span>Villa<\/span>/);
   assert.doesNotMatch(tripInfoBlock, /id="tripInfoCalendar"/);
   assert.doesNotMatch(tripInfoBlock, /<span>Calendar<\/span>/);
+});
+
+test('flight board shows edit button only on the logged-in user row', () => {
+  assert.match(html, /\.arrival-edit/);
+  assert.match(html, /const canEdit=person===currentGuest\?\.name/);
+  assert.match(html, /canEdit \? `<button class="arrival-edit"/);
+  assert.match(html, /arrivalsBoard\.querySelectorAll\('\.arrival-edit'\)\.forEach/);
+  assert.match(html, /openDialog\('dashboard'\)/);
 });
 
 test('dinner claiming excludes checkout day and has no notes field', () => {
