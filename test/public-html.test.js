@@ -34,16 +34,42 @@ test('hero video is configured for Safari-friendly autoplay on load', () => {
   assert.match(html, /video\.play\(\)\.catch/);
 });
 
-test('trip info heading is personalized and todo chips show completion icons', () => {
+test('trip info heading is personalized as a trip dashboard and todo chips show completion icons', () => {
   assert.doesNotMatch(html, />Trip dashboard<\/h2>/);
   assert.doesNotMatch(html, /Your home base for flights, dinner responsibilities, tasks, and the useful trip stuff\./);
-  assert.match(html, /<h2 class="dashboard-name" id="dashboardGuestName">Your dashboard<\/h2>/);
-  assert.match(html, /class="todo-chip/);
+  assert.match(html, /<h2 class="dashboard-name" id="dashboardGuestName">Your trip dashboard<\/h2>/);
+  assert.match(html, /\$\{name\}’s trip dashboard/);
+  assert.match(html, /<button class="todo-chip/);
   assert.match(html, /function todoIcon\(done\)/);
   assert.match(html, /Dinner claimed/);
   assert.match(html, /Claim a dinner/);
   assert.match(html, /✓/);
   assert.match(html, /○/);
+});
+
+test('undone todo chips are visually ordered before completed todos', () => {
+  assert.match(html, /\.todo-chip:not\(\.done\) \{ order: 1; \}/);
+  assert.match(html, /\.todo-chip\.done \{[^}]*order: 2;/s);
+});
+
+test('dinner claiming is in a separate picker window and not stuffed into the main dashboard', () => {
+  assert.match(html, /id="dinnerPicker"/);
+  assert.match(html, /aria-labelledby="dinnerPickerTitle"/);
+  assert.match(html, /id="closeDinnerPicker"/);
+  assert.match(html, /function openDinnerPicker\(\)/);
+  assert.match(html, /function closeDinnerPicker\(\)/);
+  assert.ok(
+    html.indexOf('id="dinnerPicker"') > html.indexOf('id="tripInfo"'),
+    'dinner picker should be a separate modal after the main trip dashboard',
+  );
+  const tripInfoBlock = html.slice(html.indexOf('id="tripInfo"'), html.indexOf('id="dinnerPicker"'));
+  assert.doesNotMatch(tripInfoBlock, /id="dinnerForm"/);
+  assert.doesNotMatch(tripInfoBlock, /id="dinnerDate"/);
+});
+
+test('todo chips route to the right detail windows', () => {
+  assert.match(html, /flightStatusChip\.addEventListener\('click',\(\)=>\{ if\(savedFlights\(\)\) openDashboard\(\); else openDialog\('tripInfo'\); \}\)/);
+  assert.match(html, /dinnerStatusChip\.addEventListener\('click',openDinnerPicker\)/);
 });
 
 test('dinner claiming excludes checkout day and has no notes field', () => {
