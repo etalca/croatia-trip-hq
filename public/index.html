@@ -232,17 +232,50 @@
   .fallback.show { visibility: visible; }
   @media (max-width: 760px) {
     .poster-img, video { object-position: 66% center; }
-    .address { max-width: 52vw; font-size: 12px; }
+    .countdown { top: max(18px, env(safe-area-inset-top)); left: 16px; }
     .countdown span { font-size: 12px; }
+    .address { top: max(18px, env(safe-area-inset-top)); right: 16px; max-width: 50vw; font-size: 12px; }
     .hero-content { padding: 22px; }
     .center { gap: 18px; }
-    .actions { gap: 9px; }
-    .pill { min-height: 25.5px; height: 25.5px; padding: 0 10px; }
-    .arrival-row { grid-template-columns: 1fr 25.5px; }
-    .arrival-meta, .arrival-flight, .arrival-countdown { grid-column: 1 / 2; }
-    .trip-info-grid { grid-template-columns: 1fr; }
-    form { grid-template-columns: 1fr; }
-    .submit { display: grid; }
+    h1 { max-width: 330px; font-size: clamp(28px, 8vw, 34px); }
+    .actions { width: min(100%, 330px); gap: 9px; }
+    .pill { min-height: 44px; height: 44px; padding: 0 16px; }
+    .pill:hover { transform: none; }
+    .gate, .dashboard { place-items: stretch; padding: max(10px, env(safe-area-inset-top)) 10px max(10px, env(safe-area-inset-bottom)); }
+    .panel, .dashboard-card { width: 100%; max-height: calc(100svh - 20px); border-radius: 20px; padding: 16px; }
+    .panel header, .dashboard-card header { gap: 12px; margin-bottom: 14px; align-items: flex-start; }
+    .panel h2, .dashboard-card h2 { font-size: 26px; line-height: 1.08; }
+    .panel p, .dashboard-card p { font-size: 13px; line-height: 1.32; }
+    .close, .back, .board-tab, .notes-toggle, .submit button { min-height: 44px; }
+    .close, .notes-toggle { width: 44px; height: 44px; flex: 0 0 44px; }
+    .back { height: 44px; padding: 0 16px; }
+    form { grid-template-columns: minmax(0, 1fr); gap: 12px; padding: 3px 3px 1px; margin: -3px -3px 0; min-width: 0; }
+    .field { min-width: 0; }
+    input, select, textarea { min-width: 0; height: 44px; padding: 0 12px; font-size: 16px; border-radius: 18px; }
+    select { padding-right: 36px; background-position: calc(100% - 20px) 19px, calc(100% - 15px) 19px; }
+    input[type="date"], input[type="time"] { -webkit-appearance: none; appearance: none; padding-right: 10px; }
+    input[type="date"]::-webkit-date-and-time-value, input[type="time"]::-webkit-date-and-time-value { text-align: left; }
+    textarea { min-height: 92px; padding: 11px 12px; }
+    .submit { display: grid; gap: 10px; margin-top: 4px; }
+    .submit button { width: 100%; padding: 0 16px; }
+    .dashboard-card { min-height: min(680px, calc(100svh - 20px)); }
+    #tripInfo { place-items: center; }
+    #tripInfo .dashboard-card { min-height: 0; max-height: calc(100svh - 20px); align-self: center; }
+    .trip-info-grid { grid-template-columns: 1fr; gap: 10px; padding: 2px 2px 1px; overflow-y: auto; min-height: 0; }
+    .info-card { min-height: 86px; padding: 14px; border-radius: 16px; transform: none !important; }
+    .info-card span:first-child { font-size: 15px; }
+    .info-card span:last-child { font-size: 13px; line-height: 1.34; }
+    .board-tabs { align-self: stretch; display: grid; grid-template-columns: 1fr 1fr; margin-bottom: 10px; }
+    .board-tab { height: 44px; }
+    .arrivals-board { flex: 1 1 auto; min-height: 0; gap: 10px; margin-bottom: 14px; padding-right: 0; }
+    .arrival-row { grid-template-columns: minmax(0, 1fr) 44px; gap: 6px 10px; align-items: start; padding: 12px; border-radius: 16px; }
+    .arrival-name { font-size: 15px; line-height: 1.2; }
+    .arrival-meta, .arrival-flight, .arrival-countdown { grid-column: 1 / 2; line-height: 1.32; overflow-wrap: anywhere; }
+    .arrival-countdown { white-space: normal; }
+    .arrival-notes { padding: 10px 12px; border-radius: 13px; }
+    .dashboard-actions { display: grid; }
+    .dashboard-actions .pill { width: 100%; }
+    .toast { bottom: max(16px, env(safe-area-inset-bottom)); max-width: calc(100vw - 32px); text-align: center; }
   }
   @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
 </style>
@@ -478,8 +511,9 @@
   const dCanvas=document.createElement('canvas'); dCanvas.width=256; dCanvas.height=256; const dctx=dCanvas.getContext('2d',{alpha:false}); dctx.fillStyle='black'; dctx.fillRect(0,0,256,256);
   let width=0,height=0,dpr=1; function resize(){ dpr=Math.min(2,window.devicePixelRatio||1); width=Math.floor(window.innerWidth*dpr); height=Math.floor(window.innerHeight*dpr); canvas.width=width; canvas.height=height; gl.viewport(0,0,width,height); } window.addEventListener('resize',resize,{passive:true});
   resize();
-  const pointer={x:.5,y:.5,px:.5,py:.5,down:false,active:false,speed:0}; function setPointer(e){ const x=e.clientX/window.innerWidth, y=e.clientY/window.innerHeight; pointer.speed=Math.hypot(x-pointer.x,y-pointer.y); pointer.px=pointer.x; pointer.py=pointer.y; pointer.x=x; pointer.y=y; pointer.active=true; } window.addEventListener('pointermove',setPointer,{passive:true}); window.addEventListener('pointerdown',e=>{pointer.down=true; setPointer(e);},{passive:true}); window.addEventListener('pointerup',()=>pointer.down=false,{passive:true});
-  function addImpulse(){ const r=Number(controls.radius.value); const waterline=Number(controls.waterline.value); const strength=Math.min(1,.18+pointer.speed*34+(pointer.down?.18:0)); if(!pointer.active || pointer.y < waterline-.01 || strength < .04) return; const x=pointer.x*256; const y=(1-pointer.y)*256; const g=dctx.createRadialGradient(x,y,0,x,y,r); g.addColorStop(0,`rgba(255,255,255,${.50*strength})`); g.addColorStop(.32,`rgba(190,220,255,${.22*strength})`); g.addColorStop(1,'rgba(0,0,0,0)'); dctx.globalCompositeOperation='lighter'; dctx.fillStyle=g; dctx.beginPath(); dctx.arc(x,y,r,0,Math.PI*2); dctx.fill(); dctx.globalCompositeOperation='source-over'; }
+  const mobileQuery=window.matchMedia('(max-width: 760px)');
+  const pointer={x:.5,y:.5,px:.5,py:.5,down:false,active:false,speed:0}; function setPointer(e){ if(mobileQuery.matches) return; const x=e.clientX/window.innerWidth, y=e.clientY/window.innerHeight; pointer.speed=Math.hypot(x-pointer.x,y-pointer.y); pointer.px=pointer.x; pointer.py=pointer.y; pointer.x=x; pointer.y=y; pointer.active=true; } window.addEventListener('pointermove',setPointer,{passive:true}); window.addEventListener('pointerdown',e=>{ if(mobileQuery.matches) return; pointer.down=true; setPointer(e);},{passive:true}); window.addEventListener('pointerup',()=>pointer.down=false,{passive:true});
+  function addImpulse(){ if(mobileQuery.matches) return; const r=Number(controls.radius.value); const waterline=Number(controls.waterline.value); const strength=Math.min(1,.18+pointer.speed*34+(pointer.down?.18:0)); if(!pointer.active || pointer.y < waterline-.01 || strength < .04) return; const x=pointer.x*256; const y=(1-pointer.y)*256; const g=dctx.createRadialGradient(x,y,0,x,y,r); g.addColorStop(0,`rgba(255,255,255,${.50*strength})`); g.addColorStop(.32,`rgba(190,220,255,${.22*strength})`); g.addColorStop(1,'rgba(0,0,0,0)'); dctx.globalCompositeOperation='lighter'; dctx.fillStyle=g; dctx.beginPath(); dctx.arc(x,y,r,0,Math.PI*2); dctx.fill(); dctx.globalCompositeOperation='source-over'; }
   function fadeDisturbance(){ dctx.globalCompositeOperation='source-over'; dctx.fillStyle=`rgba(0,0,0,${1-Number(controls.fade.value)})`; dctx.fillRect(0,0,256,256); }
   let ready=false, posterReady=false, posterUploaded=false;
   poster.onload = () => { posterReady = true; };
@@ -495,7 +529,7 @@
   document.addEventListener('visibilitychange',()=>{ if(!document.hidden) nudgeVideo(); });
   window.addEventListener('click',nudgeVideo,{once:true});
   attachVideoSource();
-  function frame(now){ const t=now*.001; fadeDisturbance(); addImpulse(); gl.useProgram(prog); gl.uniform2f(loc.resolution,width,height); gl.uniform2f(loc.videoSize,video.videoWidth||poster.naturalWidth||3324,video.videoHeight||poster.naturalHeight||2492); gl.uniform1f(loc.distortion,Number(controls.distortion.value)); gl.uniform1f(loc.shimmer,Number(controls.shimmer.value)); gl.uniform1f(loc.warmth,Number(controls.warmth.value)); gl.uniform1f(loc.waterline,Number(controls.waterline.value)); gl.uniform1f(loc.time,t); gl.uniform1f(loc.mobileShift, window.matchMedia('(max-width: 760px)').matches ? 0.16 : 0.0); gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,false); gl.activeTexture(gl.TEXTURE1); gl.bindTexture(gl.TEXTURE_2D,disturbTex); gl.texImage2D(gl.TEXTURE_2D,0,gl.LUMINANCE,gl.LUMINANCE,gl.UNSIGNED_BYTE,dCanvas); gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,true); gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D,videoTex); if(ready && video.readyState>=2){ try{ gl.texImage2D(gl.TEXTURE_2D,0,gl.RGB,gl.RGB,gl.UNSIGNED_BYTE,video); posterUploaded=true; canvas.classList.add('webgl-ready'); }catch(err){} } else if(posterReady && !posterUploaded){ try{ gl.texImage2D(gl.TEXTURE_2D,0,gl.RGB,gl.RGB,gl.UNSIGNED_BYTE,poster); posterUploaded=true; }catch(err){} } gl.drawArrays(gl.TRIANGLES,0,6); requestAnimationFrame(frame); } requestAnimationFrame(frame);
+  function frame(now){ const t=now*.001; fadeDisturbance(); addImpulse(); gl.useProgram(prog); gl.uniform2f(loc.resolution,width,height); gl.uniform2f(loc.videoSize,video.videoWidth||poster.naturalWidth||3324,video.videoHeight||poster.naturalHeight||2492); gl.uniform1f(loc.distortion,Number(controls.distortion.value)); gl.uniform1f(loc.shimmer,Number(controls.shimmer.value)); gl.uniform1f(loc.warmth,Number(controls.warmth.value)); gl.uniform1f(loc.waterline,Number(controls.waterline.value)); gl.uniform1f(loc.time,t); gl.uniform1f(loc.mobileShift, mobileQuery.matches ? 0.16 : 0.0); gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,false); gl.activeTexture(gl.TEXTURE1); gl.bindTexture(gl.TEXTURE_2D,disturbTex); gl.texImage2D(gl.TEXTURE_2D,0,gl.LUMINANCE,gl.LUMINANCE,gl.UNSIGNED_BYTE,dCanvas); gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,true); gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D,videoTex); if(ready && video.readyState>=2){ try{ gl.texImage2D(gl.TEXTURE_2D,0,gl.RGB,gl.RGB,gl.UNSIGNED_BYTE,video); posterUploaded=true; canvas.classList.add('webgl-ready'); }catch(err){} } else if(posterReady && !posterUploaded){ try{ gl.texImage2D(gl.TEXTURE_2D,0,gl.RGB,gl.RGB,gl.UNSIGNED_BYTE,poster); posterUploaded=true; }catch(err){} } gl.drawArrays(gl.TRIANGLES,0,6); requestAnimationFrame(frame); } requestAnimationFrame(frame);
 })();
 </script>
 </body>
