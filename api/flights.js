@@ -14,9 +14,14 @@ module.exports = async function handler(req, res) {
     if (!person) return sendJson(res, 400, { ok: false, error: 'Choose a valid trip guest' });
     const identityKey = guest ? token : nameKey(person);
     const record = sanitizeFlight(body.data || {}, person);
-    db.flights[identityKey] = { ...record, updatedAt: new Date().toISOString() };
+    const hasFlightDetails = Object.entries(record).some(([key, value]) => key !== 'name' && String(value || '').trim());
+    if (hasFlightDetails) {
+      db.flights[identityKey] = { ...record, updatedAt: new Date().toISOString() };
+    } else {
+      delete db.flights[identityKey];
+    }
     await writeDb(db);
-    return sendJson(res, 200, { ok: true, person, flights: db.flights[identityKey], board: publicBoard(db) });
+    return sendJson(res, 200, { ok: true, person, flights: db.flights[identityKey] || null, board: publicBoard(db) });
   } catch (err) {
     console.error(err);
     return sendJson(res, 500, { ok: false, error: 'Server error' });
