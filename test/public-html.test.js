@@ -2,12 +2,17 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
+const crypto = require('node:crypto');
 
 const html = fs.readFileSync(path.join(__dirname, '..', 'public', 'index.html'), 'utf8');
 const publicAssets = path.join(__dirname, '..', 'public', 'assets');
 
 test('expand icon asset is available for itinerary day cards', () => {
-  assert.ok(fs.existsSync(path.join(publicAssets, 'Expand icon.png')));
+  const expandIcon = fs.readFileSync(path.join(publicAssets, 'Expand icon.png'));
+  assert.equal(
+    crypto.createHash('sha256').update(expandIcon).digest('hex'),
+    '6816d2bb00c694912e9dc55f1ff0b47d2b1e1c2e8d8aa5d46d6afc61897414c4',
+  );
 });
 
 test('flight form exposes a copy-flight selector before manual flight fields without an extra button', () => {
@@ -183,15 +188,32 @@ test('dashboard itinerary cards use subtle expand icons to open an iCal-style da
   assert.match(html, /id="dayView"/);
   assert.match(html, /id="dayViewTimeline"/);
   assert.match(html, /id="closeDayView"/);
+  assert.match(html, /id="previousDayView"/);
+  assert.match(html, /id="nextDayView"/);
+  assert.match(html, /<div class="day-view-nav" aria-label="Change day"><button class="back" id="previousDayView" type="button">Previous day<\/button><button class="back" id="nextDayView" type="button">Next day<\/button><\/div>/);
   assert.match(html, /function openDayView\(date\)/);
+  assert.match(html, /let activeDayViewDate=''/);
   assert.match(html, /function closeDayView\(\)/);
   assert.match(html, /function renderDayView\(date, events\)/);
+  assert.match(html, /function moveDayView\(direction\)/);
+  assert.match(html, /activeDayViewDate=date/);
+  assert.match(html, /const allDays=tripItineraryDays\(\)/);
+  assert.match(html, /previousDayViewButton\.disabled=index<=0/);
+  assert.match(html, /nextDayViewButton\.disabled=index>=allDays\.length-1/);
+  assert.match(html, /previousDayViewButton\.addEventListener\('click',\(\)=>moveDayView\(-1\)\)/);
+  assert.match(html, /nextDayViewButton\.addEventListener\('click',\(\)=>moveDayView\(1\)\)/);
   assert.match(html, /function eventBlockStyle\(event\)/);
   assert.match(html, /top:\$\{Math\.max\(0, parseEventMinute\(event\)-480\)\*DAY_VIEW_PX_PER_MINUTE\}px/);
   assert.match(html, /height:\$\{Math\.max\(34, eventDurationMinutes\(event\)\*DAY_VIEW_PX_PER_MINUTE\)\}px/);
   assert.match(html, /<button class="calendar-expand-icon" type="button" title="View full day" aria-label="View full day for \$\{escapeHtml\(full\)\}" data-date="\$\{escapeHtml\(date\)\}"><img src="assets\/Expand icon\.png" alt=""><\/button>/);
+  assert.match(html, /const moreIndicator=needsExpand \? '<div class="calendar-more" aria-label="More events">•••<\/div>' : ''/);
+  assert.match(html, /\$\{events\}\$\{moreIndicator\}/);
   assert.match(html, /\.calendar-expand-icon \{[^}]*position: absolute;[^}]*top: 8px;[^}]*right: 8px;[^}]*width: 22px;[^}]*height: 22px;[^}]*opacity: \.2;/s);
+  assert.match(html, /\.calendar-more \{[^}]*font-size: 18px;[^}]*line-height: 1;[^}]*color: rgba\(255,255,255,\.54\);/s);
   assert.match(html, /\.day-view-timeline/);
+  assert.match(html, /\.day-view-card \{[^}]*overflow: hidden;[^}]*min-height: 0;/s);
+  assert.match(html, /\.day-view-scroll \{[^}]*overflow-y: auto;[^}]*min-height: 0;/s);
+  assert.match(html, /\.day-view-nav \{[^}]*display: flex;[^}]*justify-content: flex-end;/s);
   assert.match(html, /\.day-view-event \{[^}]*position: absolute;/s);
   assert.match(html, /closeDayViewButton\.addEventListener\('click',closeDayView\)/);
   assert.match(html, /openTripInfo\(\)/);
