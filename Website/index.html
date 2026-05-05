@@ -30,7 +30,7 @@
   .poster-img, #waterVideo, #gl { position: absolute; inset: 0; width: 100%; height: 100%; min-width: 100%; min-height: 100%; display: block; }
   .poster-img, #waterVideo { object-fit: cover; object-position: center; }
   .poster-img { z-index: 0; }
-  #waterVideo { z-index: 1; opacity: 0; transition: opacity .2s ease; }
+  #waterVideo { z-index: 1; opacity: 1; }
   #waterVideo.video-ready { opacity: 1 !important; }
   #gl { z-index: 2; opacity: 0; transition: opacity .2s ease; }
   #gl.webgl-ready { opacity: 1 !important; }
@@ -245,8 +245,10 @@
   .dashboard-actions { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-start; }
   .dashboard-hero { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-bottom: 10px; }
   .personal-card, .dinner-card { border: 1px solid rgba(255,255,255,.22); border-radius: 17px; background: rgba(255,255,255,.12); padding: 14px; }
-  .personal-card { appearance: none; width: 100%; display: grid; gap: 8px; align-content: start; text-align: left; color: white; cursor: pointer; transition: background .22s ease, border-color .22s ease; }
+  .personal-card { appearance: none; position: relative; width: 100%; display: grid; gap: 8px; align-content: start; text-align: left; color: white; cursor: pointer; padding: 14px 42px 14px 14px; transition: background .22s ease, border-color .22s ease; }
   .personal-card:hover, .personal-card:focus-visible { background: rgba(255,255,255,.20); border-color: rgba(255,255,255,.40); }
+  .dashboard-card-expand { position: absolute; top: 10px; right: 10px; width: 22px; height: 22px; display: block; opacity: .2; pointer-events: none; transition: opacity .18s ease, transform .18s ease; }
+  .personal-card:hover .dashboard-card-expand, .personal-card:focus-visible .dashboard-card-expand { opacity: .42; transform: scale(1.04); }
   .dashboard-kicker { margin: 0; color: rgba(255,255,255,.62); font-size: 13px; line-height: 1.2; }
   .dashboard-name { margin: 0; font-size: 24px; line-height: 1.04; font-weight: 400; }
   .dashboard-status { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 10px; }
@@ -427,11 +429,13 @@
     <div class="trip-info-scroll">
     <div class="dashboard-hero">
       <button class="personal-card" id="myDinnerCard" type="button" aria-label="Choose your dinner night">
+        <img class="dashboard-card-expand" src="assets/Expand icon.svg" alt="" aria-hidden="true">
         <p class="dashboard-kicker" id="myDinnerKicker">Your dinner night</p>
         <h3 class="dashboard-name" id="myDinnerTitle">Choose your dinner night</h3>
         <p id="myDinnerMeta">You’ll see your dinner responsibility here once you claim a night.</p>
       </button>
       <button class="personal-card" id="myFlightCard" type="button" aria-label="View your flight arrival">
+        <img class="dashboard-card-expand" src="assets/Expand icon.svg" alt="" aria-hidden="true">
         <p class="dashboard-kicker" id="myFlightKicker">You’re flight arrives in</p>
         <h3 class="dashboard-name" id="myFlightTitle">Add flight details</h3>
         <p id="myFlightMeta">We’ll show who you’re arriving with here.</p>

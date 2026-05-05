@@ -74,7 +74,8 @@ test('mobile hero uses dynamic viewport and cover video sizing without safe-area
   assert.match(html, /#stage \{[^}]*position: fixed;[^}]*inset: 0;[^}]*width: 100vw;[^}]*height: 100dvh;[^}]*min-height: 100dvh;[^}]*overflow: hidden;/s);
   assert.match(html, /\.poster-img, #waterVideo, #gl \{[^}]*position: absolute;[^}]*inset: 0;[^}]*width: 100%;[^}]*height: 100%;[^}]*min-width: 100%;[^}]*min-height: 100%;/s);
   assert.match(html, /\.poster-img, #waterVideo \{[^}]*object-fit: cover;[^}]*object-position: center;/s);
-  assert.match(html, /#waterVideo \{[^}]*z-index: 1;[^}]*opacity: 0;/s);
+  assert.match(html, /#waterVideo \{[^}]*z-index: 1;[^}]*opacity: 1;/s);
+  assert.doesNotMatch(html, /#waterVideo \{[^}]*opacity: 0;/s);
   assert.match(html, /#waterVideo\.video-ready \{ opacity: 1 !important; \}/);
   assert.match(html, /#gl\.webgl-ready \{ opacity: 1 !important; \}/);
   assert.match(html, /@media \(max-width: 760px\) \{\n    \.poster-img, #waterVideo \{ object-position: center; transform: none; transform-origin: center center; \}/);
@@ -270,8 +271,23 @@ test('todo chips and summary cards route to the right detail windows', () => {
 
 test('dinner summary card opens plans after claimed dinner and picker before claiming', () => {
   assert.match(html, /<button class="personal-card" id="myDinnerCard" type="button"/);
+  assert.match(html, /<img class="dashboard-card-expand" src="assets\/Expand icon\.svg" alt="" aria-hidden="true">\s*<p class="dashboard-kicker" id="myDinnerKicker">Your dinner night<\/p>/);
   assert.match(html, /myDinnerCard\.addEventListener\('click',\(\)=>\{ if\(findMyDinner\(\)\) openDinnerPlans\(\); else openDinnerPicker\('tripInfo'\); \}\)/);
   assert.match(html, /myDinnerCard=document\.getElementById\('myDinnerCard'\)/);
+});
+
+test('trip dashboard clickable cards show expand affordances and scroll below sticky todos', () => {
+  const tripInfoBlock = html.slice(html.indexOf('id="tripInfo"'), html.indexOf('id="dinnerPicker"'));
+  assert.match(tripInfoBlock, /<header><div><h2 class="dashboard-name" id="dashboardGuestName">Hi<\/h2><div class="dashboard-status"/);
+  assert.match(tripInfoBlock, /<div class="trip-info-scroll">\s*<div class="dashboard-hero">/);
+  assert.match(tripInfoBlock, /id="myDinnerCard"[\s\S]*?<img class="dashboard-card-expand" src="assets\/Expand icon\.svg" alt="" aria-hidden="true">/);
+  assert.match(tripInfoBlock, /id="myFlightCard"[\s\S]*?<img class="dashboard-card-expand" src="assets\/Expand icon\.svg" alt="" aria-hidden="true">/);
+  assert.match(tripInfoBlock, /<section class="calendar-list embedded-itinerary" id="calendarItems" aria-label="Trip itinerary"><\/section>\s*<\/div>/);
+  assert.match(html, /#tripInfo \.dashboard-card header \{ flex: 0 0 auto; \}/);
+  assert.match(html, /#tripInfo \.trip-info-scroll \{ overflow-y: auto; min-height: 0; display: grid; gap: 10px; scrollbar-width: none; \}/);
+  assert.match(html, /#tripInfo \.trip-info-scroll::-webkit-scrollbar \{ display: none; \}/);
+  assert.match(html, /\.personal-card \{[^}]*position: relative;[^}]*padding: 14px 42px 14px 14px;/s);
+  assert.match(html, /\.dashboard-card-expand \{[^}]*position: absolute;[^}]*top: 10px;[^}]*right: 10px;[^}]*width: 22px;[^}]*height: 22px;[^}]*opacity: \.2;/s);
 });
 
 test('claimed dinner card puts the prompt above, date as title, and co-lead below', () => {
@@ -302,7 +318,8 @@ test('main dashboard is a hub with only dinner, flight, and embedded itinerary c
 test('flight board edit button stays visible beside the info icon without changing row content', () => {
   assert.match(html, /\.arrival-row \{[^}]*position: relative;[^}]*grid-template-columns: minmax\(86px, 1fr\) minmax\(190px, 1\.45fr\) minmax\(86px, \.8fr\) minmax\(104px, \.72fr\);/s);
   assert.match(html, /\.arrival-actions \{[^}]*position: absolute;[^}]*top: 8px;[^}]*right: 8px;[^}]*display: inline-flex;/s);
-  assert.match(html, /\.arrival-edit \{[^}]*height: 25\.5px;[^}]*opacity: 1;[^}]*pointer-events: auto;/s);
+  assert.match(html, /\.arrival-edit \{[^}]*height: 25\.5px;[^}]*border-radius: 999px;[^}]*background: rgba\(255,255,255,\.14\);[^}]*padding: 0 10px;[^}]*font-size: 13px;[^}]*opacity: 1;[^}]*pointer-events: auto;/s);
+  assert.match(html, /\.notes-toggle \{ width: 25\.5px; height: 25\.5px;/);
   assert.match(html, /<div class="arrival-actions">\$\{editButton\}<button class="notes-toggle"/);
 });
 
