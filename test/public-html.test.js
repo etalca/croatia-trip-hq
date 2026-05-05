@@ -75,6 +75,8 @@ test('mobile hero uses dynamic viewport and cover video sizing without safe-area
   assert.match(html, /\.poster-img, #waterVideo, #gl \{[^}]*position: absolute;[^}]*inset: 0;[^}]*width: 100%;[^}]*height: 100%;[^}]*min-width: 100%;[^}]*min-height: 100%;/s);
   assert.match(html, /\.poster-img, #waterVideo \{[^}]*object-fit: cover;[^}]*object-position: center;/s);
   assert.match(html, /#waterVideo \{[^}]*z-index: 1;[^}]*opacity: 0;/s);
+  assert.match(html, /#waterVideo\.video-ready \{ opacity: 1 !important; \}/);
+  assert.match(html, /#gl\.webgl-ready \{ opacity: 1 !important; \}/);
   assert.match(html, /@media \(max-width: 760px\) \{\n    \.poster-img, #waterVideo \{ object-position: center; transform: none; transform-origin: center center; \}/);
   assert.doesNotMatch(html, /\.hero-content \{[^}]*padding:[^}]*env\(safe-area-inset-bottom/s);
   assert.doesNotMatch(html, /#stage \{[^}]*bottom: calc\(env\(safe-area-inset-bottom/s);
