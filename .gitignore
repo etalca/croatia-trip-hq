@@ -1,0 +1,12 @@
+node_modules/
+.DS_Store
+.env
+.env.*
+*.log
+Server/trip-data.json.tmp
+Data/InviteTokens.json
+Website/index-*-backup*.html
+Website/index-video2-test-start24-not-working-backup.html
+Website/index-video2-test-before-start24.html
+Outputs/Launch/croatia-trip-hq-render-bundle/
+Outputs/Launch/croatia-trip-hq-render-bundle.zip

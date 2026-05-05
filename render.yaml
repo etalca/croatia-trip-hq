@@ -1,0 +1,16 @@
+services:
+  - type: web
+    name: croatia-trip-hq
+    runtime: node
+    plan: starter
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_VERSION
+        value: 22
+      - key: DATA_PATH
+        value: /var/data/trip-data.json
+    disk:
+      name: croatia-trip-data
+      mountPath: /var/data
+      sizeGB: 1
