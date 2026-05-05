@@ -117,10 +117,11 @@ test('dinner claiming and dinner plans are separate windows, not stuffed into th
 test('dashboard itinerary view uses a week-view calendar layout with core trip events', () => {
   const tripInfoBlock = html.slice(html.indexOf('id="tripInfo"'), html.indexOf('id="dinnerPicker"'));
   assert.match(tripInfoBlock, /id="openCalendarView"/);
-  assert.match(tripInfoBlock, /<span>Itinerary<\/span><span>View an overview of what each day will hold\.<\/span>/);
+  assert.match(tripInfoBlock, /<span>Itinerary<\/span><span>An overview of what each day will hold\.<\/span>/);
   assert.match(html, /id="calendarView"/);
   assert.match(html, /aria-labelledby="calendarViewTitle"/);
   assert.match(html, /<h2 id="calendarViewTitle">Itinerary<\/h2>/);
+  assert.match(html, /The calendar will fill up as people select their dinner responsibilities and activities are scheduled\./);
   assert.match(html, /id="calendarItems"/);
   assert.match(html, /\.calendar-week \{/);
   assert.match(html, /\.calendar-day \{/);
@@ -207,8 +208,8 @@ test('dinner plans cards use clear hierarchy, fixed date tiles, and contextual a
   assert.match(html, /\.dinner-night \{[^}]*align-items: center;/s);
   assert.match(html, /\.dinner-date \{[^}]*align-self: center;[^}]*height: 54px;[^}]*padding: 6px 4px;[^}]*font-size: 10px;/s);
   assert.match(html, /\.dinner-date strong \{[^}]*font-size: 14px;/s);
-  assert.match(html, /\.dinner-main \{[^}]*justify-content: center;/s);
-  assert.match(html, /\.dinner-night\.is-open \.dinner-main \{[^}]*place-items: center start;/s);
+  assert.match(html, /\.dinner-main \{[^}]*align-items: start;[^}]*text-align: left;/s);
+  assert.match(html, /\.dinner-night\.is-open \.dinner-main \{[^}]*place-items: center start;[^}]*text-align: left;/s);
   assert.match(html, /\.dinner-owners \{[^}]*color: white;[^}]*font-size: 15px;/s);
   assert.match(html, /\.dinner-plan \{[^}]*rgba\(255,255,255,\.68\);[^}]*font-size: 12px;/s);
   assert.match(html, /\.dinner-title \{[^}]*rgba\(255,255,255,\.54\);[^}]*font-size: 11px;/s);

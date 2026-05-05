@@ -254,8 +254,8 @@
   .dinner-night { position: relative; display: grid; grid-template-columns: 58px minmax(0, 1fr); gap: 12px; align-items: center; border: 1px solid rgba(255,255,255,.20); border-radius: 16px; background: rgba(255,255,255,.12); padding: 10px; }
   .dinner-date { align-self: center; display: grid; place-items: center; height: 54px; padding: 6px 4px; border-radius: 13px; background: rgba(255,255,255,.16); color: white; font-size: 10px; line-height: 1.06; text-align: center; }
   .dinner-date strong { display: block; font-size: 14px; font-weight: 400; }
-  .dinner-main { display: grid; justify-content: center; align-content: center; justify-items: start; gap: 4px; min-width: 0; padding-right: 62px; }
-  .dinner-night.is-open .dinner-main { display: grid; place-items: center start; min-height: 54px; }
+  .dinner-main { display: grid; align-items: start; justify-content: start; align-content: center; justify-items: start; text-align: left; gap: 4px; min-width: 0; padding-right: 62px; }
+  .dinner-night.is-open .dinner-main { display: grid; place-items: center start; text-align: left; min-height: 54px; }
   .dinner-title { color: rgba(255,255,255,.54); font-size: 11px; line-height: 1.24; overflow-wrap: anywhere; }
   .dinner-owners { color: white; font-size: 15px; line-height: 1.16; overflow-wrap: anywhere; }
   .dinner-plan { color: rgba(255,255,255,.68); font-size: 12px; line-height: 1.24; overflow-wrap: anywhere; }
@@ -406,7 +406,7 @@
     <div class="trip-info-grid" aria-label="Trip info sections">
       <button class="info-card" id="openFlights" type="button"><span>Flights</span><span>View the arrivals and departures board.</span></button>
       <button class="info-card" id="openDinnerPlans" type="button"><span>Dinner plans</span><span>See who’s responsible for each night.</span></button>
-      <button class="info-card" id="openCalendarView" type="button"><span>Itinerary</span><span>View an overview of what each day will hold.</span></button>
+      <button class="info-card" id="openCalendarView" type="button"><span>Itinerary</span><span>An overview of what each day will hold.</span></button>
     </div>
   </section>
 </div>
@@ -430,7 +430,7 @@
 </div>
 <div class="dashboard" id="calendarView" role="dialog" aria-modal="true" aria-labelledby="calendarViewTitle" hidden>
   <section class="dashboard-card dinner-plans-card">
-    <header><div><h2 id="calendarViewTitle">Itinerary</h2><p>View an overview of what each day will hold.</p></div><button class="back" id="closeCalendarView" aria-label="Back to trip dashboard">Back</button></header>
+    <header><div><h2 id="calendarViewTitle">Itinerary</h2><p>The calendar will fill up as people select their dinner responsibilities and activities are scheduled.</p></div><button class="back" id="closeCalendarView" aria-label="Back to trip dashboard">Back</button></header>
     <section class="calendar-list" id="calendarItems" aria-label="Trip calendar items"></section>
   </section>
 </div>
