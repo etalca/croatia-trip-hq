@@ -58,9 +58,13 @@ test('hero video is configured for Safari-friendly autoplay on load', () => {
   assert.match(html, /video\.defaultMuted=true; video\.muted=true; video\.playsInline=true; video\.autoplay=true;/);
   assert.match(html, /video\.setAttribute\('muted',''\)/);
   assert.match(html, /window\.addEventListener\('pageshow',nudgeVideo/);
-  assert.match(html, /video\.play\(\)\.catch/);
+  assert.match(html, /video\.play\(\)\.then\(markVideoReady\)\.catch/);
   assert.match(html, /function markVideoReady\(\)\{ if\(video\.readyState>=2\)\{ ready=true; video\.classList\.add\('video-ready'\); \} \}/);
   assert.match(html, /markVideoReady\(\); nudgeVideo\(\);/);
+  assert.match(html, /video\.play\(\)\.then\(markVideoReady\)\.catch/);
+  assert.match(html, /video\.addEventListener\('loadeddata',\(\)=>\{ markVideoReady\(\); nudgeVideo\(\); \}\);/);
+  assert.match(html, /video\.addEventListener\('playing',markVideoReady\);/);
+  assert.match(html, /function frame\(now\)\{ markVideoReady\(\); const t=now\*\.001;/);
 });
 
 test('mobile hero uses dynamic viewport and cover video sizing without safe-area height constraints', () => {

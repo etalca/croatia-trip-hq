@@ -726,7 +726,7 @@
   poster.onload = () => { posterReady = true; };
   const sourceUrl = video.currentSrc || video.src || video.dataset.src;
   function markVideoReady(){ if(video.readyState>=2){ ready=true; video.classList.add('video-ready'); } }
-  function nudgeVideo(){ video.defaultMuted=true; video.muted=true; video.playsInline=true; video.autoplay=true; video.setAttribute('muted',''); video.setAttribute('playsinline',''); video.setAttribute('autoplay',''); video.play().catch(()=>{}); }
+  function nudgeVideo(){ video.defaultMuted=true; video.muted=true; video.playsInline=true; video.autoplay=true; video.setAttribute('muted',''); video.setAttribute('playsinline',''); video.setAttribute('autoplay',''); markVideoReady(); video.play().then(markVideoReady).catch(()=>{}); }
   function attachVideoSource(){
     nudgeVideo();
     if(!video.getAttribute('src')) video.src = sourceUrl;
@@ -735,11 +735,14 @@
   }
   video.addEventListener('canplay',()=>{ markVideoReady(); nudgeVideo(); });
   video.addEventListener('loadedmetadata',()=>{ markVideoReady(); nudgeVideo(); });
+  video.addEventListener('loadeddata',()=>{ markVideoReady(); nudgeVideo(); });
+  video.addEventListener('playing',markVideoReady);
+  video.addEventListener('timeupdate',markVideoReady,{once:true});
   document.addEventListener('visibilitychange',()=>{ if(!document.hidden) nudgeVideo(); });
   window.addEventListener('pageshow',nudgeVideo,{passive:true}); window.addEventListener('focus',nudgeVideo,{passive:true});
   window.addEventListener('click',nudgeVideo,{once:true}); window.addEventListener('touchstart',nudgeVideo,{once:true,passive:true}); window.addEventListener('load',nudgeVideo,{once:true});
   attachVideoSource();
-  function frame(now){ const t=now*.001; fadeDisturbance(); addImpulse(); gl.useProgram(prog); gl.uniform2f(loc.resolution,width,height); gl.uniform2f(loc.videoSize,video.videoWidth||poster.naturalWidth||3324,video.videoHeight||poster.naturalHeight||2492); gl.uniform1f(loc.distortion,Number(controls.distortion.value)); gl.uniform1f(loc.shimmer,Number(controls.shimmer.value)); gl.uniform1f(loc.warmth,Number(controls.warmth.value)); gl.uniform1f(loc.waterline,Number(controls.waterline.value)); gl.uniform1f(loc.time,t); gl.uniform1f(loc.mobileShift, mobileQuery.matches ? 0.0 : 0.0); gl.uniform1f(loc.mobileZoom, mobileQuery.matches ? 1.0 : 1.0); gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,false); gl.activeTexture(gl.TEXTURE1); gl.bindTexture(gl.TEXTURE_2D,disturbTex); gl.texImage2D(gl.TEXTURE_2D,0,gl.LUMINANCE,gl.LUMINANCE,gl.UNSIGNED_BYTE,dCanvas); gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,true); gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D,videoTex); if(ready && video.readyState>=2){ try{ gl.texImage2D(gl.TEXTURE_2D,0,gl.RGB,gl.RGB,gl.UNSIGNED_BYTE,video); posterUploaded=true; canvas.classList.add('webgl-ready'); }catch(err){} } else if(posterReady && !posterUploaded){ try{ gl.texImage2D(gl.TEXTURE_2D,0,gl.RGB,gl.RGB,gl.UNSIGNED_BYTE,poster); posterUploaded=true; }catch(err){} } gl.drawArrays(gl.TRIANGLES,0,6); requestAnimationFrame(frame); } requestAnimationFrame(frame);
+  function frame(now){ markVideoReady(); const t=now*.001; fadeDisturbance(); addImpulse(); gl.useProgram(prog); gl.uniform2f(loc.resolution,width,height); gl.uniform2f(loc.videoSize,video.videoWidth||poster.naturalWidth||3324,video.videoHeight||poster.naturalHeight||2492); gl.uniform1f(loc.distortion,Number(controls.distortion.value)); gl.uniform1f(loc.shimmer,Number(controls.shimmer.value)); gl.uniform1f(loc.warmth,Number(controls.warmth.value)); gl.uniform1f(loc.waterline,Number(controls.waterline.value)); gl.uniform1f(loc.time,t); gl.uniform1f(loc.mobileShift, mobileQuery.matches ? 0.0 : 0.0); gl.uniform1f(loc.mobileZoom, mobileQuery.matches ? 1.0 : 1.0); gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,false); gl.activeTexture(gl.TEXTURE1); gl.bindTexture(gl.TEXTURE_2D,disturbTex); gl.texImage2D(gl.TEXTURE_2D,0,gl.LUMINANCE,gl.LUMINANCE,gl.UNSIGNED_BYTE,dCanvas); gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,true); gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D,videoTex); if(ready && video.readyState>=2){ try{ gl.texImage2D(gl.TEXTURE_2D,0,gl.RGB,gl.RGB,gl.UNSIGNED_BYTE,video); posterUploaded=true; canvas.classList.add('webgl-ready'); }catch(err){} } else if(posterReady && !posterUploaded){ try{ gl.texImage2D(gl.TEXTURE_2D,0,gl.RGB,gl.RGB,gl.UNSIGNED_BYTE,poster); posterUploaded=true; }catch(err){} } gl.drawArrays(gl.TRIANGLES,0,6); requestAnimationFrame(frame); } requestAnimationFrame(frame);
 })();
 </script>
 </body>
