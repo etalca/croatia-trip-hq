@@ -63,8 +63,9 @@
     text-shadow: 0 2px 28px rgba(0,0,0,.42);
   }
   .address:hover { color: white; }
-  .planning-call { position: fixed; left: 50%; top: calc(36% - 50px); transform: translate(-50%, -50%); z-index: 4; width: min(92vw, 720px); display: grid; gap: 2px; text-align: center; color: rgba(255,255,255,.86); opacity: .58; font-size: 13px; line-height: 1.25; text-shadow: 0 2px 30px rgba(0,0,0,.52); pointer-events: auto; }
-  .planning-call a { color: inherit; opacity: .72; text-decoration: underline; text-underline-offset: 3px; transition: opacity .18s ease; }
+  .planning-call { position: fixed; left: clamp(22px, 4vw, 52px); right: clamp(22px, 4vw, 52px); bottom: clamp(22px, 4vw, 52px); z-index: 4; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: end; gap: 18px; text-align: center; color: rgba(255,255,255,.86); opacity: .58; font-size: 13px; line-height: 1.25; text-shadow: 0 2px 30px rgba(0,0,0,.52); pointer-events: auto; }
+  .planning-call span:first-child { text-align: left; }
+  .planning-call a { color: inherit; opacity: .72; justify-self: end; text-decoration: underline; text-underline-offset: 3px; transition: opacity .18s ease; }
   .planning-call a:hover, .planning-call a:focus-visible { opacity: 1; }
   .hero-content {
     transition: opacity .22s ease;
@@ -281,7 +282,8 @@
     .countdown { top: max(18px, env(safe-area-inset-top)); left: 16px; }
     .countdown span { font-size: 12px; }
     .address { top: max(18px, env(safe-area-inset-top)); right: 16px; max-width: 50vw; font-size: 12px; }
-    .planning-call { top: calc(34% - 50px); width: min(88vw, 340px); font-size: 12px; }
+    .planning-call { left: 50%; right: auto; top: calc(34% - 50px); bottom: auto; transform: translate(-50%, -50%); width: min(88vw, 340px); grid-template-columns: 1fr; gap: 2px; align-items: center; font-size: 12px; }
+    .planning-call span:first-child, .planning-call a { text-align: center; justify-self: center; }
     .hero-content { padding: 22px; }
     .center { gap: 18px; }
     h1 { max-width: 330px; font-size: clamp(28px, 8vw, 34px); }
@@ -345,7 +347,7 @@
 <div class="shade"></div>
 <div class="countdown" aria-label="Countdown to villa week"><strong id="countDays">—</strong><span>days and counting</span></div>
 <a class="address" href="https://www.google.com/maps/place/Villa+Darinka/@42.9343666,16.6551014,15.4z/data=!4m9!3m8!1s0x134a73c92d0ce117:0x3fd1fdd80b1a9ee7!5m2!4m1!1i2!8m2!3d42.929621!4d16.6681103!16s%2Fg%2F11c5qpstxg?entry=ttu&g_ep=EgoyMDI2MDQyOS4wIKXMDSoASAFQAw%3D%3D" target="_blank" rel="noreferrer">Villa Darinka<br>Triporte 32, 20270 Vela Luka, Croatia</a>
-<div class="planning-call"><span>Drop in. Discuss Deets.</span><span>May 12 @ 6:30 p.m.</span><a href="#" id="addPlanningCall">Add to calendar</a></div>
+<div class="planning-call"><span>Drop in to discuss deets.</span><span>May 12 @ 6:30 p.m.</span><a href="#" id="addPlanningCall">Add to calendar</a></div>
 <main class="hero-content">
   <section class="center" aria-label="Trip invitation">
     <h1 id="heroTitle">Your week on Korčula begins here.</h1>
@@ -619,7 +621,7 @@
     const ics = ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Korcula Trip HQ//Villa Darinka//EN','CALSCALE:GREGORIAN','METHOD:PUBLISH','BEGIN:VEVENT','UID:friends-trip-croatia-20260627@korcula-trip-hq','DTSTAMP:20260504T000000Z','DTSTART;VALUE=DATE:20260627','DTEND;VALUE=DATE:20260705','SUMMARY:Friends trip in Croatia','LOCATION:Triporte 32, 20270 Vela Luka, Croatia','DESCRIPTION:Villa week at Villa Darinka, Korčula, Croatia. Map: '+mapUrl,'END:VEVENT','END:VCALENDAR'].join('\r\n');
     downloadCalendar('Friends trip in Croatia.ics', ics); localStorage.setItem(CALENDAR_KEY,'true'); renderTripDashboard(); setPrimaryCta(); showToast('Calendar file created');
   }
-  function addPlanningCallToCalendar(){ const ics=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Korcula Trip HQ//Planning Call//EN','CALSCALE:GREGORIAN','METHOD:PUBLISH','BEGIN:VEVENT','UID:planning-call-20260512@korcula-trip-hq','DTSTAMP:20260505T000000Z','DTSTART:20260513T013000Z','DTEND:20260513T020000Z','SUMMARY:Croatia Group FaceTime','DESCRIPTION:Someone will initiate a Group FaceTime from the group message to answer questions, put forward ideas, and discuss any missed details.','END:VEVENT','END:VCALENDAR'].join('\r\n'); downloadCalendar('Croatia Group FaceTime.ics', ics); showToast('FaceTime calendar file created'); }
+  function addPlanningCallToCalendar(){ const ics=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Korcula Trip HQ//Planning Call//EN','CALSCALE:GREGORIAN','METHOD:PUBLISH','BEGIN:VEVENT','UID:planning-call-20260512@korcula-trip-hq','DTSTAMP:20260505T000000Z','DTSTART;TZID=America/Los_Angeles:20260512T183000','DTEND;TZID=America/Los_Angeles:20260512T190000','SUMMARY:Croatia Group FaceTime','DESCRIPTION:Someone will initiate a Group FaceTime from the group message to answer questions, put forward ideas, and discuss any missed details.','END:VEVENT','END:VCALENDAR'].join('\r\n'); downloadCalendar('Croatia Group FaceTime.ics', ics); showToast('FaceTime calendar file created'); }
   function handleHomeSecondaryCta(){ const next=nextHomeTodoCta(); if(next==='Add to calendar') return addTripToCalendar(); if(next==='Add flight details') return openDialog('tripInfo'); if(next==='Claim a dinner') return openDinnerPicker('tripInfo'); window.open(PLAYLIST_URL,'_blank','noreferrer'); }
   addCalendar.addEventListener('click', handleHomeSecondaryCta);
   addPlanningCall.addEventListener('click', e=>{ e.preventDefault(); addPlanningCallToCalendar(); });

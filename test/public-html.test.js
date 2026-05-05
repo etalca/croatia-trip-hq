@@ -72,16 +72,21 @@ test('homepage secondary CTA advances after calendar todo and falls back to trip
   assert.match(html, /localStorage\.setItem\(CALENDAR_KEY,'true'\); renderTripDashboard\(\); setPrimaryCta\(\);/);
 });
 
-test('FaceTime call notice floats higher with three subtle lines and correct calendar invite', () => {
+test('FaceTime call notice spreads across desktop bottom and uses Pacific-time calendar invite', () => {
   assert.match(html, /<div class="planning-call"/);
-  assert.match(html, /<span>Drop in\. Discuss Deets\.<\/span><span>May 12 @ 6:30 p\.m\.<\/span><a href="#" id="addPlanningCall">Add to calendar<\/a>/);
-  assert.match(html, /\.planning-call \{[^}]*top: calc\(36% - 50px\);[^}]*opacity: \.58;/s);
+  assert.match(html, /<span>Drop in to discuss deets\.<\/span><span>May 12 @ 6:30 p\.m\.<\/span><a href="#" id="addPlanningCall">Add to calendar<\/a>/);
+  assert.match(html, /\.planning-call \{[^}]*bottom: clamp\(22px, 4vw, 52px\);[^}]*grid-template-columns: repeat\(3, minmax\(0, 1fr\)\);[^}]*opacity: \.58;/s);
+  assert.match(html, /\.planning-call span:first-child \{ text-align: left; \}/);
+  assert.match(html, /\.planning-call a \{[^}]*justify-self: end;/s);
+  assert.match(html, /\.planning-call \{ left: 50%; right: auto; top: calc\(34% - 50px\); bottom: auto; transform: translate\(-50%, -50%\); width: min\(88vw, 340px\); grid-template-columns: 1fr;/);
   assert.match(html, /\.planning-call a \{[^}]*color: inherit;[^}]*opacity: \.72;/s);
   assert.match(html, /\.planning-call a:hover, \.planning-call a:focus-visible \{[^}]*opacity: 1;/s);
   assert.match(html, /function addPlanningCallToCalendar\(\)/);
   assert.match(html, /SUMMARY:Croatia Group FaceTime/);
   assert.match(html, /DESCRIPTION:Someone will initiate a Group FaceTime from the group message to answer questions, put forward ideas, and discuss any missed details\./);
-  assert.match(html, /DTSTART:20260513T013000Z/);
+  assert.match(html, /DTSTART;TZID=America\/Los_Angeles:20260512T183000/);
+  assert.match(html, /DTEND;TZID=America\/Los_Angeles:20260512T190000/);
+  assert.doesNotMatch(html, /DTSTART:20260513T013000Z/);
 });
 
 test('dinner claiming and dinner plans are separate windows, not stuffed into the main dashboard', () => {
