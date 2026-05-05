@@ -61,15 +61,26 @@ test('hero video is configured for Safari-friendly autoplay on load', () => {
   assert.match(html, /video\.play\(\)\.catch/);
 });
 
-test('mobile hero crops in for iPhone 15 Pro so the video covers the full viewport and safe-area chin', () => {
+test('mobile hero uses dynamic viewport and cover video sizing without safe-area height constraints', () => {
   assert.match(html, /<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" \/>/);
-  assert.match(html, /#stage \{[^}]*position: fixed;[^}]*top: 0;[^}]*right: 0;[^}]*bottom: calc\(env\(safe-area-inset-bottom, 0px\) \* -1\);[^}]*left: 0;[^}]*height: calc\(100dvh \+ env\(safe-area-inset-bottom, 0px\)\);[^}]*min-height: 100svh;[^}]*overflow: hidden;/s);
-  assert.match(html, /\.poster-img, video, canvas \{[^}]*min-height: calc\(100dvh \+ env\(safe-area-inset-bottom, 0px\)\);/s);
-  assert.match(html, /@media \(max-width: 760px\) \{\n    \.poster-img, video \{ object-position: 66% 38%; transform: scale\(1\.32\); transform-origin: center center; \}/);
-  assert.match(html, /uniform float u_mobileZoom;/);
-  assert.match(html, /mediaUv=\(mediaUv-\.5\)\/u_mobileZoom\+\.5;/);
-  assert.match(html, /mobileZoom:gl\.getUniformLocation\(prog,'u_mobileZoom'\)/);
-  assert.match(html, /gl\.uniform1f\(loc\.mobileZoom, mobileQuery\.matches \? 1\.32 : 1\.0\)/);
+  assert.match(html, /html, body \{[^}]*min-height: 100dvh;[^}]*height: 100dvh;[^}]*overflow: hidden;/s);
+  assert.doesNotMatch(html, /#stage \{[^}]*100vh/s);
+  assert.match(html, /#stage \{[^}]*position: fixed;[^}]*inset: 0;[^}]*width: 100vw;[^}]*height: 100dvh;[^}]*min-height: 100dvh;[^}]*overflow: hidden;/s);
+  assert.match(html, /\.poster-img, #waterVideo, #gl \{[^}]*position: absolute;[^}]*inset: 0;[^}]*width: 100%;[^}]*height: 100%;[^}]*min-width: 100%;[^}]*min-height: 100%;/s);
+  assert.match(html, /\.poster-img, #waterVideo \{[^}]*object-fit: cover;[^}]*object-position: center;/s);
+  assert.match(html, /#waterVideo \{[^}]*z-index: 1;[^}]*opacity: 0;/s);
+  assert.match(html, /@media \(max-width: 760px\) \{\n    \.poster-img, #waterVideo \{ object-position: center; transform: none; transform-origin: center center; \}/);
+  assert.doesNotMatch(html, /\.hero-content \{[^}]*padding:[^}]*env\(safe-area-inset-bottom/s);
+  assert.doesNotMatch(html, /#stage \{[^}]*bottom: calc\(env\(safe-area-inset-bottom/s);
+});
+
+test('webgl hero canvas follows the actual visual viewport on iPhone URL-bar changes', () => {
+  assert.match(html, /function viewportHeight\(\)\{ return Math\.ceil\(window\.visualViewport\?\.height \|\| window\.innerHeight\); \}/);
+  assert.match(html, /height=Math\.ceil\(viewportHeight\(\)\*dpr\)/);
+  assert.match(html, /window\.visualViewport\?\.addEventListener\('resize',resize,\{passive:true\}\)/);
+  assert.match(html, /window\.visualViewport\?\.addEventListener\('scroll',resize,\{passive:true\}\)/);
+  assert.match(html, /gl\.uniform1f\(loc\.mobileZoom, mobileQuery\.matches \? 1\.0 : 1\.0\)/);
+  assert.match(html, /gl\.uniform1f\(loc\.mobileShift, mobileQuery\.matches \? 0\.0 : 0\.0\)/);
 });
 
 test('homepage countdown counts calendar midnights, not trip start hour', () => {
