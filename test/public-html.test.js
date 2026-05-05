@@ -287,7 +287,8 @@ test('trip dashboard clickable cards show expand affordances and scroll below st
   assert.match(html, /#tripInfo \.trip-info-scroll \{ overflow-y: auto; min-height: 0; display: grid; gap: 10px; scrollbar-width: none; \}/);
   assert.match(html, /#tripInfo \.trip-info-scroll::-webkit-scrollbar \{ display: none; \}/);
   assert.match(html, /\.personal-card \{[^}]*position: relative;[^}]*padding: 14px 42px 14px 14px;/s);
-  assert.match(html, /\.dashboard-card-expand \{[^}]*position: absolute;[^}]*top: 10px;[^}]*right: 10px;[^}]*width: 22px;[^}]*height: 22px;[^}]*opacity: \.2;/s);
+  assert.match(html, /\.calendar-expand-icon \{[^}]*width: 22px;[^}]*height: 22px;[^}]*padding: 3px;[^}]*opacity: \.2;/s);
+  assert.match(html, /\.dashboard-card-expand \{[^}]*position: absolute;[^}]*top: 10px;[^}]*right: 10px;[^}]*width: 22px;[^}]*height: 22px;[^}]*padding: 3px;[^}]*box-sizing: border-box;[^}]*opacity: \.2;/s);
 });
 
 test('claimed dinner card puts the prompt above, date as title, and co-lead below', () => {
