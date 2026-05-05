@@ -82,8 +82,15 @@ test('dinner claiming and dinner plans are separate windows, not stuffed into th
 test('todo chips and dashboard cards route to the right detail windows', () => {
   assert.match(html, /flightStatusChip\.addEventListener\('click',\(\)=>\{ if\(savedFlights\(\)\) openDashboard\(\); else openDialog\('tripInfo'\); \}\)/);
   assert.match(html, /dinnerStatusChip\.addEventListener\('click',openDinnerPicker\)/);
+  assert.match(html, /myDinnerCard\.addEventListener\('click',openDinnerPicker\)/);
   assert.match(html, /calendarStatusChip\.addEventListener\('click',addTripToCalendar\)/);
   assert.match(html, /openDinnerPlansButton\.addEventListener\('click',openDinnerPlans\)/);
+});
+
+test('dinner summary card is a clickable dinner picker shortcut', () => {
+  const tripInfoBlock = html.slice(html.indexOf('id="tripInfo"'), html.indexOf('id="dinnerPicker"'));
+  assert.match(tripInfoBlock, /<button class="personal-card" id="myDinnerCard" type="button"/);
+  assert.match(html, /myDinnerCard=document\.getElementById\('myDinnerCard'\)/);
 });
 
 test('main dashboard summarizes only the current guest dinner and replaces Calendar card with Dinner plans', () => {
@@ -103,4 +110,12 @@ test('dinner claiming excludes checkout day and has no notes field', () => {
   assert.doesNotMatch(html, /id="dinnerNotes"/);
   assert.doesNotMatch(html, /'2026-07-04'/);
   assert.doesNotMatch(html, /dinnerNotes/);
+});
+
+test('dinner form surfaces duplicate-assignment errors without closing the picker', () => {
+  assert.match(html, /function dinnerAssignmentError\(currentName, partner\)/);
+  assert.match(html, /You have already been assigned to a dinner\./);
+  assert.match(html, /\$\{partner\} has already been assigned to a dinner\./);
+  assert.match(html, /throw new Error\(data\.error \|\| `Could not save dinner night`\)/);
+  assert.match(html, /catch\(err\)\{ console\.error\(err\); showToast\(err\.message \|\| 'Could not save dinner night'\); \}/);
 });

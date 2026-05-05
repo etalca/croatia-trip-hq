@@ -27,6 +27,20 @@ function normalizeMeals(value) {
     }),
   };
 }
+function dinnerAssignmentError(meals, person, partner) {
+  const slots = normalizeMeals(meals).slots;
+  if (person && slots.some(slot => (slot.leads || []).includes(person))) {
+    return 'You have already been assigned to a dinner.';
+  }
+  if (partner && slots.some(slot => (slot.leads || []).includes(partner))) {
+    return `${partner} has already been assigned to a dinner.`;
+  }
+  return '';
+}
+function assertDinnerAssignmentAvailable(meals, person, partner) {
+  const message = dinnerAssignmentError(meals, person, partner);
+  if (message) throw Object.assign(new Error(message), { statusCode: 409 });
+}
 async function ensureSupabaseSlots(supabase) {
   const rows = DINNER_DATES.map(date => ({ dinner_date: date, plan_type: 'undecided' }));
   const { error } = await supabase.from('dinner_slots').upsert(rows, { onConflict: 'dinner_date', ignoreDuplicates: true });
@@ -81,7 +95,8 @@ async function saveSupabaseMeal(supabase, person, body) {
   if (!date || !partner || partner === person) throw Object.assign(new Error('Choose a dinner night and co-lead.'), { statusCode: 400 });
   const planType = normalizePlanType(body.planType);
   const title = String(body.title || '').trim().slice(0, 120);
-    const { data: slot, error: slotError } = await supabase
+  assertDinnerAssignmentAvailable(await readSupabaseMeals(supabase), person, partner);
+  const { data: slot, error: slotError } = await supabase
     .from('dinner_slots')
     .upsert({ dinner_date: date, title, notes: '', plan_type: planType }, { onConflict: 'dinner_date' })
     .select('id')
@@ -100,7 +115,7 @@ function saveLocalMeal(person, body) {
   const partner = canonicalCrewName(body.partner || '');
   if (!date || !partner || partner === person) throw Object.assign(new Error('Choose a dinner night and co-lead.'), { statusCode: 400 });
   const meals = readLocalMeals();
-  for (const slot of meals.slots) slot.leads = slot.leads.filter(name => name !== person && name !== partner);
+  assertDinnerAssignmentAvailable(meals, person, partner);
   const slot = meals.slots.find(s => s.date === date);
   slot.leads = [person, partner];
   slot.planType = normalizePlanType(body.planType);
@@ -128,4 +143,4 @@ module.exports = async function handler(req, res) {
   }
 };
 
-module.exports._private = { DINNER_DATES, normalizeMeals, saveLocalMeal };
+module.exports._private = { DINNER_DATES, normalizeMeals, dinnerAssignmentError, saveLocalMeal };
