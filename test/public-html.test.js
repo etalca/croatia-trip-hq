@@ -115,6 +115,8 @@ test('main dashboard summarizes dinner, flight arrival, and dinner plans without
   assert.match(html, /You’re responsible for dinner on/);
   assert.match(html, /You’re flight arrives in/);
   assert.match(html, /function flightCompanionSummary\(current, board\)/);
+  assert.match(html, /function normalizedFlightNumber\(value\)/);
+  assert.match(html, /normalizedFlightNumber\(item\.arrivalFlight\)===flightNumber/);
   assert.match(html, /myFlightTitle\.textContent=countdownFor\(flights,'arrivals'\)/);
   assert.match(tripInfoBlock, /<button class="info-card" id="openDinnerPlans" type="button"><span>Dinner plans<\/span>/);
   assert.doesNotMatch(tripInfoBlock, /id="tripInfoEditFlights"/);
