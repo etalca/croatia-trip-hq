@@ -4,6 +4,11 @@ const fs = require('node:fs');
 const path = require('node:path');
 
 const html = fs.readFileSync(path.join(__dirname, '..', 'public', 'index.html'), 'utf8');
+const publicAssets = path.join(__dirname, '..', 'public', 'assets');
+
+test('expand icon asset is available for itinerary day cards', () => {
+  assert.ok(fs.existsSync(path.join(publicAssets, 'Expand icon.png')));
+});
 
 test('flight form exposes a copy-flight selector before manual flight fields without an extra button', () => {
   assert.match(html, /id="copyFlightsFrom"/);
@@ -167,23 +172,32 @@ test('dashboard embeds itinerary directly with floating header instead of a wrap
   assert.match(html, /dinnerPlan\(\)\.slots\.filter\(slot=>\(slot\.leads \|\| \[\]\)\.length\)/);
 });
 
-test('dashboard itinerary cards stay contained on mobile and expand into hourly day view', () => {
+test('dashboard itinerary cards use subtle expand icons to open an iCal-style day window', () => {
   assert.match(html, /const DINNER_TIME='7–8 p\.m\.'/);
   assert.match(html, /const DINNER_HOUR='7:00 p\.m\.'/);
   assert.match(html, /dinnerDates\.forEach\(date=>eventsByDate\[date\]\.push/);
   assert.match(html, /const claimedDinner=dinners\.find\(slot=>slot\.date===date\)/);
   assert.match(html, /claimedDinner \? `\$\{DINNER_TIME\} · \$\{\(claimedDinner\.leads \|\| \[\]\)\.join\(' \+ '\)\}/);
   assert.match(html, /: `\$\{DINNER_TIME\} · Dinner placeholder`/);
-  assert.match(html, /function dayAgenda\(events, full\)/);
-  assert.match(html, /function toggleCalendarDay\(button\)/);
-  assert.match(html, /class="calendar-events \$\{needsExpand\?'is-collapsed':''\}"/);
-  assert.match(html, /<button class="calendar-expand" type="button"/);
-  assert.match(html, /View day/);
-  assert.match(html, /Hide day/);
-  assert.match(html, /<div class="day-agenda" hidden>/);
-  assert.match(html, /\[calendarItems, calendarModalItems\]\.filter\(Boolean\)\.forEach\(container=>container\.querySelectorAll\('\.calendar-expand'\)\.forEach/);
-  assert.match(html, /\.calendar-day \{[^}]*overflow: hidden;/s);
+  assert.match(html, /id="dayView"/);
+  assert.match(html, /id="dayViewTimeline"/);
+  assert.match(html, /id="closeDayView"/);
+  assert.match(html, /function openDayView\(date\)/);
+  assert.match(html, /function closeDayView\(\)/);
+  assert.match(html, /function renderDayView\(date, events\)/);
+  assert.match(html, /function eventBlockStyle\(event\)/);
+  assert.match(html, /top:\$\{Math\.max\(0, parseEventMinute\(event\)-480\)\*DAY_VIEW_PX_PER_MINUTE\}px/);
+  assert.match(html, /height:\$\{Math\.max\(34, eventDurationMinutes\(event\)\*DAY_VIEW_PX_PER_MINUTE\)\}px/);
+  assert.match(html, /<button class="calendar-expand-icon" type="button" title="View full day" aria-label="View full day for \$\{escapeHtml\(full\)\}" data-date="\$\{escapeHtml\(date\)\}"><img src="assets\/Expand icon\.png" alt=""><\/button>/);
+  assert.match(html, /\.calendar-expand-icon \{[^}]*position: absolute;[^}]*top: 8px;[^}]*right: 8px;[^}]*width: 22px;[^}]*height: 22px;[^}]*opacity: \.2;/s);
+  assert.match(html, /\.day-view-timeline/);
+  assert.match(html, /\.day-view-event \{[^}]*position: absolute;/s);
+  assert.match(html, /closeDayViewButton\.addEventListener\('click',closeDayView\)/);
+  assert.match(html, /openTripInfo\(\)/);
+  assert.match(html, /\.calendar-day \{[^}]*position: relative;[^}]*overflow: hidden;/s);
   assert.match(html, /\.calendar-events\.is-collapsed \.calendar-event:nth-of-type\(n\+2\)/);
+  assert.doesNotMatch(html, /<button class="calendar-expand" type="button"/);
+  assert.doesNotMatch(html, />View day<|>Hide day</);
   assert.match(html, /@media \(max-width: 760px\) \{[\s\S]*\.calendar-week \{ grid-template-columns: 1fr; \}/);
 });
 
