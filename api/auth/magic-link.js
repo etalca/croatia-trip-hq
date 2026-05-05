@@ -8,7 +8,7 @@ function isLocalHost(host) {
 function siteOrigin(req) {
   const proto = req.headers['x-forwarded-proto'] || 'https';
   const host = req.headers['x-forwarded-host'] || req.headers.host;
-  const preferredOrigin = process.env.NEXT_PUBLIC_SITE_URL || process.env.SITE_URL || 'https://croatia.tannerbegin.com';
+  const preferredOrigin = 'https://croatia.tannerbegin.com';
   if (isLocalHost(host)) return `${proto}://${host}`;
   return preferredOrigin;
 }
