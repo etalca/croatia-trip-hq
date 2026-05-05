@@ -382,6 +382,7 @@ test('mobile polish keeps touch actions visible and flight cards readable', () =
   assert.match(html, /\.arrival-edit \{[^}]*height: 25\.5px;[^}]*width: auto;[^}]*opacity: 1;[^}]*pointer-events: auto;/s);
   assert.match(html, /\.notes-toggle \{ width: 25\.5px; height: 25\.5px;/);
   assert.match(html, /@media \(max-width: 760px\) \{[\s\S]*\.arrival-actions \{ top: 12px; right: 12px; \}[\s\S]*\.arrival-edit \{ height: 25\.5px; min-height: 0; width: auto; padding: 0 10px; \}[\s\S]*\.arrival-actions \.notes-toggle \{ width: 25\.5px; height: 25\.5px; min-height: 0; flex: 0 0 25\.5px; \}/);
+  assert.match(html, /@media \(max-width: 760px\) \{[\s\S]*\.arrival-notes \{[^}]*grid-column: 1 \/ -1;[^}]*width: calc\(100% \+ 104px\);[^}]*max-width: calc\(100% \+ 104px\);/);
   assert.match(html, /<div class="arrival-meta"><span class="arrival-time">\$\{escapeHtml\(dateTime\)\}<\/span><span class="arrival-airport">\$\{escapeHtml\(airport\)\}<\/span><\/div>/);
   assert.match(html, /const countdownLabel=has \? `\$\{isDepart\?'Departs':'Arrives'\} in \$\{countdownFor\(d,boardMode\)\}` : 'Awaiting flights'/);
   assert.match(html, /<div class="arrival-countdown">\$\{escapeHtml\(countdownLabel\)\}<\/div>/);
