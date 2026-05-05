@@ -72,14 +72,15 @@ test('homepage secondary CTA advances after calendar todo and falls back to trip
   assert.match(html, /localStorage\.setItem\(CALENDAR_KEY,'true'\); renderTripDashboard\(\); setPrimaryCta\(\);/);
 });
 
-test('planning call notice floats above the horizon in three subtle lines', () => {
+test('FaceTime call notice floats higher with four subtle lines and correct calendar invite', () => {
   assert.match(html, /<div class="planning-call"/);
-  assert.match(html, /<span>Next group planning call<\/span><span>Tuesday, May 12, 6:30 p\.m\. PDT<\/span><a href="#" id="addPlanningCall">Add to calendar<\/a>/);
-  assert.match(html, /\.planning-call \{[^}]*top: 36%;[^}]*opacity: \.58;/s);
+  assert.match(html, /<span>Drop in\. Discuss deets\.<\/span><span>May 12, 2026<\/span><span>6:30 p\.m\. PDT<\/span><a href="#" id="addPlanningCall">Add to calendar<\/a>/);
+  assert.match(html, /\.planning-call \{[^}]*top: calc\(36% - 50px\);[^}]*opacity: \.58;/s);
   assert.match(html, /\.planning-call a \{[^}]*color: inherit;[^}]*opacity: \.72;/s);
   assert.match(html, /\.planning-call a:hover, \.planning-call a:focus-visible \{[^}]*opacity: 1;/s);
   assert.match(html, /function addPlanningCallToCalendar\(\)/);
-  assert.match(html, /SUMMARY:Next group planning call/);
+  assert.match(html, /SUMMARY:Croatia Group FaceTime/);
+  assert.match(html, /DESCRIPTION:Someone will initiate a Group FaceTime from the group message to answer questions, put forward ideas, and discuss any missed details\./);
   assert.match(html, /DTSTART:20260513T013000Z/);
 });
 
@@ -216,6 +217,16 @@ test('dinner plans cards use clear hierarchy, fixed date tiles, and contextual a
   assert.match(html, /openDinnerPickerForDate\(btn\.dataset\.date,'dinnerPlans'\)/);
 });
 
+
+
+test('back navigation keeps blur overlay visible and reopens previous windows faster', () => {
+  assert.match(html, /function keepModalOverlay\(\)/);
+  assert.match(html, /function reopenAfterBack\(fn\)/);
+  assert.match(html, /setTimeout\(fn,80\)/);
+  assert.match(html, /document\.body\.classList\.add\('modal-open'\)/);
+  assert.match(html, /returnToLastScreen\(\)/);
+  assert.doesNotMatch(html, /setTimeout\(\(\)=>\{ if\(!dinnerPicker\.classList\.contains\('open'\)\) dinnerPicker\.hidden=true; if\(reopenTripInfo && currentGuest\) returnToLastScreen\(\); else syncHomeVisibility\(\); \},240\)/);
+});
 
 test('modal back buttons return to the last screen instead of always the dashboard', () => {
   assert.match(html, /let returnTarget='tripInfo'/);
