@@ -10,7 +10,7 @@ function emptyMeals() {
   return { slots: DINNER_DATES.map(date => ({ date, leads: [], planType: 'undecided', title: '', notes: '' })) };
 }
 function normalizePlanType(value) {
-  return ['reservation', 'cook', 'undecided'].includes(value) ? value : 'undecided';
+  return ['reservation', 'cook', 'undecided', 'other'].includes(value) ? value : 'undecided';
 }
 function normalizeMeals(value) {
   const byDate = new Map((value?.slots || []).map(slot => [slot.date, slot]));
@@ -27,19 +27,29 @@ function normalizeMeals(value) {
     }),
   };
 }
-function dinnerAssignmentError(meals, person, partner) {
+function dinnerAssignmentError(meals, person, partner, date) {
   const slots = normalizeMeals(meals).slots;
-  if (person && slots.some(slot => (slot.leads || []).includes(person))) {
-    return 'You have already been assigned to a dinner.';
-  }
-  if (partner && slots.some(slot => (slot.leads || []).includes(partner))) {
+  const currentSlot = person ? slots.find(slot => (slot.leads || []).includes(person)) : null;
+  const partnerSlot = partner ? slots.find(slot => (slot.leads || []).includes(partner)) : null;
+  if (partnerSlot && !(currentSlot && partnerSlot.date === currentSlot.date)) {
     return `${partner} has already been assigned to a dinner.`;
   }
   return '';
 }
-function assertDinnerAssignmentAvailable(meals, person, partner) {
-  const message = dinnerAssignmentError(meals, person, partner);
+function assertDinnerAssignmentAvailable(meals, person, partner, date) {
+  const message = dinnerAssignmentError(meals, person, partner, date);
   if (message) throw Object.assign(new Error(message), { statusCode: 409 });
+}
+function clearMealForPerson(meals, person) {
+  const next = normalizeMeals(meals);
+  const currentSlot = next.slots.find(slot => (slot.leads || []).includes(person));
+  if (currentSlot) {
+    currentSlot.leads = [];
+    currentSlot.planType = 'undecided';
+    currentSlot.title = '';
+    currentSlot.notes = '';
+  }
+  return next;
 }
 async function ensureSupabaseSlots(supabase) {
   const rows = DINNER_DATES.map(date => ({ dinner_date: date, plan_type: 'undecided' }));
@@ -88,14 +98,37 @@ async function authPerson(req, supabase, body) {
   }
   return canonicalCrewName(body?.name || '') || canonicalCrewName(body?.person || '') || null;
 }
+async function clearSupabaseDinnerForPerson(supabase, person) {
+  const meals = await readSupabaseMeals(supabase);
+  const currentSlot = meals.slots.find(slot => (slot.leads || []).includes(person));
+  if (!currentSlot) return meals;
+  const { data: slot, error: slotError } = await supabase.from('dinner_slots').select('id').eq('dinner_date', currentSlot.date).single();
+  if (slotError) throw slotError;
+  const { error: signupError } = await supabase.from('dinner_signups').delete().eq('role', 'cook').eq('dinner_slot_id', slot.id);
+  if (signupError) throw signupError;
+  const { error: resetError } = await supabase.from('dinner_slots').update({ title: '', notes: '', plan_type: 'undecided' }).eq('id', slot.id);
+  if (resetError) throw resetError;
+  return readSupabaseMeals(supabase);
+}
 async function saveSupabaseMeal(supabase, person, body) {
   await ensureSupabaseSlots(supabase);
+  if (body.clear) return clearSupabaseDinnerForPerson(supabase, person);
   const date = DINNER_DATES.includes(body.date) ? body.date : '';
   const partner = canonicalCrewName(body.partner || '');
   if (!date || !partner || partner === person) throw Object.assign(new Error('Choose a dinner night and co-lead.'), { statusCode: 400 });
   const planType = normalizePlanType(body.planType);
   const title = String(body.title || '').trim().slice(0, 120);
-  assertDinnerAssignmentAvailable(await readSupabaseMeals(supabase), person, partner);
+  const meals = await readSupabaseMeals(supabase);
+  assertDinnerAssignmentAvailable(meals, person, partner, date);
+  const currentSlot = meals.slots.find(slot => (slot.leads || []).includes(person));
+  if (currentSlot) {
+    const { data: oldSlot, error: oldSlotError } = await supabase.from('dinner_slots').select('id').eq('dinner_date', currentSlot.date).single();
+    if (oldSlotError) throw oldSlotError;
+    const { error: oldClearError } = await supabase.from('dinner_signups').delete().eq('role', 'cook').eq('dinner_slot_id', oldSlot.id);
+    if (oldClearError) throw oldClearError;
+    const { error: oldResetError } = await supabase.from('dinner_slots').update({ title: '', notes: '', plan_type: 'undecided' }).eq('id', oldSlot.id);
+    if (oldResetError) throw oldResetError;
+  }
   const { data: slot, error: slotError } = await supabase
     .from('dinner_slots')
     .upsert({ dinner_date: date, title, notes: '', plan_type: planType }, { onConflict: 'dinner_date' })
@@ -111,11 +144,19 @@ async function saveSupabaseMeal(supabase, person, body) {
   return readSupabaseMeals(supabase);
 }
 function saveLocalMeal(person, body) {
+  const meals = readLocalMeals();
+  if (body.clear) return writeLocalMeals(clearMealForPerson(meals, person));
   const date = DINNER_DATES.includes(body.date) ? body.date : '';
   const partner = canonicalCrewName(body.partner || '');
   if (!date || !partner || partner === person) throw Object.assign(new Error('Choose a dinner night and co-lead.'), { statusCode: 400 });
-  const meals = readLocalMeals();
-  assertDinnerAssignmentAvailable(meals, person, partner);
+  assertDinnerAssignmentAvailable(meals, person, partner, date);
+  const currentSlot = meals.slots.find(s => (s.leads || []).includes(person));
+  if (currentSlot) {
+    currentSlot.leads = [];
+    currentSlot.planType = 'undecided';
+    currentSlot.title = '';
+    currentSlot.notes = '';
+  }
   const slot = meals.slots.find(s => s.date === date);
   slot.leads = [person, partner];
   slot.planType = normalizePlanType(body.planType);
@@ -143,4 +184,4 @@ module.exports = async function handler(req, res) {
   }
 };
 
-module.exports._private = { DINNER_DATES, normalizeMeals, dinnerAssignmentError, saveLocalMeal };
+module.exports._private = { DINNER_DATES, normalizeMeals, dinnerAssignmentError, clearMealForPerson, saveLocalMeal };

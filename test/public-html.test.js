@@ -266,7 +266,8 @@ test('dinner claiming excludes checkout day and keeps dinner plan choices simple
   assert.match(html, /<option value="other">Other<\/option>/);
   assert.match(html, /function planLabel\(value\)\{[^}]*value==='other' \? 'Other'/);
   assert.match(html, /<button class="secondary-action" type="button" id="clearDinnerForm">Clear<\/button><button type="submit">Save<\/button>/);
-  assert.match(html, /function clearDinnerFormSelections\(\)\{ \[dinnerDate,dinnerPartner,dinnerPlanType,dinnerTitle\]\.forEach\(el=>el\.value=''\); dinnerDate\.focus\(\); \}/);
+  assert.match(html, /let dinnerClearRequested=false/);
+  assert.match(html, /function clearDinnerFormSelections\(\)\{ dinnerClearRequested=true; dinnerForm\.dataset\.clearRequested='true'; \[dinnerDate,dinnerPartner,dinnerPlanType,dinnerTitle\]\.forEach\(el=>el\.value=''\); dinnerDate\.focus\(\); \}/);
   assert.match(html, /clearDinnerFormButton\.addEventListener\('click',clearDinnerFormSelections\)/);
   assert.match(html, /clearDinnerFormButton=document\.getElementById\('clearDinnerForm'\)/);
   assert.doesNotMatch(html, /Save dinner night/);
@@ -323,9 +324,19 @@ test('modal back buttons return to the last screen instead of always the dashboa
 });
 
 test('dinner form surfaces duplicate-assignment errors without closing the picker', () => {
-  assert.match(html, /function dinnerAssignmentError\(currentName, partner\)/);
-  assert.match(html, /You have already been assigned to a dinner\./);
-  assert.match(html, /\$\{partner\} has already been assigned to a dinner\./);
+  assert.match(html, /function dinnerAssignmentError\(currentName, partner, date\)/);
+  assert.doesNotMatch(html, /You have already been assigned to a dinner\./);
+  assert.match(html, /const currentSlot=slots\.find\(slot=>\(slot\.leads \|\| \[\]\)\.includes\(currentName\)\)/);
+  assert.match(html, /const partnerSlot=slots\.find\(slot=>\(slot\.leads \|\| \[\]\)\.includes\(partner\)\)/);
+  assert.match(html, /if\(partnerSlot && !\(currentSlot && partnerSlot\.date===currentSlot\.date\)\) return `\$\{partner\} has already been assigned to a dinner\.`/);
   assert.match(html, /throw new Error\(data\.error \|\| `Could not save dinner night`\)/);
   assert.match(html, /catch\(err\)\{ console\.error\(err\); showToast\(err\.message \|\| 'Could not save dinner night'\); \}/);
+});
+
+test('clear then save clears dinner responsibility and makes dinner todo incomplete again', () => {
+  assert.match(html, /if\(dinnerClearRequested\) return true/);
+  assert.match(html, /const payload=dinnerClearRequested \? \{ clear:true, token:guestToken \} : \{ date:dinnerDate\.value, partner:dinnerPartner\.value, planType:dinnerPlanType\.value, title:dinnerTitle\.value\.trim\(\), token:guestToken \}/);
+  assert.match(html, /dinnerClearRequested=false; delete dinnerForm\.dataset\.clearRequested/);
+  assert.match(html, /cacheDinnerPlan\(data\.meals \|\| dinnerPlan\(\)\); renderTripDashboard\(\); setPrimaryCta\(\);/);
+  assert.match(html, /const hasOutstandingTodos=!flights \|\| !myDinner \|\| localStorage\.getItem\(CALENDAR_KEY\)!=='true'/);
 });
