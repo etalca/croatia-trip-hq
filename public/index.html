@@ -1,0 +1,479 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Korčula — Friends Trip in Croatia</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --white: #fff;
+    --glass: rgba(255,255,255,.20);
+    --glass-hover: rgba(255,255,255,.80);
+    --ink: #0c2027;
+    --muted-white: rgba(255,255,255,.72);
+    --line: rgba(255,255,255,.24);
+    --panel: rgba(248,246,239,.94);
+    --panel-line: rgba(255,255,255,.58);
+  }
+  * { box-sizing: border-box; letter-spacing: -0.03em; }
+  html, body { margin: 0; width: 100%; min-height: 100%; background: #04151d; color: white; font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif; }
+  body { overflow: hidden; }
+  button, input, select, textarea { font: inherit; letter-spacing: -0.03em; }
+  a { color: inherit; }
+  #stage { position: fixed; inset: 0; overflow: hidden; background: #04151d; }
+  .poster-img, video, canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+  .poster-img { object-fit: cover; z-index: 0; }
+  video { object-fit: cover; z-index: 1; opacity: 0; transition: opacity .2s ease; }
+  video.video-ready { opacity: 1; }
+  canvas { z-index: 2; opacity: 0; transition: opacity .2s ease; }
+  canvas.webgl-ready { opacity: 1; }
+  .shade { position: fixed; inset: 0; pointer-events: none; background:
+    radial-gradient(circle at 50% 47%, rgba(255,255,255,.03), transparent 30%),
+    linear-gradient(to bottom, rgba(0,0,0,.12), rgba(0,0,0,.08) 34%, rgba(0,0,0,.26));
+  }
+  .countdown {
+    position: fixed;
+    top: clamp(22px, 4vw, 48px);
+    left: clamp(22px, 4vw, 52px);
+    z-index: 4;
+    display: grid;
+    gap: 2px;
+    color: rgba(255,255,255,.90);
+    text-shadow: 0 2px 28px rgba(0,0,0,.42);
+  }
+  .countdown strong { font-size: 13px; font-weight: 400; line-height: 1.12; }
+  .countdown span { color: var(--muted-white); font-size: 13px; font-weight: 400; }
+  .address {
+    position: fixed;
+    top: clamp(22px, 4vw, 48px);
+    right: clamp(22px, 4vw, 52px);
+    z-index: 4;
+    max-width: min(320px, 44vw);
+    text-align: right;
+    color: rgba(255,255,255,.86);
+    text-decoration: none;
+    font-size: 13px;
+    line-height: 1.22;
+    font-weight: 400;
+    text-shadow: 0 2px 28px rgba(0,0,0,.42);
+  }
+  .address:hover { color: white; }
+  .hero-content {
+    transition: opacity .22s ease;
+    position: fixed;
+    inset: 0;
+    z-index: 3;
+    display: grid;
+    place-items: center;
+    padding: 32px;
+    pointer-events: none;
+  }
+  body.modal-open .hero-content { opacity: 0 !important; visibility: hidden; pointer-events: none; }
+  .center {
+    display: grid;
+    justify-items: center;
+    gap: 18px;
+    transform: translateY(1.2vh);
+    text-align: center;
+    text-shadow: 0 2px 36px rgba(0,0,0,.45);
+  }
+  h1 {
+    margin: 0;
+    max-width: 560px;
+    font-size: 32px;
+    line-height: 1.04;
+    font-weight: 400;
+    color: rgba(255,255,255,.96);
+  }
+  .actions { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; pointer-events: auto; }
+  .pill {
+    appearance: none;
+    border: 1px solid rgba(255,255,255,.30);
+    border-radius: 999px;
+    min-height: 25.5px;
+    height: 25.5px;
+    padding: 0 10px;
+    display: inline-grid;
+    place-items: center;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 400;
+    cursor: pointer;
+    transition: background .22s ease, color .22s ease, border-color .22s ease, transform .22s ease;
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+  }
+  .pill.primary { background: white; color: var(--ink); border-color: white; }
+  .pill.secondary { background: var(--glass); color: white; }
+  .pill.secondary:hover, .pill.secondary:focus-visible { background: var(--glass-hover); color: var(--ink); border-color: rgba(255,255,255,.82); }
+  .pill:hover { transform: translateY(-1px); }
+  .pill:focus-visible, .close:focus-visible, .back:focus-visible, input:focus, select:focus, textarea:focus { outline: 2px solid rgba(255,255,255,.78); outline-offset: 3px; }
+  .gate {
+    position: fixed;
+    inset: 0;
+    z-index: 10;
+    display: grid;
+    place-items: center;
+    padding: 22px;
+    background: rgba(4,17,23,.18);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .24s ease;
+  }
+  .gate[hidden] { display: none; }
+  .gate.open { opacity: 1 !important; pointer-events: auto; }
+  .panel {
+    width: min(660px, calc(100% - 16px));
+    max-height: min(88svh, 760px);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    background: rgba(255,255,255,.20);
+    color: white;
+    border: 1px solid rgba(255,255,255,.30);
+    border-radius: 22px;
+    box-shadow: 0 26px 90px rgba(0,0,0,.26);
+    padding: 20px;
+    backdrop-filter: blur(18px) saturate(120%);
+    -webkit-backdrop-filter: blur(18px) saturate(120%);
+    text-shadow: 0 2px 24px rgba(0,0,0,.28);
+  }
+  .panel header { position: sticky; top: 0; z-index: 2; display: flex; justify-content: space-between; gap: 18px; align-items: flex-start; margin-bottom: 18px; }
+  .panel h2 { margin: 0; font-size: 32px; line-height: 1.04; font-weight: 400; }
+  .panel p { margin: 8px 0 0; color: rgba(255,255,255,.72); font-size: 13px; line-height: 1.35; }
+  .close { border: 1px solid rgba(255,255,255,.24); background: rgba(255,255,255,.14); color: rgba(255,255,255,.86); width: 25.5px; height: 25.5px; border-radius: 999px; font-size: 18px; line-height: 1; cursor: pointer; padding: 0; display: grid; place-items: center; }
+  .back { border: 1px solid rgba(255,255,255,.24); background: rgba(255,255,255,.14); color: rgba(255,255,255,.86); height: 25.5px; border-radius: 999px; font-size: 13px; line-height: 1; cursor: pointer; padding: 0 10px; display: grid; place-items: center; }
+  .back:hover, .back:focus-visible, .close:hover { background: rgba(255,255,255,.24); border-color: rgba(255,255,255,.42); }
+  form { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; overflow-y: auto; scrollbar-width: none; padding: 4px 5px 1px; margin: -4px -5px 0; }
+  form::-webkit-scrollbar, .dashboard-card::-webkit-scrollbar, .arrivals-board::-webkit-scrollbar { display: none; }
+  .field { display: grid; gap: 6px; }
+  .field.full { grid-column: 1 / -1; }
+  label { font-size: 13px; text-transform: none; font-weight: 400; color: rgba(255,255,255,.74); }
+  input, select, textarea { width: 100%; height: 34px; border: 1px solid rgba(255,255,255,.30); background: rgba(255,255,255,.20); border-radius: 13px; padding: 0 10px; color: white; font-size: 13px; font-weight: 400; box-shadow: inset 0 1px 0 rgba(255,255,255,.06); outline: none; }
+  textarea { height: auto; min-height: 74px; padding: 9px 10px; resize: vertical; line-height: 1.35; }
+  input::placeholder, textarea::placeholder { color: rgba(255,255,255,.48); }
+  select { color-scheme: dark; }
+  input:focus, select:focus, textarea:focus { border-color: rgba(255,255,255,.78); background: rgba(255,255,255,.26); }
+  .submit { grid-column: 1 / -1; display: flex; gap: 12px; align-items: center; justify-content: space-between; margin-top: 8px; }
+  .submit button { border: 1px solid white; background: white; color: var(--ink); border-radius: 999px; min-height: 25.5px; padding: 0 10px; font-size: 13px; font-weight: 400; cursor: pointer; }
+  .submit small { color: rgba(255,255,255,.62); font-size: 13px; line-height: 1.35; }
+  .dashboard {
+    position: fixed;
+    inset: 0;
+    z-index: 9;
+    display: grid;
+    place-items: center;
+    padding: 22px;
+    background: rgba(4,17,23,.18);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .24s ease;
+  }
+  .dashboard.open { opacity: 1; pointer-events: auto; }
+  .dashboard[hidden] { display: none; }
+  .dashboard-card {
+    width: min(920px, 100%);
+    max-height: min(88svh, 760px);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    background: rgba(255,255,255,.20);
+    border: 1px solid rgba(255,255,255,.30);
+    border-radius: 22px;
+    color: white;
+    padding: 20px;
+    backdrop-filter: blur(18px) saturate(120%);
+    -webkit-backdrop-filter: blur(18px) saturate(120%);
+    box-shadow: 0 26px 90px rgba(0,0,0,.26);
+    text-shadow: 0 2px 24px rgba(0,0,0,.28);
+  }
+  .dashboard-card header { position: sticky; top: 0; z-index: 2; display: flex; justify-content: space-between; gap: 18px; align-items: flex-start; margin-bottom: 18px; }
+  .dashboard-card h2 { margin: 0; font-size: 32px; line-height: 1.04; font-weight: 400; }
+  .dashboard-card p { margin: 8px 0 0; color: rgba(255,255,255,.72); font-size: 13px; line-height: 1.35; }
+  .trip-info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; overflow-y: auto; scrollbar-width: none; padding: 2px 1px 1px; }
+  .trip-info-grid::-webkit-scrollbar { display: none; }
+  .info-card { appearance: none; width: 100%; min-height: 82px; display: grid; align-content: space-between; gap: 14px; text-align: left; border: 1px solid rgba(255,255,255,.24); border-radius: 15px; background: rgba(255,255,255,.14); color: white; padding: 12px; cursor: pointer; transition: background .22s ease, border-color .22s ease, transform .22s ease; text-decoration: none; }
+  .info-card:hover, .info-card:focus-visible { background: rgba(255,255,255,.24); border-color: rgba(255,255,255,.42); transform: none; }
+  .info-card span:first-child { font-size: 13px; line-height: 1.1; color: white; }
+  .info-card span:last-child { font-size: 13px; line-height: 1.28; color: rgba(255,255,255,.66); }
+  .board-tabs { flex: 0 0 auto; display: inline-flex; align-self: flex-start; gap: 3px; padding: 3px; margin: 2px 0 12px; border: 1px solid rgba(255,255,255,.24); border-radius: 999px; background: rgba(255,255,255,.12); }
+  .board-tab { height: 25.5px; padding: 0 10px; border: 0; border-radius: 999px; background: transparent; color: rgba(255,255,255,.70); font-size: 13px; font-weight: 400; cursor: pointer; }
+  .board-tab.active { background: rgba(255,255,255,.80); color: var(--ink); }
+  .arrivals-board { display: grid; gap: 8px; margin: 0 0 18px; overflow-y: auto; scrollbar-width: none; padding-right: 1px; }
+  .arrival-row { display: grid; grid-template-columns: minmax(86px, 1fr) minmax(190px, 1.45fr) minmax(86px, .8fr) minmax(104px, .72fr) 25.5px; gap: 8px; align-items: center; border: 1px solid rgba(255,255,255,.24); background: rgba(255,255,255,.14); border-radius: 13px; padding: 8px; font-size: 13px; }
+  .arrival-row.is-empty { color: rgba(255,255,255,.54); }
+  .arrival-name { color: white; }
+  .arrival-row.is-empty .arrival-name { color: rgba(255,255,255,.72); }
+  .arrival-meta, .arrival-countdown { color: rgba(255,255,255,.72); line-height: 1.3; min-width: 0; }
+  .arrival-countdown { white-space: nowrap; text-align: left; }
+  .arrival-flight { color: rgba(255,255,255,.88); line-height: 1.3; min-width: 0; }
+  .notes-toggle { width: 25.5px; height: 25.5px; border-radius: 999px; display: grid; place-items: center; border: 1px solid rgba(255,255,255,.24); background: rgba(255,255,255,.14); color: rgba(255,255,255,.86); cursor: pointer; padding: 0; }
+  .info-glyph { display: grid; place-items: center; width: 14px; height: 14px; border-radius: 999px; font-size: 12px; line-height: 1; font-weight: 400; font-style: normal; font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif; letter-spacing: -0.03em; }
+  .notes-toggle:hover, .notes-toggle:focus-visible { background: rgba(255,255,255,.26); border-color: rgba(255,255,255,.42); }
+  .arrival-notes { grid-column: 1 / -1; margin-top: 2px; padding: 8px 10px; border-radius: 11px; border: 1px solid rgba(255,255,255,.18); background: rgba(255,255,255,.10); color: rgba(255,255,255,.70); line-height: 1.35; }
+  .arrival-notes[hidden], .notes-toggle[hidden] { display: none; }
+  .dashboard-actions { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-start; }
+  .debug {
+    position: fixed;
+    top: 82px;
+    right: 18px;
+    z-index: 20;
+    width: 300px;
+    padding: 14px;
+    border: 1px solid rgba(255,255,255,.18);
+    border-radius: 18px;
+    background: rgba(5,18,25,.72);
+    backdrop-filter: blur(14px);
+    color: rgba(255,255,255,.82);
+    font-size: 12px;
+    display: none;
+  }
+  .debug.show { display: block; }
+  .debug label { display: grid; gap: 5px; margin: 9px 0; color: rgba(255,255,255,.82); text-transform: none; font-size: 12px; }
+  .debug input { width: 100%; }
+  .mask-line { position: fixed; left: 0; right: 0; height: 0; border-top: 2px solid rgba(255,222,148,.95); box-shadow: 0 0 0 1px rgba(4,18,25,.45), 0 0 24px rgba(255,222,148,.45); pointer-events: none; z-index: 19; display: none; }
+  .mask-line::before { content: "waterline mask"; position: absolute; right: 18px; top: -28px; padding: 5px 8px; border-radius: 999px; background: rgba(5,18,25,.72); color: rgba(255,241,205,.96); font-size: 11px; text-transform: uppercase; }
+  .mask-line.show { display: block; }
+  .toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%) translateY(20px); opacity: 0; z-index: 22; background: rgba(255,255,255,.92); color: var(--ink); border-radius: 999px; padding: 7px 10px; font-size: 13px; font-weight: 400; transition: .22s ease; }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .fallback { position: fixed; inset: 0; display: grid; place-items: center; padding: 30px; color: rgba(255,255,255,.8); text-align: center; background: #061923; visibility: hidden; z-index: 30; }
+  .fallback.show { visibility: visible; }
+  @media (max-width: 760px) {
+    .address { max-width: 52vw; font-size: 12px; }
+    .countdown span { font-size: 12px; }
+    .hero-content { padding: 22px; }
+    .center { gap: 18px; }
+    .actions { gap: 9px; }
+    .pill { min-height: 25.5px; height: 25.5px; padding: 0 10px; }
+    .arrival-row { grid-template-columns: 1fr 25.5px; }
+    .arrival-meta, .arrival-flight, .arrival-countdown { grid-column: 1 / 2; }
+    .trip-info-grid { grid-template-columns: 1fr; }
+    form { grid-template-columns: 1fr; }
+    .submit { display: grid; }
+  }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+</style>
+</head>
+<body>
+<div id="stage">
+  <img class="poster-img" src="assets/hero-water-2-poster.jpg" alt="" aria-hidden="true">
+  <video id="waterVideo" data-src="assets/hero-water-2-browser.mp4" poster="assets/hero-water-2-poster.jpg" muted playsinline loop preload="auto"></video>
+  <canvas id="gl"></canvas>
+</div>
+<div class="shade"></div>
+<div class="countdown" aria-label="Countdown to villa week"><strong id="countDays">—</strong><span>days and counting</span></div>
+<a class="address" href="https://www.google.com/maps/place/Villa+Darinka/@42.9343666,16.6551014,15.4z/data=!4m9!3m8!1s0x134a73c92d0ce117:0x3fd1fdd80b1a9ee7!5m2!4m1!1i2!8m2!3d42.929621!4d16.6681103!16s%2Fg%2F11c5qpstxg?entry=ttu&g_ep=EgoyMDI2MDQyOS4wIKXMDSoASAFQAw%3D%3D" target="_blank" rel="noreferrer">Villa Darinka<br>Triporte 32, 20270 Vela Luka, Croatia</a>
+<main class="hero-content">
+  <section class="center" aria-label="Trip invitation">
+    <h1>Your week on Korčula awaits.</h1>
+    <div class="actions">
+      <button class="pill primary" id="openGate">Enter flight info</button>
+      <button class="pill secondary" id="addCalendar">Add to calendar</button>
+    </div>
+  </section>
+</main>
+<div class="gate" id="gate" role="dialog" aria-modal="true" aria-labelledby="gateTitle" hidden>
+  <section class="panel">
+    <header><div><h2 id="gateTitle">Flight details</h2><p>Add your flight information so we can keep track of you.</p></div><button class="close" id="closeGate" aria-label="Close">×</button></header>
+    <form id="tripForm">
+      <div class="field"><label for="name">Name</label><select id="name" required><option value="">Choose your name</option></select></div>
+      <div class="field"><label for="flightStatus">Flight status</label><select id="flightStatus" required><option value="">Choose status</option><option>Booked</option><option>Not booked yet</option><option>Partially booked</option></select></div>
+      <div class="field"><label for="arrivalDate">Arrival date</label><input id="arrivalDate" type="date" required></div>
+      <div class="field"><label for="arrivalAirport">Arrival airport</label><input id="arrivalAirport" placeholder="DBV, SPU, ZAG…" required></div>
+      <div class="field"><label for="arrivalTime">Arrival time</label><input id="arrivalTime" type="time"></div>
+      <div class="field"><label for="arrivalFlight">Arrival flight</label><input id="arrivalFlight" placeholder="UA 123 / OU 661"></div>
+      <div class="field"><label for="departureDate">Departure date</label><input id="departureDate" type="date" required></div>
+      <div class="field"><label for="departureAirport">Departure airport</label><input id="departureAirport" placeholder="DBV, SPU, ZAG…" required></div>
+      <div class="field"><label for="departureTime">Departure time</label><input id="departureTime" type="time"></div>
+      <div class="field"><label for="departureFlight">Departure flight</label><input id="departureFlight" placeholder="UA 124 / OU 662"></div>
+      <div class="field full"><label for="flightNotes">Flight notes</label><textarea id="flightNotes" placeholder="Layovers, ferry timing, people you’re traveling with, early/late plans…"></textarea></div>
+      <div class="submit"><small>This saves to the shared trip board so everyone can stay in sync.</small><button type="submit">Save flights</button></div>
+    </form>
+  </section>
+</div>
+<div class="dashboard" id="tripInfo" role="dialog" aria-modal="true" aria-labelledby="tripInfoTitle" hidden>
+  <section class="dashboard-card">
+    <header><div><h2 id="tripInfoTitle">Trip info</h2><p>Keep coming back for more info and tasks to complete before the trip.</p></div></header>
+    <div class="trip-info-grid" aria-label="Trip info sections">
+      <button class="info-card" id="openFlights" type="button"><span>Flights</span><span>View the arrivals and departures board.</span></button>
+      <button class="info-card" id="tripInfoEditFlights" type="button"><span>My flight details</span><span>Add or update your own plans.</span></button>
+      <a class="info-card" href="https://www.google.com/maps/place/Villa+Darinka/@42.9343666,16.6551014,15.4z/data=!4m9!3m8!1s0x134a73c92d0ce117:0x3fd1fdd80b1a9ee7!5m2!4m1!1i2!8m2!3d42.929621!4d16.6681103!16s%2Fg%2F11c5qpstxg?entry=ttu&g_ep=EgoyMDI2MDQyOS4wIKXMDSoASAFQAw%3D%3D" target="_blank" rel="noreferrer"><span>Villa</span><span>Open Villa Darinka on Google Maps.</span></a>
+      <button class="info-card" id="tripInfoCalendar" type="button"><span>Calendar</span><span>Add villa week to your calendar.</span></button>
+    </div>
+  </section>
+</div>
+<div class="dashboard" id="dashboard" role="dialog" aria-modal="true" aria-labelledby="dashboardTitle" hidden>
+  <section class="dashboard-card">
+    <header><div><h2 id="dashboardTitle">Flights</h2><p>Arrivals and departures for everyone so we can keep track of who's getting here first!</p></div><button class="back" id="closeDashboard" aria-label="Back to trip info">Back</button></header>
+    <div class="board-tabs" role="tablist" aria-label="Flight board">
+      <button class="board-tab active" id="arrivalsTab" type="button" role="tab" aria-selected="true">Arrivals</button>
+      <button class="board-tab" id="departuresTab" type="button" role="tab" aria-selected="false">Departures</button>
+    </div>
+    <div class="arrivals-board" id="arrivalsBoard"></div>
+    <div class="dashboard-actions">
+      <button class="pill primary" id="editFlights">Edit flight details</button>
+    </div>
+  </section>
+</div>
+<div class="debug" id="debug">
+  <strong>Water tuning</strong><br><code>D toggles · R resets</code>
+  <label>Distortion <input id="distortion" type="range" min="0" max="0.045" step="0.001" value="0.016"></label>
+  <label>Shimmer boost <input id="shimmer" type="range" min="0" max="1.4" step="0.02" value="0.48"></label>
+  <label>Impulse size <input id="radius" type="range" min="8" max="42" step="1" value="22"></label>
+  <label>Fade speed <input id="fade" type="range" min="0.86" max="0.985" step="0.001" value="0.944"></label>
+  <label>Warmth <input id="warmth" type="range" min="0" max="0.22" step="0.005" value="0.075"></label>
+  <label>Waterline mask <input id="waterline" type="range" min="0.20" max="0.70" step="0.005" value="0.405"></label>
+</div>
+<div class="mask-line" id="maskLine"></div>
+<div class="toast" id="toast">Saved</div>
+<div class="fallback" id="fallback">This browser could not start the WebGL water experience.</div>
+<script>
+(() => {
+  const crew=['Tanner','David','Jacob G.','Jacob M.','Mikaela','Candace','Kaelin','Mark','Amanda','Ellie','Erika','Andie','Zach','Kait','Nick'];
+  const villaStart = new Date('2026-06-27T15:00:00');
+  const mapUrl = 'https://www.google.com/maps/place/Villa+Darinka/@42.9343666,16.6551014,15.4z/data=!4m9!3m8!1s0x134a73c92d0ce117:0x3fd1fdd80b1a9ee7!5m2!4m1!1i2!8m2!3d42.929621!4d16.6681103!16s%2Fg%2F11c5qpstxg?entry=ttu&g_ep=EgoyMDI2MDQyOS4wIKXMDSoASAFQAw%3D%3D';
+  const countDays=document.getElementById('countDays');
+  function updateCountdown(){ countDays.textContent = Math.ceil(Math.max(0, villaStart - new Date()) / 86400000); }
+  updateCountdown(); setInterval(updateCountdown, 3600000);
+
+  const nameSelect=document.getElementById('name');
+  crew.forEach(n=>{const o=document.createElement('option');o.textContent=n;o.value=n;nameSelect.appendChild(o)});
+  const gate=document.getElementById('gate'), openGate=document.getElementById('openGate'), closeGate=document.getElementById('closeGate'), form=document.getElementById('tripForm'), toast=document.getElementById('toast'), tripInfo=document.getElementById('tripInfo'), closeTripInfo=document.getElementById('closeTripInfo'), openFlights=document.getElementById('openFlights'), tripInfoEditFlights=document.getElementById('tripInfoEditFlights'), tripInfoCalendar=document.getElementById('tripInfoCalendar'), dashboard=document.getElementById('dashboard'), closeDashboard=document.getElementById('closeDashboard'), editFlights=document.getElementById('editFlights'), arrivalsBoard=document.getElementById('arrivalsBoard'), arrivalsTab=document.getElementById('arrivalsTab'), departuresTab=document.getElementById('departuresTab');
+  let boardMode='arrivals';
+  const fields={ name:document.getElementById('name'), flightStatus:document.getElementById('flightStatus'), arrivalDate:document.getElementById('arrivalDate'), arrivalAirport:document.getElementById('arrivalAirport'), arrivalTime:document.getElementById('arrivalTime'), arrivalFlight:document.getElementById('arrivalFlight'), departureDate:document.getElementById('departureDate'), departureAirport:document.getElementById('departureAirport'), departureTime:document.getElementById('departureTime'), departureFlight:document.getElementById('departureFlight'), flightNotes:document.getElementById('flightNotes') };
+  const airportCities={ DBV:'Dubrovnik', SPU:'Split', ZAG:'Zagreb', ZAD:'Zadar', PUY:'Pula', RJK:'Rijeka', BWK:'Brač', SJJ:'Sarajevo', TIV:'Tivat', TGD:'Podgorica', VIE:'Vienna', FRA:'Frankfurt', MUC:'Munich', LHR:'London Heathrow', LGW:'London Gatwick', CDG:'Paris Charles de Gaulle', AMS:'Amsterdam', FCO:'Rome', BCN:'Barcelona', MAD:'Madrid', JFK:'New York JFK', EWR:'Newark', LAX:'Los Angeles', SFO:'San Francisco', ORD:'Chicago O’Hare', ATL:'Atlanta' };
+  function showToast(text){ toast.textContent=text; toast.classList.add('show'); setTimeout(()=>toast.classList.remove('show'),1400); }
+  function anyModalOpen(){ return gate.classList.contains('open') || tripInfo.classList.contains('open') || dashboard.classList.contains('open'); }
+  function syncHomeVisibility(){ document.body.classList.toggle('modal-open', anyModalOpen()); }
+  function hideHomeContent(){ document.body.classList.add('modal-open'); }
+  function escapeHtml(v){ return String(v ?? '').replace(/[&<>'"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c])); }
+  function normalizeAirportInput(el){ const raw=el.value.trim(); const code=(raw.match(/[A-Za-z]{3}/)?.[0] || '').toUpperCase(); if(code && airportCities[code] && !raw.includes('(')) el.value = `${airportCities[code]} (${code})`; }
+  [fields.arrivalAirport, fields.departureAirport].forEach(el=>{ el.addEventListener('blur',()=>normalizeAirportInput(el)); el.addEventListener('change',()=>normalizeAirportInput(el)); });
+  const TOKEN_KEY='korculaGuestToken';
+  const NAME_KEY='korculaGuestName';
+  const params=new URLSearchParams(window.location.search);
+  const urlToken=params.get('guest') || params.get('token') || '';
+  if(urlToken) localStorage.setItem(TOKEN_KEY, urlToken);
+  let guestToken=localStorage.getItem(TOKEN_KEY) || '';
+  let cachedFlights=null;
+  let cachedBoard={};
+  function readLocalFlights(){ try { return JSON.parse(localStorage.getItem('korculaFlightDetails') || 'null'); } catch { return null; } }
+  function readLocalBoard(){ try { return JSON.parse(localStorage.getItem('korculaFlightBoard') || '{}'); } catch { return {}; } }
+  function rememberedName(){ return fields.name.value || localStorage.getItem(NAME_KEY) || readLocalFlights()?.name || ''; }
+  cachedFlights=readLocalFlights(); cachedBoard=readLocalBoard();
+  if(rememberedName()) fields.name.value=rememberedName();
+  function savedFlights(){ return cachedFlights || readLocalFlights(); }
+  function flightBoard(){ return cachedBoard || readLocalBoard(); }
+  function cacheFlightState(data, board){ if(data){ cachedFlights=data; localStorage.setItem('korculaFlightDetails', JSON.stringify(data)); if(data.name) localStorage.setItem(NAME_KEY, data.name); } if(board){ cachedBoard=board; localStorage.setItem('korculaFlightBoard', JSON.stringify(board)); } }
+  async function loadRemoteState(nameOverride){
+    const selectedName=nameOverride || rememberedName();
+    const query=guestToken ? `token=${encodeURIComponent(guestToken)}` : (selectedName ? `name=${encodeURIComponent(selectedName)}` : '');
+    try {
+      const res=await fetch(`/api/bootstrap${query ? '?' + query : ''}`, { cache:'no-store' });
+      if(!res.ok) throw new Error(`bootstrap ${res.status}`);
+      const payload=await res.json();
+      if(payload.board) cacheFlightState(null, payload.board || {});
+      if(payload.person){ fields.name.value=payload.person; localStorage.setItem(NAME_KEY, payload.person); }
+      if(payload.flights){ cacheFlightState(payload.flights, payload.board || flightBoard()); fillForm(payload.flights); }
+      setPrimaryCta();
+      if(dashboard.classList.contains('open')) renderDashboard();
+    } catch(err) { console.warn('Using this browser’s saved trip info until backend is reachable.', err); setPrimaryCta(); }
+  }
+  async function saveFlightRecord(data){
+    const localBoard={...flightBoard()}; if(data.name) localBoard[data.name]=data; cacheFlightState(data, localBoard);
+    const res=await fetch('/api/flights', { method:'POST', headers:{'content-type':'application/json'}, body:JSON.stringify({ token:guestToken, name:data.name, data }) });
+    if(!res.ok) throw new Error(`save ${res.status}`);
+    const payload=await res.json();
+    cacheFlightState(payload.flights || data, payload.board || localBoard);
+    return { remote:true };
+  }
+  function setPrimaryCta(){ openGate.textContent = savedFlights() ? 'View trip info' : 'Enter flight info'; }
+  function fillForm(data){ if(!data) return; Object.entries(fields).forEach(([k,el])=>{ if(data[k] !== undefined) el.value=data[k]; }); }
+  function openDialog(){ hideHomeContent(); const current=savedFlights(); if(current) fillForm(current); dashboard.classList.remove('open'); dashboard.hidden=true; tripInfo.classList.remove('open'); tripInfo.hidden=true; gate.hidden=false; gate.classList.add('open'); setTimeout(()=>fields.name.focus(),60); }
+  function closeDialog(){ gate.classList.remove('open'); setTimeout(()=>{ if(!gate.classList.contains('open')) gate.hidden=true; syncHomeVisibility(); },240); }
+  function countdownFor(d,mode=boardMode){ const date=mode==='departures'?d?.departureDate:d?.arrivalDate; const time=mode==='departures'?d?.departureTime:d?.arrivalTime; if(!date) return 'awaiting flights'; const when=new Date(`${date}T${time || '12:00'}`); if(Number.isNaN(when.getTime())) return 'awaiting flights'; const ms=when-new Date(); if(ms<=0) return mode==='departures' ? 'departed' : 'arrived'; const days=Math.floor(ms/86400000); const hours=Math.floor((ms%86400000)/3600000); return days>0 ? `${days}d ${hours}h` : `${Math.max(1,hours)}h`; }
+  function setBoardMode(mode){ boardMode=mode; arrivalsTab.classList.toggle('active',mode==='arrivals'); departuresTab.classList.toggle('active',mode==='departures'); arrivalsTab.setAttribute('aria-selected',mode==='arrivals'); departuresTab.setAttribute('aria-selected',mode==='departures'); renderDashboard(); }
+  function noteIcon(){ return `<span class="info-glyph" aria-hidden="true">i</span>`; }
+  function timeValue(d,mode=boardMode){ const date=mode==='departures'?d?.departureDate:d?.arrivalDate; const time=mode==='departures'?d?.departureTime:d?.arrivalTime; if(!date) return Infinity; const when=new Date(`${date}T${time || '12:00'}`); return Number.isNaN(when.getTime()) ? Infinity : when.getTime(); }
+  function orderedPeople(board){ return crew.map((person,index)=>({person,index,d:board[person]})).sort((a,b)=>{ const av=timeValue(a.d,'arrivals'), bv=timeValue(b.d,'arrivals'); if(av!==bv) return av-bv; return a.index-b.index; }); }
+  function renderDashboard(){ const board=flightBoard(); const latest=savedFlights(); if(latest?.name && !board[latest.name]) board[latest.name]=latest; arrivalsBoard.innerHTML=orderedPeople(board).map(({person,d},i)=>{ const has=!!d; const isDepart=boardMode==='departures'; const main=has ? [isDepart?d.departureDate:d.arrivalDate, isDepart?d.departureTime:d.arrivalTime, isDepart?d.departureAirport:d.arrivalAirport].filter(Boolean).join(' · ') : 'Not added yet'; const flight=has ? (isDepart?d.departureFlight:d.arrivalFlight) || d.flightStatus || 'Flight details saved' : 'Waiting'; const noteText=has && d.flightNotes ? d.flightNotes : 'No flight notes yet.'; const notes=escapeHtml(noteText); return `<div class="arrival-row ${has?'':'is-empty'}"><div class="arrival-name">${escapeHtml(person)}</div><div class="arrival-meta">${escapeHtml(main)}</div><div class="arrival-flight">${escapeHtml(flight)}</div><div class="arrival-countdown">${escapeHtml(countdownFor(d,boardMode))}</div><button class="notes-toggle" data-note="note-${boardMode}-${i}" title="Show notes" aria-label="Show notes for ${escapeHtml(person)}">${noteIcon()}</button><div class="arrival-notes" id="note-${boardMode}-${i}" hidden>${notes}</div></div>`; }).join(''); arrivalsBoard.querySelectorAll('.notes-toggle').forEach(btn=>btn.addEventListener('click',()=>{ const note=document.getElementById(btn.dataset.note); note.hidden=!note.hidden; })); }
+  function openTripInfo(){ hideHomeContent(); if(!savedFlights()){ openDialog(); return; } closeDialog(); closeDash(); tripInfo.hidden=false; tripInfo.classList.add('open'); }
+  function closeTripInfoModal(){ tripInfo.classList.remove('open'); setTimeout(()=>{ if(!tripInfo.classList.contains('open')) tripInfo.hidden=true; syncHomeVisibility(); },240); }
+  function openDashboard(){ hideHomeContent(); if(!savedFlights()){ openDialog(); return; } closeDialog(); closeTripInfoModal(); renderDashboard(); dashboard.hidden=false; dashboard.classList.add('open'); }
+  function closeDash(){ dashboard.classList.remove('open'); setTimeout(()=>{ if(!dashboard.classList.contains('open')) dashboard.hidden=true; syncHomeVisibility(); },240); }
+  openGate.addEventListener('click', () => savedFlights() ? openTripInfo() : openDialog()); closeGate.addEventListener('click', closeDialog); gate.addEventListener('click', e=>{ if(e.target===gate) closeDialog(); }); if(closeTripInfo) closeTripInfo.addEventListener('click', closeTripInfoModal); tripInfo.addEventListener('click', e=>{ if(e.target===tripInfo) closeTripInfoModal(); }); openFlights.addEventListener('click', openDashboard); tripInfoEditFlights.addEventListener('click', openDialog); tripInfoCalendar.addEventListener('click',()=>document.getElementById('addCalendar').click()); closeDashboard.addEventListener('click',()=>{ closeDash(); openTripInfo(); }); dashboard.addEventListener('click', e=>{ if(e.target===dashboard) closeDash(); }); editFlights.addEventListener('click', openDialog); arrivalsTab.addEventListener('click',()=>setBoardMode('arrivals')); departuresTab.addEventListener('click',()=>setBoardMode('departures')); fields.name.addEventListener('change',()=>{ const selected=fields.name.value; if(selected) localStorage.setItem(NAME_KEY, selected); const local=flightBoard()[selected]; if(local) fillForm(local); loadRemoteState(selected); });
+  setPrimaryCta(); loadRemoteState();
+  form.addEventListener('submit', async e=>{ e.preventDefault(); normalizeAirportInput(fields.arrivalAirport); normalizeAirportInput(fields.departureAirport); if(!form.reportValidity()) return; const data={ name:fields.name.value, flightStatus:fields.flightStatus.value, arrivalDate:fields.arrivalDate.value, arrivalAirport:fields.arrivalAirport.value.trim(), arrivalTime:fields.arrivalTime.value, arrivalFlight:fields.arrivalFlight.value.trim(), departureDate:fields.departureDate.value, departureAirport:fields.departureAirport.value.trim(), departureTime:fields.departureTime.value, departureFlight:fields.departureFlight.value.trim(), flightNotes:fields.flightNotes.value.trim() }; try { await saveFlightRecord(data); setPrimaryCta(); closeDialog(); openTripInfo(); showToast('Flights saved for the group'); } catch(err) { console.error(err); setPrimaryCta(); closeDialog(); openTripInfo(); showToast('Saved here — backend unreachable'); } });
+  document.getElementById('addCalendar').addEventListener('click', () => {
+    const ics = ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Korcula Trip HQ//Villa Darinka//EN','CALSCALE:GREGORIAN','METHOD:PUBLISH','BEGIN:VEVENT','UID:friends-trip-croatia-20260627@korcula-trip-hq','DTSTAMP:20260504T000000Z','DTSTART;VALUE=DATE:20260627','DTEND;VALUE=DATE:20260705','SUMMARY:Friends trip in Croatia','LOCATION:Triporte 32, 20270 Vela Luka, Croatia','DESCRIPTION:Villa week at Villa Darinka, Korčula, Croatia. Map: '+mapUrl,'END:VEVENT','END:VCALENDAR'].join('\r\n');
+    const blob = new Blob([ics], { type: 'text/calendar;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a'); a.href = url; a.download = 'Friends trip in Croatia.ics'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url); showToast('Calendar file created');
+  });
+
+  const canvas = document.getElementById('gl');
+  const video = document.getElementById('waterVideo');
+  const poster = new Image();
+  poster.src = 'assets/hero-water-2-poster.jpg';
+  const fallback = document.getElementById('fallback');
+  const debug = document.getElementById('debug');
+  const maskLine = document.getElementById('maskLine');
+  const controls = { distortion, shimmer, radius, fade, warmth, waterline };
+  const gl = canvas.getContext('webgl', { antialias: false, alpha: false, preserveDrawingBuffer: false });
+  if (!gl) { fallback.classList.add('show'); return; }
+  const vert = `attribute vec2 a_pos; varying vec2 v_uv; void main(){ v_uv=a_pos*0.5+0.5; gl_Position=vec4(a_pos,0.0,1.0); }`;
+  const frag = `precision highp float; uniform sampler2D u_video; uniform sampler2D u_disturb; uniform vec2 u_resolution; uniform vec2 u_videoSize; uniform float u_distortion; uniform float u_shimmer; uniform float u_warmth; uniform float u_waterline; uniform float u_time; varying vec2 v_uv;
+    vec2 coverUv(vec2 uv, vec2 canvasSize, vec2 mediaSize){ float ca=canvasSize.x/canvasSize.y; float ma=mediaSize.x/mediaSize.y; vec2 scale=vec2(1.0); if(ma>ca){ scale.x=ca/ma; } else { scale.y=ma/ca; } return (uv-.5)*scale+.5; }
+    float luma(vec3 c){ return dot(c, vec3(.299,.587,.114)); }
+    void main(){ vec2 uv=v_uv; float screenY=1.0-uv.y; float waterMask=smoothstep(u_waterline-.015,u_waterline+.055,screenY); vec2 texel=vec2(1.0/256.0); float c=texture2D(u_disturb,uv).r*waterMask; float cx1=texture2D(u_disturb,uv+vec2(texel.x,0.0)).r; float cx0=texture2D(u_disturb,uv-vec2(texel.x,0.0)).r; float cy1=texture2D(u_disturb,uv+vec2(0.0,texel.y)).r; float cy0=texture2D(u_disturb,uv-vec2(0.0,texel.y)).r; vec2 grad=vec2(cx1-cx0,cy1-cy0)*waterMask; vec2 refractUv=uv+grad*u_distortion+vec2(sin((uv.y*38.0)+u_time*.65),cos((uv.x*26.0)-u_time*.42))*c*u_distortion*.13; vec2 mediaUv=coverUv(refractUv,u_resolution,u_videoSize); vec3 color=texture2D(u_video,mediaUv).rgb; color.r+=u_warmth*.42; color.g+=u_warmth*.18; color.b-=u_warmth*.12; color=clamp(color,0.0,1.0); float lum=luma(color); float highlightMask=smoothstep(.48,.92,lum); float glint=highlightMask*c*u_shimmer; glint*=.62+.38*sin(u_time*2.2+uv.x*80.0+uv.y*26.0); color+=vec3(1.0,.93,.72)*glint; float d=distance(uv,vec2(.52,.50)); color*=1.0-smoothstep(.42,.86,d)*.26; gl_FragColor=vec4(color,1.0); }`;
+  function shader(type, src){ const s=gl.createShader(type); gl.shaderSource(s,src); gl.compileShader(s); if(!gl.getShaderParameter(s,gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(s)); return s; }
+  function program(vs,fs){ const p=gl.createProgram(); gl.attachShader(p,shader(gl.VERTEX_SHADER,vs)); gl.attachShader(p,shader(gl.FRAGMENT_SHADER,fs)); gl.linkProgram(p); if(!gl.getProgramParameter(p,gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(p)); return p; }
+  let prog; try { prog=program(vert,frag); } catch(err){ console.error(err); fallback.classList.add('show'); return; }
+  gl.useProgram(prog);
+  const quad=gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER,quad); gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,1,-1,-1,1,-1,1,1,-1,1,1]),gl.STATIC_DRAW); const aPos=gl.getAttribLocation(prog,'a_pos'); gl.enableVertexAttribArray(aPos); gl.vertexAttribPointer(aPos,2,gl.FLOAT,false,0,0);
+  function makeTexture(unit){ const tex=gl.createTexture(); gl.activeTexture(gl.TEXTURE0+unit); gl.bindTexture(gl.TEXTURE_2D,tex); gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_S,gl.CLAMP_TO_EDGE); gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_WRAP_T,gl.CLAMP_TO_EDGE); gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MIN_FILTER,gl.LINEAR); gl.texParameteri(gl.TEXTURE_2D,gl.TEXTURE_MAG_FILTER,gl.LINEAR); return tex; }
+  const videoTex=makeTexture(0); gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,true); const disturbTex=makeTexture(1); gl.uniform1i(gl.getUniformLocation(prog,'u_video'),0); gl.uniform1i(gl.getUniformLocation(prog,'u_disturb'),1);
+  const loc={ resolution:gl.getUniformLocation(prog,'u_resolution'), videoSize:gl.getUniformLocation(prog,'u_videoSize'), distortion:gl.getUniformLocation(prog,'u_distortion'), shimmer:gl.getUniformLocation(prog,'u_shimmer'), warmth:gl.getUniformLocation(prog,'u_warmth'), waterline:gl.getUniformLocation(prog,'u_waterline'), time:gl.getUniformLocation(prog,'u_time') };
+  const dCanvas=document.createElement('canvas'); dCanvas.width=256; dCanvas.height=256; const dctx=dCanvas.getContext('2d',{alpha:false}); dctx.fillStyle='black'; dctx.fillRect(0,0,256,256);
+  let width=0,height=0,dpr=1; function resize(){ dpr=Math.min(2,window.devicePixelRatio||1); width=Math.floor(window.innerWidth*dpr); height=Math.floor(window.innerHeight*dpr); canvas.width=width; canvas.height=height; gl.viewport(0,0,width,height); updateMaskLine(); } window.addEventListener('resize',resize,{passive:true});
+  function updateMaskLine(){ if(maskLine) maskLine.style.top=(Number(controls.waterline.value)*window.innerHeight)+'px'; } controls.waterline.addEventListener('input',updateMaskLine); resize();
+  const pointer={x:.5,y:.5,px:.5,py:.5,down:false,active:false,speed:0}; function setPointer(e){ const x=e.clientX/window.innerWidth, y=e.clientY/window.innerHeight; pointer.speed=Math.hypot(x-pointer.x,y-pointer.y); pointer.px=pointer.x; pointer.py=pointer.y; pointer.x=x; pointer.y=y; pointer.active=true; } window.addEventListener('pointermove',setPointer,{passive:true}); window.addEventListener('pointerdown',e=>{pointer.down=true; setPointer(e);},{passive:true}); window.addEventListener('pointerup',()=>pointer.down=false,{passive:true});
+  function addImpulse(){ const r=Number(controls.radius.value); const waterline=Number(controls.waterline.value); const strength=Math.min(1,.18+pointer.speed*34+(pointer.down?.18:0)); if(!pointer.active || pointer.y < waterline-.01 || strength < .04) return; const x=pointer.x*256; const y=(1-pointer.y)*256; const g=dctx.createRadialGradient(x,y,0,x,y,r); g.addColorStop(0,`rgba(255,255,255,${.50*strength})`); g.addColorStop(.32,`rgba(190,220,255,${.22*strength})`); g.addColorStop(1,'rgba(0,0,0,0)'); dctx.globalCompositeOperation='lighter'; dctx.fillStyle=g; dctx.beginPath(); dctx.arc(x,y,r,0,Math.PI*2); dctx.fill(); dctx.globalCompositeOperation='source-over'; }
+  function fadeDisturbance(){ dctx.globalCompositeOperation='source-over'; dctx.fillStyle=`rgba(0,0,0,${1-Number(controls.fade.value)})`; dctx.fillRect(0,0,256,256); }
+  let ready=false, posterReady=false, posterUploaded=false;
+  poster.onload = () => { posterReady = true; };
+  const sourceUrl = video.dataset.src;
+  function nudgeVideo(){ video.play().catch(()=>{}); }
+  function attachVideoSource(){
+    fetch(sourceUrl).then(r => {
+      if (!r.ok) throw new Error('video fetch failed ' + r.status);
+      return r.blob();
+    }).then(blob => {
+      video.src = URL.createObjectURL(blob);
+      video.load();
+      nudgeVideo();
+    }).catch(err => {
+      console.warn('Using direct video URL fallback', err);
+      video.src = sourceUrl;
+      video.load();
+      nudgeVideo();
+    });
+  }
+  video.addEventListener('canplay',()=>{ready=true; video.classList.add('video-ready'); nudgeVideo();});
+  video.addEventListener('loadedmetadata',()=>{ready=true; video.classList.add('video-ready'); nudgeVideo();});
+  document.addEventListener('visibilitychange',()=>{ if(!document.hidden) nudgeVideo(); });
+  window.addEventListener('click',nudgeVideo,{once:true});
+  attachVideoSource();
+  function frame(now){ const t=now*.001; fadeDisturbance(); addImpulse(); gl.useProgram(prog); gl.uniform2f(loc.resolution,width,height); gl.uniform2f(loc.videoSize,video.videoWidth||poster.naturalWidth||3324,video.videoHeight||poster.naturalHeight||2492); gl.uniform1f(loc.distortion,Number(controls.distortion.value)); gl.uniform1f(loc.shimmer,Number(controls.shimmer.value)); gl.uniform1f(loc.warmth,Number(controls.warmth.value)); gl.uniform1f(loc.waterline,Number(controls.waterline.value)); gl.uniform1f(loc.time,t); gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,false); gl.activeTexture(gl.TEXTURE1); gl.bindTexture(gl.TEXTURE_2D,disturbTex); gl.texImage2D(gl.TEXTURE_2D,0,gl.LUMINANCE,gl.LUMINANCE,gl.UNSIGNED_BYTE,dCanvas); gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,true); gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D,videoTex); if(ready && video.readyState>=2){ try{ gl.texImage2D(gl.TEXTURE_2D,0,gl.RGB,gl.RGB,gl.UNSIGNED_BYTE,video); posterUploaded=true; canvas.classList.add('webgl-ready'); }catch(err){} } else if(posterReady && !posterUploaded){ try{ gl.texImage2D(gl.TEXTURE_2D,0,gl.RGB,gl.RGB,gl.UNSIGNED_BYTE,poster); posterUploaded=true; }catch(err){} } gl.drawArrays(gl.TRIANGLES,0,6); requestAnimationFrame(frame); } requestAnimationFrame(frame);
+  window.addEventListener('keydown', e=>{ if(e.key.toLowerCase()==='d'){ debug.classList.toggle('show'); maskLine.classList.toggle('show', debug.classList.contains('show')); updateMaskLine(); } if(e.key.toLowerCase()==='r'){ dctx.fillStyle='black'; dctx.fillRect(0,0,256,256); } });
+})();
+</script>
+</body>
+</html>
