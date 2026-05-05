@@ -160,6 +160,7 @@ test('dashboard embeds itinerary directly with floating header instead of a wrap
   assert.doesNotMatch(html, /\.embedded-itinerary \{[^}]*border:/);
   assert.doesNotMatch(html, /\.embedded-itinerary \{[^}]*background:/);
   assert.match(html, /\.itinerary-heading \{/);
+  assert.match(html, /\.embedded-itinerary \{ display: grid; gap: 8px; padding-top: 5px; \}/);
   assert.match(html, /\.calendar-week \{/);
   assert.match(html, /\.calendar-day \{/);
   assert.match(html, /function renderCalendarView\(\)/);
