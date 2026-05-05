@@ -225,27 +225,6 @@
   .arrival-notes { grid-column: 1 / -1; margin-top: 2px; padding: 8px 10px; border-radius: 11px; border: 1px solid rgba(255,255,255,.18); background: rgba(255,255,255,.10); color: rgba(255,255,255,.70); line-height: 1.35; }
   .arrival-notes[hidden], .notes-toggle[hidden] { display: none; }
   .dashboard-actions { display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-start; }
-  .debug {
-    position: fixed;
-    top: 82px;
-    right: 18px;
-    z-index: 20;
-    width: 300px;
-    padding: 14px;
-    border: 1px solid rgba(255,255,255,.18);
-    border-radius: 18px;
-    background: rgba(5,18,25,.72);
-    backdrop-filter: blur(14px);
-    color: rgba(255,255,255,.82);
-    font-size: 12px;
-    display: none;
-  }
-  .debug.show { display: block; }
-  .debug label { display: grid; gap: 5px; margin: 9px 0; color: rgba(255,255,255,.82); text-transform: none; font-size: 12px; }
-  .debug input { width: 100%; }
-  .mask-line { position: fixed; left: 0; right: 0; height: 0; border-top: 2px solid rgba(255,222,148,.95); box-shadow: 0 0 0 1px rgba(4,18,25,.45), 0 0 24px rgba(255,222,148,.45); pointer-events: none; z-index: 19; display: none; }
-  .mask-line::before { content: "waterline mask"; position: absolute; right: 18px; top: -28px; padding: 5px 8px; border-radius: 999px; background: rgba(5,18,25,.72); color: rgba(255,241,205,.96); font-size: 11px; text-transform: uppercase; }
-  .mask-line.show { display: block; }
   .toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%) translateY(20px); opacity: 0; z-index: 22; background: rgba(255,255,255,.92); color: var(--ink); border-radius: 999px; padding: 7px 10px; font-size: 13px; font-weight: 400; transition: .22s ease; }
   .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
   .fallback { position: fixed; inset: 0; display: grid; place-items: center; padding: 30px; color: rgba(255,255,255,.8); text-align: center; background: #061923; visibility: hidden; z-index: 30; }
@@ -268,8 +247,8 @@
 </head>
 <body>
 <div id="stage">
-  <img class="poster-img" src="assets/hero-water-2-poster.jpg" alt="" aria-hidden="true">
-  <video id="waterVideo" data-src="assets/hero-water-2-browser.mp4" poster="assets/hero-water-2-poster.jpg" muted playsinline loop preload="auto"></video>
+  <img class="poster-img" src="assets/hero-water-3-poster.jpg" alt="" aria-hidden="true">
+  <video id="waterVideo" data-src="assets/hero-water-3-browser.mp4" poster="assets/hero-water-3-poster.jpg" muted playsinline loop preload="auto"></video>
   <canvas id="gl"></canvas>
 </div>
 <div class="shade"></div>
@@ -335,16 +314,6 @@
     </div>
   </section>
 </div>
-<div class="debug" id="debug">
-  <strong>Water tuning</strong><br><code>D toggles · R resets</code>
-  <label>Distortion <input id="distortion" type="range" min="0" max="0.045" step="0.001" value="0.016"></label>
-  <label>Shimmer boost <input id="shimmer" type="range" min="0" max="1.4" step="0.02" value="0.48"></label>
-  <label>Impulse size <input id="radius" type="range" min="8" max="42" step="1" value="22"></label>
-  <label>Fade speed <input id="fade" type="range" min="0.86" max="0.985" step="0.001" value="0.944"></label>
-  <label>Warmth <input id="warmth" type="range" min="0" max="0.22" step="0.005" value="0.075"></label>
-  <label>Waterline mask <input id="waterline" type="range" min="0.20" max="0.70" step="0.005" value="0.405"></label>
-</div>
-<div class="mask-line" id="maskLine"></div>
 <div class="toast" id="toast">Saved</div>
 <div class="fallback" id="fallback">This browser could not start the WebGL water experience.</div>
 <script>
@@ -475,11 +444,16 @@
   const canvas = document.getElementById('gl');
   const video = document.getElementById('waterVideo');
   const poster = new Image();
-  poster.src = 'assets/hero-water-2-poster.jpg';
+  poster.src = 'assets/hero-water-3-poster.jpg';
   const fallback = document.getElementById('fallback');
-  const debug = document.getElementById('debug');
-  const maskLine = document.getElementById('maskLine');
-  const controls = { distortion, shimmer, radius, fade, warmth, waterline };
+  const controls = {
+    distortion: { value: '0.016' },
+    shimmer: { value: '0.48' },
+    radius: { value: '22' },
+    fade: { value: '0.944' },
+    warmth: { value: '0.075' },
+    waterline: { value: '0.405' }
+  };
   const gl = canvas.getContext('webgl', { antialias: false, alpha: false, preserveDrawingBuffer: false });
   if (!gl) { fallback.classList.add('show'); return; }
   const vert = `attribute vec2 a_pos; varying vec2 v_uv; void main(){ v_uv=a_pos*0.5+0.5; gl_Position=vec4(a_pos,0.0,1.0); }`;
@@ -496,8 +470,8 @@
   const videoTex=makeTexture(0); gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,true); const disturbTex=makeTexture(1); gl.uniform1i(gl.getUniformLocation(prog,'u_video'),0); gl.uniform1i(gl.getUniformLocation(prog,'u_disturb'),1);
   const loc={ resolution:gl.getUniformLocation(prog,'u_resolution'), videoSize:gl.getUniformLocation(prog,'u_videoSize'), distortion:gl.getUniformLocation(prog,'u_distortion'), shimmer:gl.getUniformLocation(prog,'u_shimmer'), warmth:gl.getUniformLocation(prog,'u_warmth'), waterline:gl.getUniformLocation(prog,'u_waterline'), time:gl.getUniformLocation(prog,'u_time') };
   const dCanvas=document.createElement('canvas'); dCanvas.width=256; dCanvas.height=256; const dctx=dCanvas.getContext('2d',{alpha:false}); dctx.fillStyle='black'; dctx.fillRect(0,0,256,256);
-  let width=0,height=0,dpr=1; function resize(){ dpr=Math.min(2,window.devicePixelRatio||1); width=Math.floor(window.innerWidth*dpr); height=Math.floor(window.innerHeight*dpr); canvas.width=width; canvas.height=height; gl.viewport(0,0,width,height); updateMaskLine(); } window.addEventListener('resize',resize,{passive:true});
-  function updateMaskLine(){ if(maskLine) maskLine.style.top=(Number(controls.waterline.value)*window.innerHeight)+'px'; } controls.waterline.addEventListener('input',updateMaskLine); resize();
+  let width=0,height=0,dpr=1; function resize(){ dpr=Math.min(2,window.devicePixelRatio||1); width=Math.floor(window.innerWidth*dpr); height=Math.floor(window.innerHeight*dpr); canvas.width=width; canvas.height=height; gl.viewport(0,0,width,height); } window.addEventListener('resize',resize,{passive:true});
+  resize();
   const pointer={x:.5,y:.5,px:.5,py:.5,down:false,active:false,speed:0}; function setPointer(e){ const x=e.clientX/window.innerWidth, y=e.clientY/window.innerHeight; pointer.speed=Math.hypot(x-pointer.x,y-pointer.y); pointer.px=pointer.x; pointer.py=pointer.y; pointer.x=x; pointer.y=y; pointer.active=true; } window.addEventListener('pointermove',setPointer,{passive:true}); window.addEventListener('pointerdown',e=>{pointer.down=true; setPointer(e);},{passive:true}); window.addEventListener('pointerup',()=>pointer.down=false,{passive:true});
   function addImpulse(){ const r=Number(controls.radius.value); const waterline=Number(controls.waterline.value); const strength=Math.min(1,.18+pointer.speed*34+(pointer.down?.18:0)); if(!pointer.active || pointer.y < waterline-.01 || strength < .04) return; const x=pointer.x*256; const y=(1-pointer.y)*256; const g=dctx.createRadialGradient(x,y,0,x,y,r); g.addColorStop(0,`rgba(255,255,255,${.50*strength})`); g.addColorStop(.32,`rgba(190,220,255,${.22*strength})`); g.addColorStop(1,'rgba(0,0,0,0)'); dctx.globalCompositeOperation='lighter'; dctx.fillStyle=g; dctx.beginPath(); dctx.arc(x,y,r,0,Math.PI*2); dctx.fill(); dctx.globalCompositeOperation='source-over'; }
   function fadeDisturbance(){ dctx.globalCompositeOperation='source-over'; dctx.fillStyle=`rgba(0,0,0,${1-Number(controls.fade.value)})`; dctx.fillRect(0,0,256,256); }
@@ -506,19 +480,9 @@
   const sourceUrl = video.dataset.src;
   function nudgeVideo(){ video.play().catch(()=>{}); }
   function attachVideoSource(){
-    fetch(sourceUrl).then(r => {
-      if (!r.ok) throw new Error('video fetch failed ' + r.status);
-      return r.blob();
-    }).then(blob => {
-      video.src = URL.createObjectURL(blob);
-      video.load();
-      nudgeVideo();
-    }).catch(err => {
-      console.warn('Using direct video URL fallback', err);
-      video.src = sourceUrl;
-      video.load();
-      nudgeVideo();
-    });
+    video.src = sourceUrl;
+    video.load();
+    nudgeVideo();
   }
   video.addEventListener('canplay',()=>{ready=true; video.classList.add('video-ready'); nudgeVideo();});
   video.addEventListener('loadedmetadata',()=>{ready=true; video.classList.add('video-ready'); nudgeVideo();});
@@ -526,7 +490,6 @@
   window.addEventListener('click',nudgeVideo,{once:true});
   attachVideoSource();
   function frame(now){ const t=now*.001; fadeDisturbance(); addImpulse(); gl.useProgram(prog); gl.uniform2f(loc.resolution,width,height); gl.uniform2f(loc.videoSize,video.videoWidth||poster.naturalWidth||3324,video.videoHeight||poster.naturalHeight||2492); gl.uniform1f(loc.distortion,Number(controls.distortion.value)); gl.uniform1f(loc.shimmer,Number(controls.shimmer.value)); gl.uniform1f(loc.warmth,Number(controls.warmth.value)); gl.uniform1f(loc.waterline,Number(controls.waterline.value)); gl.uniform1f(loc.time,t); gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,false); gl.activeTexture(gl.TEXTURE1); gl.bindTexture(gl.TEXTURE_2D,disturbTex); gl.texImage2D(gl.TEXTURE_2D,0,gl.LUMINANCE,gl.LUMINANCE,gl.UNSIGNED_BYTE,dCanvas); gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,true); gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D,videoTex); if(ready && video.readyState>=2){ try{ gl.texImage2D(gl.TEXTURE_2D,0,gl.RGB,gl.RGB,gl.UNSIGNED_BYTE,video); posterUploaded=true; canvas.classList.add('webgl-ready'); }catch(err){} } else if(posterReady && !posterUploaded){ try{ gl.texImage2D(gl.TEXTURE_2D,0,gl.RGB,gl.RGB,gl.UNSIGNED_BYTE,poster); posterUploaded=true; }catch(err){} } gl.drawArrays(gl.TRIANGLES,0,6); requestAnimationFrame(frame); } requestAnimationFrame(frame);
-  window.addEventListener('keydown', e=>{ if(e.key.toLowerCase()==='d'){ debug.classList.toggle('show'); maskLine.classList.toggle('show', debug.classList.contains('show')); updateMaskLine(); } if(e.key.toLowerCase()==='r'){ dctx.fillStyle='black'; dctx.fillRect(0,0,256,256); } });
 })();
 </script>
 </body>
