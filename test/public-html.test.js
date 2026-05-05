@@ -72,9 +72,9 @@ test('homepage secondary CTA advances after calendar todo and falls back to trip
   assert.match(html, /localStorage\.setItem\(CALENDAR_KEY,'true'\); renderTripDashboard\(\); setPrimaryCta\(\);/);
 });
 
-test('FaceTime call notice floats higher with four subtle lines and correct calendar invite', () => {
+test('FaceTime call notice floats higher with three subtle lines and correct calendar invite', () => {
   assert.match(html, /<div class="planning-call"/);
-  assert.match(html, /<span>Drop in\. Discuss deets\.<\/span><span>May 12, 2026<\/span><span>6:30 p\.m\. PDT<\/span><a href="#" id="addPlanningCall">Add to calendar<\/a>/);
+  assert.match(html, /<span>Drop in\. Discuss Deets\.<\/span><span>May 12 @ 6:30 p\.m\.<\/span><a href="#" id="addPlanningCall">Add to calendar<\/a>/);
   assert.match(html, /\.planning-call \{[^}]*top: calc\(36% - 50px\);[^}]*opacity: \.58;/s);
   assert.match(html, /\.planning-call a \{[^}]*color: inherit;[^}]*opacity: \.72;/s);
   assert.match(html, /\.planning-call a:hover, \.planning-call a:focus-visible \{[^}]*opacity: 1;/s);
