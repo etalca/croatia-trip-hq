@@ -320,8 +320,10 @@ test('main dashboard is a hub with only dinner, flight, and embedded itinerary c
 test('flight board edit button stays visible beside the info icon without changing row content', () => {
   assert.match(html, /\.arrival-row \{[^}]*position: relative;[^}]*grid-template-columns: minmax\(86px, 1fr\) minmax\(190px, 1\.45fr\) minmax\(86px, \.8fr\) minmax\(104px, \.72fr\);/s);
   assert.match(html, /\.arrival-actions \{[^}]*position: absolute;[^}]*top: 8px;[^}]*right: 8px;[^}]*display: inline-flex;/s);
-  assert.match(html, /\.arrival-edit \{[^}]*height: 25\.5px;[^}]*border-radius: 999px;[^}]*background: rgba\(255,255,255,\.14\);[^}]*padding: 0 10px;[^}]*font-size: 13px;[^}]*opacity: 1;[^}]*pointer-events: auto;/s);
+  assert.match(html, /\.arrival-edit \{[^}]*height: 25\.5px;[^}]*width: auto;[^}]*border-radius: 999px;[^}]*background: rgba\(255,255,255,\.14\);[^}]*padding: 0 10px;[^}]*font-size: 13px;[^}]*opacity: 1;[^}]*pointer-events: auto;/s);
   assert.match(html, /\.notes-toggle \{ width: 25\.5px; height: 25\.5px;/);
+  assert.match(html, /@media \(max-width: 760px\) \{[\s\S]*\.arrival-edit \{ height: 25\.5px; min-height: 0; width: auto; padding: 0 10px; \}[\s\S]*\.arrival-actions \.notes-toggle \{ width: 25\.5px; height: 25\.5px; min-height: 0; flex: 0 0 25\.5px; \}/);
+  assert.doesNotMatch(html, /\.arrival-edit, \.notes-toggle \{ height: 44px; \}/);
   assert.match(html, /<div class="arrival-actions">\$\{editButton\}<button class="notes-toggle"/);
 });
 
@@ -377,9 +379,9 @@ test('dinner plans cards use clear hierarchy, fixed date tiles, and contextual a
 test('mobile polish keeps touch actions visible and flight cards readable', () => {
   assert.match(html, /@media \(max-width: 760px\) \{[\s\S]*\.dinner-action \{ opacity: 1; pointer-events: auto; \}/);
   assert.match(html, /\.arrival-actions \{[^}]*position: absolute;[^}]*top: 8px;[^}]*right: 8px;[^}]*display: inline-flex;/s);
-  assert.match(html, /\.arrival-edit \{[^}]*height: 25\.5px;[^}]*opacity: 1;[^}]*pointer-events: auto;/s);
+  assert.match(html, /\.arrival-edit \{[^}]*height: 25\.5px;[^}]*width: auto;[^}]*opacity: 1;[^}]*pointer-events: auto;/s);
   assert.match(html, /\.notes-toggle \{ width: 25\.5px; height: 25\.5px;/);
-  assert.match(html, /@media \(max-width: 760px\) \{[\s\S]*\.arrival-actions \{ top: 12px; right: 12px; \}[\s\S]*\.arrival-edit, \.notes-toggle \{ height: 44px; \}/);
+  assert.match(html, /@media \(max-width: 760px\) \{[\s\S]*\.arrival-actions \{ top: 12px; right: 12px; \}[\s\S]*\.arrival-edit \{ height: 25\.5px; min-height: 0; width: auto; padding: 0 10px; \}[\s\S]*\.arrival-actions \.notes-toggle \{ width: 25\.5px; height: 25\.5px; min-height: 0; flex: 0 0 25\.5px; \}/);
   assert.match(html, /<div class="arrival-meta"><span class="arrival-time">\$\{escapeHtml\(dateTime\)\}<\/span><span class="arrival-airport">\$\{escapeHtml\(airport\)\}<\/span><\/div>/);
   assert.match(html, /const countdownLabel=has \? `\$\{isDepart\?'Departs':'Arrives'\} in \$\{countdownFor\(d,boardMode\)\}` : 'Awaiting flights'/);
   assert.match(html, /<div class="arrival-countdown">\$\{escapeHtml\(countdownLabel\)\}<\/div>/);

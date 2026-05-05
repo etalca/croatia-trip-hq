@@ -237,7 +237,7 @@
   .arrival-countdown { white-space: nowrap; text-align: left; }
   .arrival-flight { color: rgba(255,255,255,.88); line-height: 1.3; min-width: 0; }
   .arrival-actions { position: absolute; top: 8px; right: 8px; display: inline-flex; gap: 6px; align-items: center; }
-  .arrival-edit { height: 25.5px; border-radius: 999px; display: grid; place-items: center; border: 1px solid rgba(255,255,255,.24); background: rgba(255,255,255,.14); color: rgba(255,255,255,.86); cursor: pointer; padding: 0 10px; font-size: 13px; opacity: 1; pointer-events: auto; transition: background .18s ease, border-color .18s ease; }
+  .arrival-edit { height: 25.5px; width: auto; border-radius: 999px; display: grid; place-items: center; border: 1px solid rgba(255,255,255,.24); background: rgba(255,255,255,.14); color: rgba(255,255,255,.86); cursor: pointer; padding: 0 10px; font-size: 13px; opacity: 1; pointer-events: auto; transition: background .18s ease, border-color .18s ease; }
   .notes-toggle { width: 25.5px; height: 25.5px; border-radius: 999px; display: grid; place-items: center; border: 1px solid rgba(255,255,255,.24); background: rgba(255,255,255,.14); color: rgba(255,255,255,.86); cursor: pointer; padding: 0; }
   .info-glyph { display: grid; place-items: center; width: 14px; height: 14px; border-radius: 999px; font-size: 12px; line-height: 1; font-weight: 400; font-style: normal; font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif; letter-spacing: -0.03em; }
   .arrival-edit:hover, .arrival-edit:focus-visible, .notes-toggle:hover, .notes-toggle:focus-visible { background: rgba(255,255,255,.26); border-color: rgba(255,255,255,.42); }
@@ -359,7 +359,8 @@
     .arrival-name { font-size: 15px; line-height: 1.2; }
     .arrival-meta, .arrival-flight, .arrival-countdown { grid-column: 1 / -1; line-height: 1.32; overflow-wrap: anywhere; }
     .arrival-actions { top: 12px; right: 12px; }
-    .arrival-edit, .notes-toggle { height: 44px; }
+    .arrival-edit { height: 25.5px; min-height: 0; width: auto; padding: 0 10px; }
+    .arrival-actions .notes-toggle { width: 25.5px; height: 25.5px; min-height: 0; flex: 0 0 25.5px; }
     .arrival-countdown { white-space: normal; }
     .arrival-notes { padding: 10px 12px; border-radius: 13px; }
     .dashboard-actions { display: grid; }
