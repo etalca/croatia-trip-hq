@@ -95,7 +95,7 @@ test('trip info heading is a friendly greeting and todo chips show completion ic
   assert.doesNotMatch(html, />Trip dashboard<\/h2>/);
   assert.doesNotMatch(html, /Your home base for flights, dinner responsibilities, tasks, and the useful trip stuff\./);
   assert.match(html, /<h2 class="dashboard-name" id="dashboardGuestName">Hi<\/h2>/);
-  assert.match(html, /`Hi, \${name} \${hasOutstandingTodos \? 'you have a task to complete\.' : 'you’re all caught up\.'}`/);
+  assert.match(html, /`Hi, \${name}\. \${hasOutstandingTodos \? 'You have a task to complete\.' : 'You’re all caught up\.'}`/);
   assert.doesNotMatch(html, /\$\{name\}’s trip dashboard/);
   assert.match(html, /<button class="todo-chip/);
   assert.match(html, /function todoIcon\(done\)/);
@@ -110,7 +110,7 @@ test('trip info heading is a friendly greeting and todo chips show completion ic
 
 test('dashboard title changes based on outstanding todos', () => {
   assert.match(html, /const hasOutstandingTodos=!flights \|\| !myDinner \|\| localStorage\.getItem\(CALENDAR_KEY\)!=='true'/);
-  assert.match(html, /dashboardGuestName\.textContent=name \? `Hi, \$\{name\} \$\{hasOutstandingTodos \? 'you have a task to complete\.' : 'you’re all caught up\.'\}` : 'Hi'/);
+  assert.match(html, /dashboardGuestName\.textContent=name \? `Hi, \$\{name\}\. \$\{hasOutstandingTodos \? 'You have a task to complete\.' : 'You’re all caught up\.'\}` : 'Hi'/);
 });
 
 test('undone todo chips are visually ordered before completed todos', () => {
@@ -213,8 +213,8 @@ test('dashboard itinerary cards use subtle expand icons to open an iCal-style da
   assert.match(html, /function moveDayView\(direction\)/);
   assert.match(html, /activeDayViewDate=date/);
   assert.match(html, /const allDays=tripItineraryDays\(\)/);
-  assert.match(html, /previousDayViewButton\.disabled=index<=0/);
-  assert.match(html, /nextDayViewButton\.disabled=index>=allDays\.length-1/);
+  assert.match(html, /previousDayViewButton\.hidden=index<=0/);
+  assert.match(html, /nextDayViewButton\.hidden=index>=allDays\.length-1/);
   assert.match(html, /previousDayViewButton\.addEventListener\('click',\(\)=>moveDayView\(-1\)\)/);
   assert.match(html, /nextDayViewButton\.addEventListener\('click',\(\)=>moveDayView\(1\)\)/);
   assert.match(html, /function eventBlockStyle\(event\)/);
@@ -268,7 +268,7 @@ test('main dashboard is a hub with only dinner, flight, and embedded itinerary c
   assert.match(tripInfoBlock, /id="myDinnerMeta"/);
   assert.match(tripInfoBlock, /id="myFlightCard"/);
   assert.match(html, /You’re responsible for dinner on/);
-  assert.match(html, /You’re flight arrives in/);
+  assert.match(html, /Your flight arrives in/);
   assert.match(html, /function flightCompanionSummary\(current, board\)/);
   assert.match(html, /function normalizedFlightNumber\(value\)/);
   assert.match(html, /normalizedFlightNumber\(item\.arrivalFlight\)===flightNumber/);
@@ -280,11 +280,11 @@ test('main dashboard is a hub with only dinner, flight, and embedded itinerary c
   assert.doesNotMatch(tripInfoBlock, /<span>Villa<\/span>/);
 });
 
-test('flight board edit button overlays before info icon without changing row columns', () => {
-  assert.match(html, /\.arrival-row \{[^}]*position: relative;[^}]*grid-template-columns: minmax\(86px, 1fr\) minmax\(190px, 1\.45fr\) minmax\(86px, \.8fr\) minmax\(104px, \.72fr\) 25\.5px;/s);
-  assert.match(html, /\.arrival-edit \{[^}]*position: absolute;[^}]*top: 8px;[^}]*right: 41\.5px;[^}]*opacity: 0;/s);
-  assert.match(html, /\.arrival-row:hover \.arrival-edit, \.arrival-row:focus-within \.arrival-edit/);
-  assert.match(html, /\$\{editButton\}<button class="notes-toggle"/);
+test('flight board edit button stays visible beside the info icon without changing row content', () => {
+  assert.match(html, /\.arrival-row \{[^}]*position: relative;[^}]*grid-template-columns: minmax\(86px, 1fr\) minmax\(190px, 1\.45fr\) minmax\(86px, \.8fr\) minmax\(104px, \.72fr\);/s);
+  assert.match(html, /\.arrival-actions \{[^}]*position: absolute;[^}]*top: 8px;[^}]*right: 8px;[^}]*display: inline-flex;/s);
+  assert.match(html, /\.arrival-edit \{[^}]*height: 25\.5px;[^}]*opacity: 1;[^}]*pointer-events: auto;/s);
+  assert.match(html, /<div class="arrival-actions">\$\{editButton\}<button class="notes-toggle"/);
 });
 
 test('flight board shows edit button only on the logged-in user row', () => {
@@ -333,6 +333,42 @@ test('dinner plans cards use clear hierarchy, fixed date tiles, and contextual a
   assert.match(html, /const leads=claimed \? \(slot\.leads \|\| \[\]\)\.join\(' \+ '\) : 'Open'/);
   assert.match(html, /dinnerBoard\.querySelectorAll\('\.dinner-action'\)\.forEach/);
   assert.match(html, /openDinnerPickerForDate\(btn\.dataset\.date,'dinnerPlans'\)/);
+});
+
+
+test('mobile polish keeps touch actions visible and flight cards readable', () => {
+  assert.match(html, /@media \(max-width: 760px\) \{[\s\S]*\.dinner-action \{ opacity: 1; pointer-events: auto; \}/);
+  assert.match(html, /\.arrival-actions \{[^}]*position: absolute;[^}]*top: 8px;[^}]*right: 8px;[^}]*display: inline-flex;/s);
+  assert.match(html, /\.arrival-edit \{[^}]*height: 25\.5px;[^}]*opacity: 1;[^}]*pointer-events: auto;/s);
+  assert.match(html, /\.notes-toggle \{ width: 25\.5px; height: 25\.5px;/);
+  assert.match(html, /@media \(max-width: 760px\) \{[\s\S]*\.arrival-actions \{ top: 12px; right: 12px; \}[\s\S]*\.arrival-edit, \.notes-toggle \{ height: 44px; \}/);
+  assert.match(html, /<div class="arrival-meta"><span class="arrival-time">\$\{escapeHtml\(dateTime\)\}<\/span><span class="arrival-airport">\$\{escapeHtml\(airport\)\}<\/span><\/div>/);
+  assert.match(html, /const countdownLabel=has \? `\$\{isDepart\?'Departs':'Arrives'\} in \$\{countdownFor\(d,boardMode\)\}` : 'Awaiting flights'/);
+  assert.match(html, /<div class="arrival-countdown">\$\{escapeHtml\(countdownLabel\)\}<\/div>/);
+});
+
+test('mobile dashboard keeps todo chips sticky while trip cards and itinerary scroll', () => {
+  assert.match(html, /dashboardGuestName\.textContent=name \? `Hi, \$\{name\}\. \$\{hasOutstandingTodos \? 'You have a task to complete\.' : 'You’re all caught up\.'\}` : 'Hi'/);
+  const tripInfoBlock = html.slice(html.indexOf('id="tripInfo"'), html.indexOf('id="dinnerPicker"'));
+  assert.match(tripInfoBlock, /<header><div><h2 class="dashboard-name" id="dashboardGuestName">Hi<\/h2><div class="dashboard-status"/);
+  assert.match(tripInfoBlock, /<div class="trip-info-scroll">\s*<div class="dashboard-hero">/);
+  assert.match(tripInfoBlock, /<section class="calendar-list embedded-itinerary" id="calendarItems" aria-label="Trip itinerary"><\/section>\s*<\/div>/);
+  assert.match(html, /#tripInfo \.dashboard-card header \{ flex: 0 0 auto; \}/);
+  assert.match(html, /#tripInfo \.trip-info-scroll \{ overflow-y: auto; min-height: 0; display: grid; gap: 10px; scrollbar-width: none; \}/);
+});
+
+test('day view titles omit year and hide edge navigation instead of disabling it', () => {
+  assert.match(html, /const full=d\.toLocaleDateString\(undefined,\{weekday:'long', month:'long', day:'numeric'\}\)/);
+  assert.doesNotMatch(html, /dayViewTitle\.textContent=full;[\s\S]{0,120}year:'numeric'/);
+  assert.match(html, /previousDayViewButton\.hidden=index<=0/);
+  assert.match(html, /nextDayViewButton\.hidden=index>=allDays\.length-1/);
+  assert.doesNotMatch(html, /previousDayViewButton\.disabled=index<=0/);
+  assert.doesNotMatch(html, /nextDayViewButton\.disabled=index>=allDays\.length-1/);
+});
+
+test('magic-link sign-up gate is compact and centered on mobile', () => {
+  assert.match(html, /gate\.classList\.toggle\('auth-mode', !currentGuest\)/);
+  assert.match(html, /@media \(max-width: 760px\) \{[\s\S]*\.gate\.auth-mode \{ place-items: center; \}[\s\S]*\.gate\.auth-mode \.panel \{ width: min\(100%, 380px\); max-height: none; min-height: 0; align-self: center; \}/);
 });
 
 
