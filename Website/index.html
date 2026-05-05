@@ -215,8 +215,9 @@
   .dashboard-card p { margin: 8px 0 0; color: rgba(255,255,255,.72); font-size: 13px; line-height: 1.35; }
   .trip-info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; overflow-y: auto; scrollbar-width: none; padding: 2px 1px 1px; }
   #tripInfo .dashboard-card header { flex: 0 0 auto; }
-  #tripInfo .trip-info-scroll { overflow-y: auto; min-height: 0; display: grid; gap: 10px; scrollbar-width: none; }
-  #tripInfo .trip-info-scroll::-webkit-scrollbar { display: none; }
+  #tripInfo .trip-info-scroll { flex: 1 1 auto; overflow-y: auto; min-height: 0; display: grid; gap: 10px; scrollbar-width: none; -ms-overflow-style: none; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; }
+  #tripInfo .calendar-list { overflow: visible; min-height: auto; }
+  #tripInfo .trip-info-scroll::-webkit-scrollbar { width: 0; height: 0; display: none; }
   .trip-info-grid::-webkit-scrollbar { display: none; }
   .info-card { appearance: none; width: 100%; min-height: 82px; display: grid; align-content: space-between; gap: 14px; text-align: left; border: 1px solid rgba(255,255,255,.24); border-radius: 15px; background: rgba(255,255,255,.14); color: white; padding: 12px; cursor: pointer; transition: background .22s ease, border-color .22s ease, transform .22s ease; text-decoration: none; }
   .info-card:hover, .info-card:focus-visible { background: rgba(255,255,255,.24); border-color: rgba(255,255,255,.42); transform: none; }

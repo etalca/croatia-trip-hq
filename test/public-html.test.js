@@ -284,8 +284,9 @@ test('trip dashboard clickable cards show expand affordances and scroll below st
   assert.match(tripInfoBlock, /id="myFlightCard"[\s\S]*?<img class="dashboard-card-expand" src="assets\/Expand icon\.svg" alt="" aria-hidden="true">/);
   assert.match(tripInfoBlock, /<section class="calendar-list embedded-itinerary" id="calendarItems" aria-label="Trip itinerary"><\/section>\s*<\/div>/);
   assert.match(html, /#tripInfo \.dashboard-card header \{ flex: 0 0 auto; \}/);
-  assert.match(html, /#tripInfo \.trip-info-scroll \{ overflow-y: auto; min-height: 0; display: grid; gap: 10px; scrollbar-width: none; \}/);
-  assert.match(html, /#tripInfo \.trip-info-scroll::-webkit-scrollbar \{ display: none; \}/);
+  assert.match(html, /#tripInfo \.trip-info-scroll \{ flex: 1 1 auto; overflow-y: auto; min-height: 0; display: grid; gap: 10px; scrollbar-width: none; -ms-overflow-style: none; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; \}/);
+  assert.match(html, /#tripInfo \.calendar-list \{ overflow: visible; min-height: auto; \}/);
+  assert.match(html, /#tripInfo \.trip-info-scroll::-webkit-scrollbar \{ width: 0; height: 0; display: none; \}/);
   assert.match(html, /\.personal-card \{[^}]*position: relative;[^}]*padding: 14px 42px 14px 14px;/s);
   assert.match(html, /\.calendar-expand-icon \{[^}]*width: 22px;[^}]*height: 22px;[^}]*padding: 3px;[^}]*opacity: \.2;/s);
   assert.match(html, /\.dashboard-card-expand \{[^}]*position: absolute;[^}]*top: 10px;[^}]*right: 10px;[^}]*width: 22px;[^}]*height: 22px;[^}]*padding: 3px;[^}]*box-sizing: border-box;[^}]*opacity: \.2;/s);
@@ -391,7 +392,9 @@ test('mobile dashboard keeps todo chips sticky while trip cards and itinerary sc
   assert.match(tripInfoBlock, /<div class="trip-info-scroll">\s*<div class="dashboard-hero">/);
   assert.match(tripInfoBlock, /<section class="calendar-list embedded-itinerary" id="calendarItems" aria-label="Trip itinerary"><\/section>\s*<\/div>/);
   assert.match(html, /#tripInfo \.dashboard-card header \{ flex: 0 0 auto; \}/);
-  assert.match(html, /#tripInfo \.trip-info-scroll \{ overflow-y: auto; min-height: 0; display: grid; gap: 10px; scrollbar-width: none; \}/);
+  assert.match(html, /#tripInfo \.trip-info-scroll \{ flex: 1 1 auto; overflow-y: auto; min-height: 0; display: grid; gap: 10px; scrollbar-width: none; -ms-overflow-style: none; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; \}/);
+  assert.match(html, /#tripInfo \.calendar-list \{ overflow: visible; min-height: auto; \}/);
+  assert.match(html, /#tripInfo \.trip-info-scroll::-webkit-scrollbar \{ width: 0; height: 0; display: none; \}/);
 });
 
 test('day view titles omit year and hide edge navigation instead of disabling it', () => {
