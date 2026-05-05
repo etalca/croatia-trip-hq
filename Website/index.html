@@ -23,6 +23,7 @@
   body { overflow: hidden; }
   button, input, select, textarea { font: inherit; letter-spacing: -0.03em; }
   a { color: inherit; }
+  [hidden] { display: none !important; }
   #stage { position: fixed; inset: 0; overflow: hidden; background: #04151d; }
   .poster-img, video, canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
   .poster-img { object-fit: cover; z-index: 0; }
@@ -150,6 +151,10 @@
   .back { border: 1px solid rgba(255,255,255,.24); background: rgba(255,255,255,.14); color: rgba(255,255,255,.86); height: 25.5px; border-radius: 999px; font-size: 13px; line-height: 1; cursor: pointer; padding: 0 10px; display: grid; place-items: center; }
   .back:hover, .back:focus-visible, .close:hover { background: rgba(255,255,255,.24); border-color: rgba(255,255,255,.42); }
   form { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; overflow-y: auto; scrollbar-width: none; padding: 4px 5px 1px; margin: -4px -5px 0; }
+  .auth-pane { display: grid; gap: 12px; }
+  .auth-pane[hidden] { display: none; }
+  .claim-form { grid-template-columns: 1fr; overflow: visible; padding: 0; margin: 0; }
+  .claim-note { margin: 0; color: rgba(255,255,255,.72); font-size: 13px; line-height: 1.35; }
   form::-webkit-scrollbar, .dashboard-card::-webkit-scrollbar, .arrivals-board::-webkit-scrollbar { display: none; }
   .field { display: grid; gap: 6px; }
   .field.full { grid-column: 1 / -1; }
@@ -272,17 +277,25 @@
 <a class="address" href="https://www.google.com/maps/place/Villa+Darinka/@42.9343666,16.6551014,15.4z/data=!4m9!3m8!1s0x134a73c92d0ce117:0x3fd1fdd80b1a9ee7!5m2!4m1!1i2!8m2!3d42.929621!4d16.6681103!16s%2Fg%2F11c5qpstxg?entry=ttu&g_ep=EgoyMDI2MDQyOS4wIKXMDSoASAFQAw%3D%3D" target="_blank" rel="noreferrer">Villa Darinka<br>Triporte 32, 20270 Vela Luka, Croatia</a>
 <main class="hero-content">
   <section class="center" aria-label="Trip invitation">
-    <h1>Your week on Korčula awaits.</h1>
+    <h1 id="heroTitle">Your week on Korčula awaits.</h1>
     <div class="actions">
-      <button class="pill primary" id="openGate">Enter flight info</button>
+      <button class="pill primary" id="openGate">Let’s go</button>
       <button class="pill secondary" id="addCalendar">Add to calendar</button>
     </div>
   </section>
 </main>
 <div class="gate" id="gate" role="dialog" aria-modal="true" aria-labelledby="gateTitle" hidden>
   <section class="panel">
-    <header><div><h2 id="gateTitle">Flight details</h2><p>Add your flight information so we can keep track of you.</p></div><button class="close" id="closeGate" aria-label="Close">×</button></header>
-    <form id="tripForm">
+    <header><div><h2 id="gateTitle">Hi, let’s confirm who you are first!</h2><p id="gateSubtitle">Pick your name, add your email, and we’ll send you a magic link. No password needed.</p></div><button class="close" id="closeGate" aria-label="Close">×</button></header>
+    <div class="auth-pane" id="authPane">
+      <form id="claimForm" class="claim-form">
+        <div class="field full"><label for="claimName">Who are you?</label><select id="claimName" required><option value="">Choose your name</option></select></div>
+        <div class="field full"><label for="claimEmail">Email</label><input id="claimEmail" type="email" autocomplete="email" placeholder="you@example.com" required></div>
+        <div class="submit"><small>We’ll use this once to confirm it’s you next time.</small><button type="submit">Send magic link</button></div>
+      </form>
+      <p class="claim-note" id="claimMessage">Once you click the link in your email, this page will turn into your trip page.</p>
+    </div>
+    <form id="tripForm" hidden>
       <div class="field"><label for="name">Name</label><select id="name" required><option value="">Choose your name</option></select></div>
       <div class="field"><label for="flightStatus">Flight status</label><select id="flightStatus" required><option value="">Choose status</option><option>Booked</option><option>Not booked yet</option><option>Partially booked</option></select></div>
       <div class="field"><label for="arrivalDate">Arrival date</label><input id="arrivalDate" type="date" required></div>
@@ -344,8 +357,9 @@
   updateCountdown(); setInterval(updateCountdown, 3600000);
 
   const nameSelect=document.getElementById('name');
-  crew.forEach(n=>{const o=document.createElement('option');o.textContent=n;o.value=n;nameSelect.appendChild(o)});
-  const gate=document.getElementById('gate'), openGate=document.getElementById('openGate'), closeGate=document.getElementById('closeGate'), form=document.getElementById('tripForm'), toast=document.getElementById('toast'), tripInfo=document.getElementById('tripInfo'), closeTripInfo=document.getElementById('closeTripInfo'), openFlights=document.getElementById('openFlights'), tripInfoEditFlights=document.getElementById('tripInfoEditFlights'), tripInfoCalendar=document.getElementById('tripInfoCalendar'), dashboard=document.getElementById('dashboard'), closeDashboard=document.getElementById('closeDashboard'), editFlights=document.getElementById('editFlights'), arrivalsBoard=document.getElementById('arrivalsBoard'), arrivalsTab=document.getElementById('arrivalsTab'), departuresTab=document.getElementById('departuresTab');
+  const claimNameSelect=document.getElementById('claimName');
+  crew.forEach(n=>{const o=document.createElement('option');o.textContent=n;o.value=n;nameSelect.appendChild(o); const c=o.cloneNode(true); claimNameSelect.appendChild(c);});
+  const gate=document.getElementById('gate'), openGate=document.getElementById('openGate'), closeGate=document.getElementById('closeGate'), form=document.getElementById('tripForm'), claimForm=document.getElementById('claimForm'), authPane=document.getElementById('authPane'), claimEmail=document.getElementById('claimEmail'), claimMessage=document.getElementById('claimMessage'), gateTitle=document.getElementById('gateTitle'), gateSubtitle=document.getElementById('gateSubtitle'), heroTitle=document.getElementById('heroTitle'), toast=document.getElementById('toast'), tripInfo=document.getElementById('tripInfo'), closeTripInfo=document.getElementById('closeTripInfo'), openFlights=document.getElementById('openFlights'), tripInfoEditFlights=document.getElementById('tripInfoEditFlights'), tripInfoCalendar=document.getElementById('tripInfoCalendar'), dashboard=document.getElementById('dashboard'), closeDashboard=document.getElementById('closeDashboard'), editFlights=document.getElementById('editFlights'), arrivalsBoard=document.getElementById('arrivalsBoard'), arrivalsTab=document.getElementById('arrivalsTab'), departuresTab=document.getElementById('departuresTab');
   let boardMode='arrivals';
   const fields={ name:document.getElementById('name'), flightStatus:document.getElementById('flightStatus'), arrivalDate:document.getElementById('arrivalDate'), arrivalAirport:document.getElementById('arrivalAirport'), arrivalTime:document.getElementById('arrivalTime'), arrivalFlight:document.getElementById('arrivalFlight'), departureDate:document.getElementById('departureDate'), departureAirport:document.getElementById('departureAirport'), departureTime:document.getElementById('departureTime'), departureFlight:document.getElementById('departureFlight'), flightNotes:document.getElementById('flightNotes') };
   const airportCities={ DBV:'Dubrovnik', SPU:'Split', ZAG:'Zagreb', ZAD:'Zadar', PUY:'Pula', RJK:'Rijeka', BWK:'Brač', SJJ:'Sarajevo', TIV:'Tivat', TGD:'Podgorica', VIE:'Vienna', FRA:'Frankfurt', MUC:'Munich', LHR:'London Heathrow', LGW:'London Gatwick', CDG:'Paris Charles de Gaulle', AMS:'Amsterdam', FCO:'Rome', BCN:'Barcelona', MAD:'Madrid', JFK:'New York JFK', EWR:'Newark', LAX:'Los Angeles', SFO:'San Francisco', ORD:'Chicago O’Hare', ATL:'Atlanta' };
@@ -364,39 +378,49 @@
   let guestToken=localStorage.getItem(TOKEN_KEY) || '';
   let cachedFlights=null;
   let cachedBoard={};
+  let authToken='';
+  let currentGuest=null;
+  const PENDING_CLAIM_KEY='korculaPendingClaimName';
   function readLocalFlights(){ try { return JSON.parse(localStorage.getItem('korculaFlightDetails') || 'null'); } catch { return null; } }
   function readLocalBoard(){ try { return JSON.parse(localStorage.getItem('korculaFlightBoard') || '{}'); } catch { return {}; } }
   function rememberedName(){ return fields.name.value || localStorage.getItem(NAME_KEY) || readLocalFlights()?.name || ''; }
   cachedFlights=readLocalFlights(); cachedBoard=readLocalBoard();
   if(rememberedName()) fields.name.value=rememberedName();
   function savedFlights(){ return cachedFlights || readLocalFlights(); }
+  function authHeaders(){ return authToken ? { authorization:`Bearer ${authToken}` } : {}; }
+  function friendlyTitle(){ heroTitle.textContent = currentGuest?.name ? `${currentGuest.name}, your week on Korčula awaits.` : 'Your week on Korčula awaits.'; }
+  function setClaimMessage(text){ claimMessage.textContent=text; }
   function flightBoard(){ return cachedBoard || readLocalBoard(); }
   function cacheFlightState(data, board){ if(data){ cachedFlights=data; localStorage.setItem('korculaFlightDetails', JSON.stringify(data)); if(data.name) localStorage.setItem(NAME_KEY, data.name); } if(board){ cachedBoard=board; localStorage.setItem('korculaFlightBoard', JSON.stringify(board)); } }
+  function clearSavedFlights(){ cachedFlights=null; localStorage.removeItem('korculaFlightDetails'); }
   async function loadRemoteState(nameOverride){
     const selectedName=nameOverride || rememberedName();
-    const query=guestToken ? `token=${encodeURIComponent(guestToken)}` : (selectedName ? `name=${encodeURIComponent(selectedName)}` : '');
+    const query=authToken ? '' : (guestToken ? `token=${encodeURIComponent(guestToken)}` : (selectedName ? `name=${encodeURIComponent(selectedName)}` : ''));
     try {
-      const res=await fetch(`/api/bootstrap${query ? '?' + query : ''}`, { cache:'no-store' });
+      const res=await fetch(`/api/bootstrap${query ? '?' + query : ''}`, { cache:'no-store', headers:authHeaders() });
       if(!res.ok) throw new Error(`bootstrap ${res.status}`);
       const payload=await res.json();
       if(payload.board) cacheFlightState(null, payload.board || {});
-      if(payload.person){ fields.name.value=payload.person; localStorage.setItem(NAME_KEY, payload.person); }
+      if(payload.guest){ currentGuest=payload.guest; friendlyTitle(); }
+      if(payload.person){ fields.name.value=payload.person; claimNameSelect.value=payload.person; localStorage.setItem(NAME_KEY, payload.person); }
       if(payload.flights){ cacheFlightState(payload.flights, payload.board || flightBoard()); fillForm(payload.flights); }
+      else if(currentGuest){ clearSavedFlights(); }
       setPrimaryCta();
       if(dashboard.classList.contains('open')) renderDashboard();
     } catch(err) { console.warn('Using this browser’s saved trip info until backend is reachable.', err); setPrimaryCta(); }
   }
   async function saveFlightRecord(data){
+    if(currentGuest?.name) data.name=currentGuest.name;
     const localBoard={...flightBoard()}; if(data.name) localBoard[data.name]=data; cacheFlightState(data, localBoard);
-    const res=await fetch('/api/flights', { method:'POST', headers:{'content-type':'application/json'}, body:JSON.stringify({ token:guestToken, name:data.name, data }) });
+    const res=await fetch('/api/flights', { method:'POST', headers:{'content-type':'application/json', ...authHeaders()}, body:JSON.stringify({ token:guestToken, name:data.name, data }) });
     if(!res.ok) throw new Error(`save ${res.status}`);
     const payload=await res.json();
     cacheFlightState(payload.flights || data, payload.board || localBoard);
     return { remote:true };
   }
-  function setPrimaryCta(){ openGate.textContent = savedFlights() ? 'View trip info' : 'Enter flight info'; }
+  function setPrimaryCta(){ friendlyTitle(); openGate.textContent = currentGuest ? (savedFlights() ? 'View trip info' : 'Enter flight info') : 'Let’s go'; }
   function fillForm(data){ if(!data) return; Object.entries(fields).forEach(([k,el])=>{ if(data[k] !== undefined) el.value=data[k]; }); }
-  function openDialog(){ hideHomeContent(); const current=savedFlights(); if(current) fillForm(current); dashboard.classList.remove('open'); dashboard.hidden=true; tripInfo.classList.remove('open'); tripInfo.hidden=true; gate.hidden=false; gate.classList.add('open'); setTimeout(()=>fields.name.focus(),60); }
+  function openDialog(){ hideHomeContent(); dashboard.classList.remove('open'); dashboard.hidden=true; tripInfo.classList.remove('open'); tripInfo.hidden=true; gate.hidden=false; gate.classList.add('open'); if(!currentGuest){ gateTitle.textContent='Hi, let’s confirm who you are first!'; gateSubtitle.textContent='Pick your name, add your email, and we’ll send you a magic link. No password needed.'; authPane.hidden=false; form.hidden=true; setTimeout(()=>claimNameSelect.focus(),60); return; } gateTitle.textContent='Flight details'; gateSubtitle.textContent='Add your flight information so we can keep track of you.'; authPane.hidden=true; form.hidden=false; fields.name.value=currentGuest.name; fields.name.disabled=true; const current=savedFlights(); if(current) fillForm(current); setTimeout(()=>fields.flightStatus.focus(),60); }
   function closeDialog(){ gate.classList.remove('open'); setTimeout(()=>{ if(!gate.classList.contains('open')) gate.hidden=true; syncHomeVisibility(); },240); }
   function countdownFor(d,mode=boardMode){ const date=mode==='departures'?d?.departureDate:d?.arrivalDate; const time=mode==='departures'?d?.departureTime:d?.arrivalTime; if(!date) return 'awaiting flights'; const when=new Date(`${date}T${time || '12:00'}`); if(Number.isNaN(when.getTime())) return 'awaiting flights'; const ms=when-new Date(); if(ms<=0) return mode==='departures' ? 'departed' : 'arrived'; const days=Math.floor(ms/86400000); const hours=Math.floor((ms%86400000)/3600000); return days>0 ? `${days}d ${hours}h` : `${Math.max(1,hours)}h`; }
   function setBoardMode(mode){ boardMode=mode; arrivalsTab.classList.toggle('active',mode==='arrivals'); departuresTab.classList.toggle('active',mode==='departures'); arrivalsTab.setAttribute('aria-selected',mode==='arrivals'); departuresTab.setAttribute('aria-selected',mode==='departures'); renderDashboard(); }
@@ -404,13 +428,43 @@
   function timeValue(d,mode=boardMode){ const date=mode==='departures'?d?.departureDate:d?.arrivalDate; const time=mode==='departures'?d?.departureTime:d?.arrivalTime; if(!date) return Infinity; const when=new Date(`${date}T${time || '12:00'}`); return Number.isNaN(when.getTime()) ? Infinity : when.getTime(); }
   function orderedPeople(board){ return crew.map((person,index)=>({person,index,d:board[person]})).sort((a,b)=>{ const av=timeValue(a.d,'arrivals'), bv=timeValue(b.d,'arrivals'); if(av!==bv) return av-bv; return a.index-b.index; }); }
   function renderDashboard(){ const board=flightBoard(); const latest=savedFlights(); if(latest?.name && !board[latest.name]) board[latest.name]=latest; arrivalsBoard.innerHTML=orderedPeople(board).map(({person,d},i)=>{ const has=!!d; const isDepart=boardMode==='departures'; const main=has ? [isDepart?d.departureDate:d.arrivalDate, isDepart?d.departureTime:d.arrivalTime, isDepart?d.departureAirport:d.arrivalAirport].filter(Boolean).join(' · ') : 'Not added yet'; const flight=has ? (isDepart?d.departureFlight:d.arrivalFlight) || d.flightStatus || 'Flight details saved' : 'Waiting'; const noteText=has && d.flightNotes ? d.flightNotes : 'No flight notes yet.'; const notes=escapeHtml(noteText); return `<div class="arrival-row ${has?'':'is-empty'}"><div class="arrival-name">${escapeHtml(person)}</div><div class="arrival-meta">${escapeHtml(main)}</div><div class="arrival-flight">${escapeHtml(flight)}</div><div class="arrival-countdown">${escapeHtml(countdownFor(d,boardMode))}</div><button class="notes-toggle" data-note="note-${boardMode}-${i}" title="Show notes" aria-label="Show notes for ${escapeHtml(person)}">${noteIcon()}</button><div class="arrival-notes" id="note-${boardMode}-${i}" hidden>${notes}</div></div>`; }).join(''); arrivalsBoard.querySelectorAll('.notes-toggle').forEach(btn=>btn.addEventListener('click',()=>{ const note=document.getElementById(btn.dataset.note); note.hidden=!note.hidden; })); }
-  function openTripInfo(){ hideHomeContent(); if(!savedFlights()){ openDialog(); return; } closeDialog(); closeDash(); tripInfo.hidden=false; tripInfo.classList.add('open'); }
+  function openTripInfo(){ hideHomeContent(); if(!currentGuest || !savedFlights()){ openDialog(); return; } closeDialog(); closeDash(); tripInfo.hidden=false; tripInfo.classList.add('open'); }
   function closeTripInfoModal(){ tripInfo.classList.remove('open'); setTimeout(()=>{ if(!tripInfo.classList.contains('open')) tripInfo.hidden=true; syncHomeVisibility(); },240); }
-  function openDashboard(){ hideHomeContent(); if(!savedFlights()){ openDialog(); return; } closeDialog(); closeTripInfoModal(); renderDashboard(); dashboard.hidden=false; dashboard.classList.add('open'); }
+  function openDashboard(){ hideHomeContent(); if(!currentGuest || !savedFlights()){ openDialog(); return; } closeDialog(); closeTripInfoModal(); renderDashboard(); dashboard.hidden=false; dashboard.classList.add('open'); }
   function closeDash(){ dashboard.classList.remove('open'); setTimeout(()=>{ if(!dashboard.classList.contains('open')) dashboard.hidden=true; syncHomeVisibility(); },240); }
   openGate.addEventListener('click', () => savedFlights() ? openTripInfo() : openDialog()); closeGate.addEventListener('click', closeDialog); gate.addEventListener('click', e=>{ if(e.target===gate) closeDialog(); }); if(closeTripInfo) closeTripInfo.addEventListener('click', closeTripInfoModal); tripInfo.addEventListener('click', e=>{ if(e.target===tripInfo) closeTripInfoModal(); }); openFlights.addEventListener('click', openDashboard); tripInfoEditFlights.addEventListener('click', openDialog); tripInfoCalendar.addEventListener('click',()=>document.getElementById('addCalendar').click()); closeDashboard.addEventListener('click',()=>{ closeDash(); openTripInfo(); }); dashboard.addEventListener('click', e=>{ if(e.target===dashboard) closeDash(); }); editFlights.addEventListener('click', openDialog); arrivalsTab.addEventListener('click',()=>setBoardMode('arrivals')); departuresTab.addEventListener('click',()=>setBoardMode('departures')); fields.name.addEventListener('change',()=>{ const selected=fields.name.value; if(selected) localStorage.setItem(NAME_KEY, selected); const local=flightBoard()[selected]; if(local) fillForm(local); loadRemoteState(selected); });
-  setPrimaryCta(); loadRemoteState();
-  form.addEventListener('submit', async e=>{ e.preventDefault(); normalizeAirportInput(fields.arrivalAirport); normalizeAirportInput(fields.departureAirport); if(!form.reportValidity()) return; const data={ name:fields.name.value, flightStatus:fields.flightStatus.value, arrivalDate:fields.arrivalDate.value, arrivalAirport:fields.arrivalAirport.value.trim(), arrivalTime:fields.arrivalTime.value, arrivalFlight:fields.arrivalFlight.value.trim(), departureDate:fields.departureDate.value, departureAirport:fields.departureAirport.value.trim(), departureTime:fields.departureTime.value, departureFlight:fields.departureFlight.value.trim(), flightNotes:fields.flightNotes.value.trim() }; try { await saveFlightRecord(data); setPrimaryCta(); closeDialog(); openTripInfo(); showToast('Flights saved for the group'); } catch(err) { console.error(err); setPrimaryCta(); closeDialog(); openTripInfo(); showToast('Saved here — backend unreachable'); } });
+  function tokenFromUrlHash(){
+    const hash=new URLSearchParams((window.location.hash || '').replace(/^#/, ''));
+    return hash.get('access_token') || '';
+  }
+  function rememberAuthToken(token){
+    if(!token) return;
+    authToken=token;
+    localStorage.setItem('korculaAuthToken', token);
+    if(window.location.hash) history.replaceState(null,'',window.location.pathname + window.location.search);
+  }
+  async function claimProfile(name){
+    const res=await fetch('/api/auth/claim', { method:'POST', headers:{'content-type':'application/json', ...authHeaders()}, body:JSON.stringify({ name }) });
+    const payload=await res.json().catch(()=>({}));
+    if(!res.ok) throw new Error(payload.error || `claim ${res.status}`);
+    currentGuest=payload.guest; fields.name.value=currentGuest.name; claimNameSelect.value=currentGuest.name; localStorage.setItem(NAME_KEY,currentGuest.name); localStorage.removeItem(PENDING_CLAIM_KEY); friendlyTitle(); setPrimaryCta(); return currentGuest;
+  }
+  async function refreshAuthState(){
+    rememberAuthToken(tokenFromUrlHash() || localStorage.getItem('korculaAuthToken') || '');
+    const claimFromUrl=new URLSearchParams(window.location.search).get('claim') || '';
+    const pendingName=claimFromUrl || localStorage.getItem(PENDING_CLAIM_KEY) || '';
+    if(authToken && pendingName){
+      try { await claimProfile(pendingName); if(claimFromUrl){ history.replaceState(null,'',window.location.pathname); } showToast(`Welcome, ${currentGuest.name}`); }
+      catch(err){ console.error(err); setClaimMessage(err.message || 'We couldn’t claim that profile yet.'); openDialog(); }
+    } else if(authToken){
+      const res=await fetch('/api/auth/me', { cache:'no-store', headers:authHeaders() });
+      if(res.ok){ const payload=await res.json(); if(payload.guest){ currentGuest=payload.guest; fields.name.value=currentGuest.name; claimNameSelect.value=currentGuest.name; localStorage.setItem(NAME_KEY,currentGuest.name); } }
+    }
+    setPrimaryCta(); await loadRemoteState();
+  }
+  claimForm.addEventListener('submit', async e=>{ e.preventDefault(); const name=claimNameSelect.value; const email=claimEmail.value.trim(); if(!claimForm.reportValidity()) return; localStorage.setItem(PENDING_CLAIM_KEY,name); setClaimMessage('Sending your magic link…'); const res=await fetch('/api/auth/magic-link', { method:'POST', headers:{'content-type':'application/json'}, body:JSON.stringify({ name, email }) }); const payload=await res.json().catch(()=>({})); if(!res.ok){ setClaimMessage(payload.error || 'Something went wrong sending the magic link.'); return; } setClaimMessage('Magic link sent — check your email, then come right back here.'); showToast('Magic link sent'); });
+  setPrimaryCta(); refreshAuthState();
+  form.addEventListener('submit', async e=>{ e.preventDefault(); normalizeAirportInput(fields.arrivalAirport); normalizeAirportInput(fields.departureAirport); if(!form.reportValidity()) return; const data={ name:currentGuest?.name || fields.name.value, flightStatus:fields.flightStatus.value, arrivalDate:fields.arrivalDate.value, arrivalAirport:fields.arrivalAirport.value.trim(), arrivalTime:fields.arrivalTime.value, arrivalFlight:fields.arrivalFlight.value.trim(), departureDate:fields.departureDate.value, departureAirport:fields.departureAirport.value.trim(), departureTime:fields.departureTime.value, departureFlight:fields.departureFlight.value.trim(), flightNotes:fields.flightNotes.value.trim() }; try { await saveFlightRecord(data); setPrimaryCta(); closeDialog(); openTripInfo(); showToast('Flights saved for the group'); } catch(err) { console.error(err); setPrimaryCta(); closeDialog(); openTripInfo(); showToast('Saved here — backend unreachable'); } });
   document.getElementById('addCalendar').addEventListener('click', () => {
     const ics = ['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Korcula Trip HQ//Villa Darinka//EN','CALSCALE:GREGORIAN','METHOD:PUBLISH','BEGIN:VEVENT','UID:friends-trip-croatia-20260627@korcula-trip-hq','DTSTAMP:20260504T000000Z','DTSTART;VALUE=DATE:20260627','DTEND;VALUE=DATE:20260705','SUMMARY:Friends trip in Croatia','LOCATION:Triporte 32, 20270 Vela Luka, Croatia','DESCRIPTION:Villa week at Villa Darinka, Korčula, Croatia. Map: '+mapUrl,'END:VEVENT','END:VCALENDAR'].join('\r\n');
     const blob = new Blob([ics], { type: 'text/calendar;charset=utf-8' });

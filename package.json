@@ -5,7 +5,8 @@
   "type": "commonjs",
   "scripts": {
     "dev": "vercel dev",
-    "start": "node Server/server.js"
+    "start": "node Server/server.js",
+    "test": "node --test"
   },
   "engines": {
     "node": ">=20"
