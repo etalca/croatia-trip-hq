@@ -88,9 +88,17 @@ test('todo chips and dashboard cards route to the right detail windows', () => {
 });
 
 test('dinner summary card is a clickable dinner picker shortcut', () => {
-  const tripInfoBlock = html.slice(html.indexOf('id="tripInfo"'), html.indexOf('id="dinnerPicker"'));
-  assert.match(tripInfoBlock, /<button class="personal-card" id="myDinnerCard" type="button"/);
+  assert.match(html, /<button class="personal-card" id="myDinnerCard" type="button"/);
+  assert.match(html, /myDinnerCard\.addEventListener\('click',openDinnerPicker\)/);
   assert.match(html, /myDinnerCard=document\.getElementById\('myDinnerCard'\)/);
+});
+
+test('claimed dinner card puts the prompt above, date as title, and idea with co-lead below', () => {
+  assert.match(html, /id="myDinnerKicker"/);
+  assert.match(html, /myDinnerKicker\.textContent='You’re responsible for dinner plans on'/);
+  assert.match(html, /myDinnerTitle\.textContent=longDinnerDate\(myDinner\.date\)/);
+  assert.match(html, /dinnerIdeaSummary\(myDinner, partner\)/);
+  assert.doesNotMatch(html, /myDinnerMeta\.textContent=`You’re responsible for dinner plans on/);
 });
 
 test('main dashboard summarizes only dinner and dinner plans, not flight details or villa cards', () => {
