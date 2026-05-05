@@ -26,6 +26,19 @@ test('copy-flight logic copies flight fields but not notes or current guest name
   assert.match(html, /copyFlightsFrom\.addEventListener\('change',\(\)=>copyFlightDetailsFrom\(copyFlightsFrom\.value\)\)/);
 });
 
+test('not booked flight status collapses optional flight details and saves status only', () => {
+  assert.match(html, /<option>Not booked yet<\/option>/);
+  assert.match(html, /class="field full copy-flight-field flight-detail-field"/);
+  assert.match(html, /class="field flight-detail-field"><label for="arrivalDate"/);
+  assert.match(html, /class="field full flight-detail-field"><label for="flightNotes"/);
+  assert.match(html, /function syncFlightDetailsVisibility\(\)/);
+  assert.match(html, /const notBooked=fields\.flightStatus\.value==='Not booked yet'/);
+  assert.match(html, /document\.querySelectorAll\('\.flight-detail-field'\)\.forEach\(field=>\{ field\.hidden=notBooked; field\.querySelectorAll\('input, select, textarea'\)\.forEach\(el=>el\.disabled=notBooked\); \}\)/);
+  assert.match(html, /fields\.flightStatus\.addEventListener\('change',syncFlightDetailsVisibility\)/);
+  assert.match(html, /syncFlightDetailsVisibility\(\); setTimeout\(\(\)=>fields\.flightStatus\.focus\(\),60\)/);
+  assert.match(html, /if\(data\.flightStatus==='Not booked yet'\) \{ \['arrivalDate','arrivalAirport','arrivalTime','arrivalFlight','departureDate','departureAirport','departureTime','departureFlight','flightNotes'\]\.forEach\(key=>data\[key\]=''\); \}/);
+});
+
 test('hero video is configured for Safari-friendly autoplay on load', () => {
   assert.match(html, /<video id="waterVideo"[^>]*src="assets\/hero-water-3-browser\.mp4"[^>]*muted[^>]*playsinline[^>]*autoplay/);
   assert.match(html, /video\.defaultMuted=true; video\.muted=true; video\.playsInline=true; video\.autoplay=true;/);
@@ -237,7 +250,10 @@ test('dinner claiming excludes checkout day and keeps dinner plan choices simple
   assert.match(html, /id="dinnerPlanType"/);
   assert.match(html, /<option value="other">Other<\/option>/);
   assert.match(html, /function planLabel\(value\)\{[^}]*value==='other' \? 'Other'/);
-  assert.match(html, /<button type="submit">Save<\/button>/);
+  assert.match(html, /<button class="secondary-action" type="button" id="clearDinnerForm">Clear<\/button><button type="submit">Save<\/button>/);
+  assert.match(html, /function clearDinnerFormSelections\(\)\{ \[dinnerDate,dinnerPartner,dinnerPlanType,dinnerTitle\]\.forEach\(el=>el\.value=''\); dinnerDate\.focus\(\); \}/);
+  assert.match(html, /clearDinnerFormButton\.addEventListener\('click',clearDinnerFormSelections\)/);
+  assert.match(html, /clearDinnerFormButton=document\.getElementById\('clearDinnerForm'\)/);
   assert.doesNotMatch(html, /Save dinner night/);
   assert.doesNotMatch(html, /id="dinnerNotes"/);
   assert.doesNotMatch(html, /id="dinnerOther"/);
