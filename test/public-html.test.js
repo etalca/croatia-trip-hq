@@ -132,13 +132,16 @@ test('dinner claiming and dinner plans are separate windows, not stuffed into th
   assert.doesNotMatch(tripInfoBlock, /id="dinnerBoard"/);
 });
 
-test('dashboard embeds itinerary directly instead of hiding it behind a card', () => {
+test('dashboard embeds itinerary directly with floating header instead of a wrapper card', () => {
   const tripInfoBlock = html.slice(html.indexOf('id="tripInfo"'), html.indexOf('id="dinnerPicker"'));
   assert.doesNotMatch(tripInfoBlock, /id="openCalendarView"/);
   assert.doesNotMatch(tripInfoBlock, /<button class="info-card"/);
-  assert.match(tripInfoBlock, /<section class="embedded-itinerary" aria-label="Trip itinerary">/);
-  assert.match(tripInfoBlock, /<h3>Itinerary<\/h3><p>The calendar will fill up as people select their dinner responsibilities and activities are scheduled\.<\/p>/);
+  assert.doesNotMatch(tripInfoBlock, /<section class="embedded-itinerary" aria-label="Trip itinerary">/);
+  assert.match(tripInfoBlock, /<div class="itinerary-heading"><h3>Itinerary<\/h3><p>The calendar will fill up as people select their dinner responsibilities and activities are scheduled\.<\/p><\/div>\s*<section class="calendar-list embedded-itinerary" id="calendarItems" aria-label="Trip itinerary"><\/section>/);
   assert.match(tripInfoBlock, /id="calendarItems"/);
+  assert.doesNotMatch(html, /\.embedded-itinerary \{[^}]*border:/);
+  assert.doesNotMatch(html, /\.embedded-itinerary \{[^}]*background:/);
+  assert.match(html, /\.itinerary-heading \{/);
   assert.match(html, /\.calendar-week \{/);
   assert.match(html, /\.calendar-day \{/);
   assert.match(html, /function renderCalendarView\(\)/);

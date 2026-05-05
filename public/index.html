@@ -263,10 +263,10 @@
   .dinner-night:hover .dinner-action, .dinner-night:focus-within .dinner-action { opacity: 1; pointer-events: auto; }
   .dinner-action:hover, .dinner-action:focus-visible { background: rgba(255,255,255,.26); border-color: rgba(255,255,255,.42); }
   .dinner-card { display: grid; gap: 10px; align-content: start; }
-  .embedded-itinerary { display: grid; gap: 10px; border: 1px solid rgba(255,255,255,.18); border-radius: 18px; background: rgba(255,255,255,.08); padding: 12px; }
-  .embedded-itinerary header { position: static; display: grid; gap: 3px; margin: 0; }
-  .embedded-itinerary h3 { margin: 0; font-size: 18px; line-height: 1.08; font-weight: 400; color: white; }
-  .embedded-itinerary p { margin: 0; color: rgba(255,255,255,.64); font-size: 12px; line-height: 1.3; }
+  .itinerary-heading { display: grid; gap: 3px; margin: 4px 2px 0; }
+  .itinerary-heading h3 { margin: 0; font-size: 18px; line-height: 1.08; font-weight: 400; color: white; }
+  .itinerary-heading p { margin: 0; color: rgba(255,255,255,.64); font-size: 12px; line-height: 1.3; }
+  .embedded-itinerary { display: grid; gap: 8px; }
   .calendar-list { overflow-y: auto; min-height: 0; }
   .calendar-week { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
   .calendar-day { min-height: 132px; display: grid; align-content: start; gap: 8px; border: 1px solid rgba(255,255,255,.18); border-radius: 16px; background: rgba(255,255,255,.10); padding: 10px; }
@@ -407,10 +407,8 @@
         <p id="myFlightMeta">We’ll show who you’re arriving with here.</p>
       </button>
     </div>
-    <section class="embedded-itinerary" aria-label="Trip itinerary">
-      <header><h3>Itinerary</h3><p>The calendar will fill up as people select their dinner responsibilities and activities are scheduled.</p></header>
-      <section class="calendar-list" id="calendarItems" aria-label="Trip calendar items"></section>
-    </section>
+    <div class="itinerary-heading"><h3>Itinerary</h3><p>The calendar will fill up as people select their dinner responsibilities and activities are scheduled.</p></div>
+    <section class="calendar-list embedded-itinerary" id="calendarItems" aria-label="Trip itinerary"></section>
   </section>
 </div>
 <div class="dashboard" id="dinnerPicker" role="dialog" aria-modal="true" aria-labelledby="dinnerPickerTitle" hidden>
