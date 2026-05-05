@@ -100,24 +100,35 @@ test('dinner summary card is a clickable dinner picker shortcut', () => {
   assert.match(html, /myDinnerCard=document\.getElementById\('myDinnerCard'\)/);
 });
 
-test('claimed dinner card puts the prompt above, date as title, and idea with co-lead below', () => {
+test('claimed dinner card puts the prompt above, date as title, and co-lead below', () => {
   assert.match(html, /id="myDinnerKicker"/);
-  assert.match(html, /myDinnerKicker\.textContent='You’re responsible for dinner plans on'/);
+  assert.match(html, /myDinnerKicker\.textContent='You’re responsible for dinner on'/);
   assert.match(html, /myDinnerTitle\.textContent=longDinnerDate\(myDinner\.date\)/);
-  assert.match(html, /dinnerIdeaSummary\(myDinner, partner\)/);
-  assert.doesNotMatch(html, /myDinnerMeta\.textContent=`You’re responsible for dinner plans on/);
+  assert.match(html, /myDinnerMeta\.textContent=`with \$\{partner\}`/);
+  assert.doesNotMatch(html, /myDinnerMeta\.textContent=dinnerIdeaSummary\(myDinner, partner\)/);
 });
 
-test('main dashboard summarizes only dinner and dinner plans, not flight details or villa cards', () => {
+test('main dashboard summarizes dinner, flight arrival, and dinner plans without villa cards', () => {
   const tripInfoBlock = html.slice(html.indexOf('id="tripInfo"'), html.indexOf('id="dinnerPicker"'));
   assert.match(tripInfoBlock, /id="myDinnerMeta"/);
-  assert.match(html, /You’re responsible for dinner plans on/);
+  assert.match(tripInfoBlock, /id="myFlightCard"/);
+  assert.match(html, /You’re responsible for dinner on/);
+  assert.match(html, /You’re flight arrives in/);
+  assert.match(html, /function flightCompanionSummary\(current, board\)/);
+  assert.match(html, /myFlightTitle\.textContent=countdownFor\(flights,'arrivals'\)/);
   assert.match(tripInfoBlock, /<button class="info-card" id="openDinnerPlans" type="button"><span>Dinner plans<\/span>/);
   assert.doesNotMatch(tripInfoBlock, /id="tripInfoEditFlights"/);
   assert.doesNotMatch(tripInfoBlock, /<span>My flight details<\/span>/);
   assert.doesNotMatch(tripInfoBlock, /<span>Villa<\/span>/);
   assert.doesNotMatch(tripInfoBlock, /id="tripInfoCalendar"/);
   assert.doesNotMatch(tripInfoBlock, /<span>Calendar<\/span>/);
+});
+
+test('flight board edit button overlays before info icon without changing row columns', () => {
+  assert.match(html, /\.arrival-row \{[^}]*position: relative;[^}]*grid-template-columns: minmax\(86px, 1fr\) minmax\(190px, 1\.45fr\) minmax\(86px, \.8fr\) minmax\(104px, \.72fr\) 25\.5px;/s);
+  assert.match(html, /\.arrival-edit \{[^}]*position: absolute;[^}]*right: 41\.5px;[^}]*opacity: 0;/s);
+  assert.match(html, /\.arrival-row:hover \.arrival-edit, \.arrival-row:focus-within \.arrival-edit/);
+  assert.match(html, /\$\{editButton\}<button class="notes-toggle"/);
 });
 
 test('flight board shows edit button only on the logged-in user row', () => {
@@ -136,6 +147,19 @@ test('dinner claiming excludes checkout day and has no notes field', () => {
   assert.doesNotMatch(html, /id="dinnerNotes"/);
   assert.doesNotMatch(html, /'2026-07-04'/);
   assert.doesNotMatch(html, /dinnerNotes/);
+});
+
+test('dinner plans cards use hierarchy, smaller dates, and hover claim or edit actions', () => {
+  assert.match(html, /\.dinner-date \{[^}]*font-size: 11px;/s);
+  assert.match(html, /\.dinner-date strong \{[^}]*font-size: 16px;/s);
+  assert.match(html, /\.dinner-action \{[^}]*opacity: 0;/s);
+  assert.match(html, /\.dinner-night:hover \.dinner-action, \.dinner-night:focus-within \.dinner-action/);
+  assert.match(html, /const isMyDinner=\(slot\.leads \|\| \[\]\)\.includes\(currentGuest\?\.name\)/);
+  assert.match(html, /const actionLabel=!claimed \? 'Claim' : isMyDinner \? 'Edit' : ''/);
+  assert.match(html, /const details=claimed \? `<div class="dinner-plan">\$\{escapeHtml\(planLabel\(slot\.planType \|\| 'undecided'\)\)\}<\/div><div class="dinner-title">\$\{escapeHtml\(title\)\}<\/div>` : ''/);
+  assert.match(html, /const leads=claimed \? \(slot\.leads \|\| \[\]\)\.join\(' \+ '\) : 'Open'/);
+  assert.match(html, /dinnerBoard\.querySelectorAll\('\.dinner-action'\)\.forEach/);
+  assert.match(html, /openDinnerPickerForDate\(btn\.dataset\.date\)/);
 });
 
 test('dinner form surfaces duplicate-assignment errors without closing the picker', () => {
