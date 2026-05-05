@@ -57,7 +57,7 @@ test('trip info heading is a friendly greeting and todo chips show completion ic
   assert.doesNotMatch(html, />Trip dashboard<\/h2>/);
   assert.doesNotMatch(html, /Your home base for flights, dinner responsibilities, tasks, and the useful trip stuff\./);
   assert.match(html, /<h2 class="dashboard-name" id="dashboardGuestName">Hi<\/h2>/);
-  assert.match(html, /`Hi, \${name}`/);
+  assert.match(html, /`Hi, \${name} \${hasOutstandingTodos \? 'you have a task to complete\.' : 'you’re all caught up\.'}`/);
   assert.doesNotMatch(html, /\$\{name\}’s trip dashboard/);
   assert.match(html, /<button class="todo-chip/);
   assert.match(html, /function todoIcon\(done\)/);
@@ -67,6 +67,12 @@ test('trip info heading is a friendly greeting and todo chips show completion ic
   assert.match(html, /<button class="pill secondary" id="addCalendar">Add to calendar<\/button>/);
   assert.match(html, /✓/);
   assert.match(html, /○/);
+});
+
+
+test('dashboard title changes based on outstanding todos', () => {
+  assert.match(html, /const hasOutstandingTodos=!flights \|\| !myDinner \|\| localStorage\.getItem\(CALENDAR_KEY\)!=='true'/);
+  assert.match(html, /dashboardGuestName\.textContent=name \? `Hi, \$\{name\} \$\{hasOutstandingTodos \? 'you have a task to complete\.' : 'you’re all caught up\.'\}` : 'Hi'/);
 });
 
 test('undone todo chips are visually ordered before completed todos', () => {
@@ -108,7 +114,6 @@ test('dinner claiming and dinner plans are separate windows, not stuffed into th
   assert.match(html, /id="closeDinnerPicker"/);
   assert.match(html, /id="dinnerPlans"/);
   assert.match(html, /aria-labelledby="dinnerPlansTitle"/);
-  assert.match(html, /id="openDinnerPlans"/);
   assert.match(html, /function openDinnerPlans\(\)/);
   assert.match(html, /function closeDinnerPlans\(\)/);
   assert.match(html, /function openDinnerPicker\(backTarget='tripInfo'\)/);
@@ -127,15 +132,13 @@ test('dinner claiming and dinner plans are separate windows, not stuffed into th
   assert.doesNotMatch(tripInfoBlock, /id="dinnerBoard"/);
 });
 
-test('dashboard itinerary view uses a week-view calendar layout with core trip events', () => {
+test('dashboard embeds itinerary directly instead of hiding it behind a card', () => {
   const tripInfoBlock = html.slice(html.indexOf('id="tripInfo"'), html.indexOf('id="dinnerPicker"'));
-  assert.match(tripInfoBlock, /id="openCalendarView"/);
-  assert.match(tripInfoBlock, /<span>Itinerary<\/span><span>An overview of what each day will hold\.<\/span>/);
-  assert.match(html, /id="calendarView"/);
-  assert.match(html, /aria-labelledby="calendarViewTitle"/);
-  assert.match(html, /<h2 id="calendarViewTitle">Itinerary<\/h2>/);
-  assert.match(html, /The calendar will fill up as people select their dinner responsibilities and activities are scheduled\./);
-  assert.match(html, /id="calendarItems"/);
+  assert.doesNotMatch(tripInfoBlock, /id="openCalendarView"/);
+  assert.doesNotMatch(tripInfoBlock, /<button class="info-card"/);
+  assert.match(tripInfoBlock, /<section class="embedded-itinerary" aria-label="Trip itinerary">/);
+  assert.match(tripInfoBlock, /<h3>Itinerary<\/h3><p>The calendar will fill up as people select their dinner responsibilities and activities are scheduled\.<\/p>/);
+  assert.match(tripInfoBlock, /id="calendarItems"/);
   assert.match(html, /\.calendar-week \{/);
   assert.match(html, /\.calendar-day \{/);
   assert.match(html, /function renderCalendarView\(\)/);
@@ -146,23 +149,21 @@ test('dashboard itinerary view uses a week-view calendar layout with core trip e
   assert.match(html, /July 4, 2026|month:'long', day:'numeric', year:'numeric'/);
   assert.match(html, /10:00 a\.m\./);
   assert.match(html, /dinnerPlan\(\)\.slots\.filter\(slot=>\(slot\.leads \|\| \[\]\)\.length\)/);
-  const calendarBlock = html.slice(html.indexOf('id="calendarView"'), html.indexOf('id="dashboard"'));
-  assert.doesNotMatch(calendarBlock, /Flights/);
-  assert.doesNotMatch(calendarBlock, /Villa/);
 });
 
-test('todo chips and dashboard cards route to the right detail windows', () => {
+test('todo chips and summary cards route to the right detail windows', () => {
   assert.match(html, /flightStatusChip\.addEventListener\('click',\(\)=>\{ if\(savedFlights\(\)\) openDashboard\(\); else openDialog\('tripInfo'\); \}\)/);
   assert.match(html, /dinnerStatusChip\.addEventListener\('click',\(\)=>openDinnerPicker\('tripInfo'\)\)/);
-  assert.match(html, /myDinnerCard\.addEventListener\('click',\(\)=>openDinnerPicker\('tripInfo'\)\)/);
+  assert.match(html, /myDinnerCard\.addEventListener\('click',\(\)=>\{ if\(findMyDinner\(\)\) openDinnerPlans\(\); else openDinnerPicker\('tripInfo'\); \}\)/);
+  assert.match(html, /myFlightCard\.addEventListener\('click',\(\)=>\{ if\(savedFlights\(\)\) openDashboard\(\); else openDialog\('tripInfo'\); \}\)/);
   assert.match(html, /calendarStatusChip\.addEventListener\('click',addTripToCalendar\)/);
-  assert.match(html, /openDinnerPlansButton\.addEventListener\('click',openDinnerPlans\)/);
-  assert.match(html, /openCalendarViewButton\.addEventListener\('click',openCalendarView\)/);
+  assert.doesNotMatch(html, /openDinnerPlansButton\.addEventListener\('click',openDinnerPlans\)/);
+  assert.doesNotMatch(html, /openCalendarViewButton\.addEventListener\('click',openCalendarView\)/);
 });
 
-test('dinner summary card is a clickable dinner picker shortcut', () => {
+test('dinner summary card opens plans after claimed dinner and picker before claiming', () => {
   assert.match(html, /<button class="personal-card" id="myDinnerCard" type="button"/);
-  assert.match(html, /myDinnerCard\.addEventListener\('click',\(\)=>openDinnerPicker\('tripInfo'\)\)/);
+  assert.match(html, /myDinnerCard\.addEventListener\('click',\(\)=>\{ if\(findMyDinner\(\)\) openDinnerPlans\(\); else openDinnerPicker\('tripInfo'\); \}\)/);
   assert.match(html, /myDinnerCard=document\.getElementById\('myDinnerCard'\)/);
 });
 
@@ -174,7 +175,7 @@ test('claimed dinner card puts the prompt above, date as title, and co-lead belo
   assert.doesNotMatch(html, /myDinnerMeta\.textContent=dinnerIdeaSummary\(myDinner, partner\)/);
 });
 
-test('main dashboard summarizes dinner, flight arrival, and dinner plans without villa cards', () => {
+test('main dashboard is a hub with only dinner, flight, and embedded itinerary cards', () => {
   const tripInfoBlock = html.slice(html.indexOf('id="tripInfo"'), html.indexOf('id="dinnerPicker"'));
   assert.match(tripInfoBlock, /id="myDinnerMeta"/);
   assert.match(tripInfoBlock, /id="myFlightCard"/);
@@ -184,11 +185,11 @@ test('main dashboard summarizes dinner, flight arrival, and dinner plans without
   assert.match(html, /function normalizedFlightNumber\(value\)/);
   assert.match(html, /normalizedFlightNumber\(item\.arrivalFlight\)===flightNumber/);
   assert.match(html, /myFlightTitle\.textContent=countdownFor\(flights,'arrivals'\)/);
-  assert.match(tripInfoBlock, /<button class="info-card" id="openDinnerPlans" type="button"><span>Dinner plans<\/span>/);
-  assert.doesNotMatch(tripInfoBlock, /id="tripInfoEditFlights"/);
-  assert.doesNotMatch(tripInfoBlock, /<span>My flight details<\/span>/);
+  assert.doesNotMatch(tripInfoBlock, /id="openFlights"/);
+  assert.doesNotMatch(tripInfoBlock, /id="openDinnerPlans"/);
+  assert.doesNotMatch(tripInfoBlock, /id="openCalendarView"/);
+  assert.doesNotMatch(tripInfoBlock, /<button class="info-card"/);
   assert.doesNotMatch(tripInfoBlock, /<span>Villa<\/span>/);
-  assert.match(tripInfoBlock, /id="openCalendarView"/);
 });
 
 test('flight board edit button overlays before info icon without changing row columns', () => {
