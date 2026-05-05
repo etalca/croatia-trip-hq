@@ -34,6 +34,13 @@ test('hero video is configured for Safari-friendly autoplay on load', () => {
   assert.match(html, /video\.play\(\)\.catch/);
 });
 
+test('homepage countdown counts calendar midnights, not trip start hour', () => {
+  assert.match(html, /const villaStartDate='2026-06-27'/);
+  assert.match(html, /function daysUntilTrip\(now=new Date\(\)\)/);
+  assert.match(html, /new Date\(now\.getFullYear\(\),now\.getMonth\(\),now\.getDate\(\)\)/);
+  assert.doesNotMatch(html, /Math\.ceil\(Math\.max\(0, villaStart - new Date\(\)\) \/ 86400000\)/);
+});
+
 test('trip info heading is a friendly greeting and todo chips show completion icons', () => {
   assert.doesNotMatch(html, />Trip dashboard<\/h2>/);
   assert.doesNotMatch(html, /Your home base for flights, dinner responsibilities, tasks, and the useful trip stuff\./);

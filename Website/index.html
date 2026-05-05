@@ -412,10 +412,11 @@
 <script>
 (() => {
   const crew=['Tanner','David','Jacob G.','Jacob M.','Mikaela','Candace','Kaelin','Mark','Amanda','Ellie','Erika','Andie','Zach','Kait','Nick'];
-  const villaStart = new Date('2026-06-27T15:00:00');
+  const villaStartDate='2026-06-27';
   const mapUrl = 'https://www.google.com/maps/place/Villa+Darinka/@42.9343666,16.6551014,15.4z/data=!4m9!3m8!1s0x134a73c92d0ce117:0x3fd1fdd80b1a9ee7!5m2!4m1!1i2!8m2!3d42.929621!4d16.6681103!16s%2Fg%2F11c5qpstxg?entry=ttu&g_ep=EgoyMDI2MDQyOS4wIKXMDSoASAFQAw%3D%3D';
   const countDays=document.getElementById('countDays');
-  function updateCountdown(){ countDays.textContent = Math.ceil(Math.max(0, villaStart - new Date()) / 86400000); }
+  function daysUntilTrip(now=new Date()){ const start=new Date(`${villaStartDate}T00:00:00`); const today=new Date(now.getFullYear(),now.getMonth(),now.getDate()); return Math.max(0, Math.round((start - today) / 86400000)); }
+  function updateCountdown(){ countDays.textContent = daysUntilTrip(); }
   updateCountdown(); setInterval(updateCountdown, 3600000);
 
   const nameSelect=document.getElementById('name');
