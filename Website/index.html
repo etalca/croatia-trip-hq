@@ -359,7 +359,7 @@
   if(rememberedName()) fields.name.value=rememberedName();
   function savedFlights(){ return cachedFlights || readLocalFlights(); }
   function authHeaders(){ return authToken ? { authorization:`Bearer ${authToken}` } : {}; }
-  function friendlyTitle(){ heroTitle.textContent = currentGuest?.name ? `${currentGuest.name}, your week on korcula awaits` : 'Your week on Korcula begins here.'; }
+  function friendlyTitle(){ heroTitle.textContent = currentGuest?.name ? `${currentGuest.name}, your week on Korčula awaits.` : 'Your week on Korčula begins here.'; }
   function setClaimMessage(text){ claimMessage.textContent=text; claimMessage.hidden = !text; }
   function flightBoard(){ return cachedBoard || readLocalBoard(); }
   function cacheFlightState(data, board){ if(data){ cachedFlights=data; localStorage.setItem('korculaFlightDetails', JSON.stringify(data)); if(data.name) localStorage.setItem(NAME_KEY, data.name); } if(board){ cachedBoard=board; localStorage.setItem('korculaFlightBoard', JSON.stringify(board)); } }
