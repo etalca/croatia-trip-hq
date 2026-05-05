@@ -154,6 +154,26 @@ test('dashboard embeds itinerary directly with floating header instead of a wrap
   assert.match(html, /dinnerPlan\(\)\.slots\.filter\(slot=>\(slot\.leads \|\| \[\]\)\.length\)/);
 });
 
+test('dashboard itinerary cards stay contained on mobile and expand into hourly day view', () => {
+  assert.match(html, /const DINNER_TIME='7–8 p\.m\.'/);
+  assert.match(html, /const DINNER_HOUR='7:00 p\.m\.'/);
+  assert.match(html, /dinnerDates\.forEach\(date=>eventsByDate\[date\]\.push/);
+  assert.match(html, /const claimedDinner=dinners\.find\(slot=>slot\.date===date\)/);
+  assert.match(html, /claimedDinner \? `\$\{DINNER_TIME\} · \$\{\(claimedDinner\.leads \|\| \[\]\)\.join\(' \+ '\)\}/);
+  assert.match(html, /: `\$\{DINNER_TIME\} · Dinner placeholder`/);
+  assert.match(html, /function dayAgenda\(events, full\)/);
+  assert.match(html, /function toggleCalendarDay\(button\)/);
+  assert.match(html, /class="calendar-events \$\{needsExpand\?'is-collapsed':''\}"/);
+  assert.match(html, /<button class="calendar-expand" type="button"/);
+  assert.match(html, /View day/);
+  assert.match(html, /Hide day/);
+  assert.match(html, /<div class="day-agenda" hidden>/);
+  assert.match(html, /\[calendarItems, calendarModalItems\]\.filter\(Boolean\)\.forEach\(container=>container\.querySelectorAll\('\.calendar-expand'\)\.forEach/);
+  assert.match(html, /\.calendar-day \{[^}]*overflow: hidden;/s);
+  assert.match(html, /\.calendar-events\.is-collapsed \.calendar-event:nth-of-type\(n\+2\)/);
+  assert.match(html, /@media \(max-width: 760px\) \{[\s\S]*\.calendar-week \{ grid-template-columns: 1fr; \}/);
+});
+
 test('todo chips and summary cards route to the right detail windows', () => {
   assert.match(html, /flightStatusChip\.addEventListener\('click',\(\)=>\{ if\(savedFlights\(\)\) openDashboard\(\); else openDialog\('tripInfo'\); \}\)/);
   assert.match(html, /dinnerStatusChip\.addEventListener\('click',\(\)=>openDinnerPicker\('tripInfo'\)\)/);
