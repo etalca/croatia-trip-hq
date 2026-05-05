@@ -1,11 +1,16 @@
 const { CREW, getSupabase, sendJson } = require('../../lib/trip-store');
 const { normalizeEmail } = require('../../lib/trip-auth');
 
+function isLocalHost(host) {
+  return /^localhost(?::\d+)?$/.test(String(host || '')) || /^127\.0\.0\.1(?::\d+)?$/.test(String(host || ''));
+}
+
 function siteOrigin(req) {
   const proto = req.headers['x-forwarded-proto'] || 'https';
   const host = req.headers['x-forwarded-host'] || req.headers.host;
-  if (host) return `${proto}://${host}`;
-  return process.env.NEXT_PUBLIC_SITE_URL || process.env.SITE_URL || 'https://croatia-trip-hq.vercel.app';
+  const preferredOrigin = process.env.NEXT_PUBLIC_SITE_URL || process.env.SITE_URL || 'https://croatia.tannerbegin.com';
+  if (isLocalHost(host)) return `${proto}://${host}`;
+  return preferredOrigin;
 }
 
 module.exports = async function handler(req, res) {

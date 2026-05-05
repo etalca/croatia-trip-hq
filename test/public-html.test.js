@@ -44,7 +44,7 @@ test('homepage countdown counts calendar midnights, not trip start hour', () => 
 test('magic-link auth personalizes the homepage headline after claim', () => {
   assert.match(html, /<h1 id="heroTitle">Your week on Korčula begins here\.<\/h1>/);
   assert.match(html, /function friendlyTitle\(\)/);
-  assert.match(html, /\$\{currentGuest\.name\} your week on Korčula awaits\./);
+  assert.match(html, /\$\{currentGuest\.name\}, your week on Korčula awaits\./);
   assert.match(html, /function tokenFromAuthRedirect\(\)/);
   assert.match(html, /new URLSearchParams\(window\.location\.search\)/);
   assert.match(html, /return hash\.get\('access_token'\) \|\| query\.get\('access_token'\) \|\| ''/);
@@ -79,9 +79,10 @@ test('homepage secondary CTA advances after calendar todo and falls back to trip
   assert.match(html, /function nextHomeTodoCta\(\)/);
   assert.match(html, /return 'Add flight details'/);
   assert.match(html, /return 'Claim a dinner'/);
-  assert.match(html, /return 'Add songs trip playlist'/);
+  assert.match(html, /return 'Add songs to trip playlist'/);
   assert.match(html, /window\.open\(PLAYLIST_URL,'_blank','noreferrer'\)/);
   assert.match(html, /localStorage\.setItem\(CALENDAR_KEY,'true'\); renderTripDashboard\(\); setPrimaryCta\(\);/);
+  assert.match(html, /cacheDinnerPlan\(data\.meals \|\| dinnerPlan\(\)\); renderTripDashboard\(\); setPrimaryCta\(\);/);
 });
 
 test('FaceTime call notice spreads across desktop bottom and uses Pacific-time calendar invite', () => {
@@ -192,7 +193,7 @@ test('main dashboard summarizes dinner, flight arrival, and dinner plans without
 
 test('flight board edit button overlays before info icon without changing row columns', () => {
   assert.match(html, /\.arrival-row \{[^}]*position: relative;[^}]*grid-template-columns: minmax\(86px, 1fr\) minmax\(190px, 1\.45fr\) minmax\(86px, \.8fr\) minmax\(104px, \.72fr\) 25\.5px;/s);
-  assert.match(html, /\.arrival-edit \{[^}]*position: absolute;[^}]*right: 41\.5px;[^}]*opacity: 0;/s);
+  assert.match(html, /\.arrival-edit \{[^}]*position: absolute;[^}]*top: 8px;[^}]*right: 41\.5px;[^}]*opacity: 0;/s);
   assert.match(html, /\.arrival-row:hover \.arrival-edit, \.arrival-row:focus-within \.arrival-edit/);
   assert.match(html, /\$\{editButton\}<button class="notes-toggle"/);
 });
