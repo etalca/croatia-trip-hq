@@ -22,6 +22,8 @@
   * { box-sizing: border-box; letter-spacing: -0.03em; }
   html, body { margin: 0; width: 100%; min-height: 100%; background: #04151d; color: white; font-family: Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif; }
   body { overflow: hidden; }
+  .modal-blur { position: fixed; inset: 0; z-index: 8; pointer-events: none; background: rgba(4,17,23,0); backdrop-filter: none; -webkit-backdrop-filter: none; transition: background .18s ease; }
+  body.modal-open .modal-blur { background: rgba(4,17,23,.18); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
   button, input, select, textarea { font: inherit; letter-spacing: -0.03em; }
   a { color: inherit; }
   [hidden] { display: none !important; }
@@ -345,6 +347,7 @@
   <canvas id="gl"></canvas>
 </div>
 <div class="shade"></div>
+<div class="modal-blur" id="modalBlur" aria-hidden="true"></div>
 <div class="countdown" aria-label="Countdown to villa week"><strong id="countDays">—</strong><span>days and counting</span></div>
 <a class="address" href="https://www.google.com/maps/place/Villa+Darinka/@42.9343666,16.6551014,15.4z/data=!4m9!3m8!1s0x134a73c92d0ce117:0x3fd1fdd80b1a9ee7!5m2!4m1!1i2!8m2!3d42.929621!4d16.6681103!16s%2Fg%2F11c5qpstxg?entry=ttu&g_ep=EgoyMDI2MDQyOS4wIKXMDSoASAFQAw%3D%3D" target="_blank" rel="noreferrer">Villa Darinka<br>Triporte 32, 20270 Vela Luka, Croatia</a>
 <div class="planning-call"><span>Drop in to discuss deets.</span><span>May 12 @ 6:30 p.m.</span><a href="#" id="addPlanningCall">Add to calendar</a></div>

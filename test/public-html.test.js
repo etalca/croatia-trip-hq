@@ -225,6 +225,9 @@ test('dinner plans cards use clear hierarchy, fixed date tiles, and contextual a
 
 
 test('back navigation keeps blur overlay visible and reopens previous windows faster', () => {
+  assert.match(html, /<div class="modal-blur" id="modalBlur" aria-hidden="true"><\/div>/);
+  assert.match(html, /\.modal-blur \{[^}]*position: fixed;[^}]*background: rgba\(4,17,23,0\);[^}]*backdrop-filter: none;/s);
+  assert.match(html, /body\.modal-open \.modal-blur \{[^}]*background: rgba\(4,17,23,\.18\);[^}]*backdrop-filter: blur\(10px\);/s);
   assert.match(html, /function keepModalOverlay\(\)/);
   assert.match(html, /function reopenAfterBack\(fn\)/);
   assert.match(html, /setTimeout\(fn,80\)/);
