@@ -495,7 +495,7 @@
   if(rememberedName()) fields.name.value=rememberedName();
   function savedFlights(){ return cachedFlights || readLocalFlights(); }
   function authHeaders(){ return authToken ? { authorization:`Bearer ${authToken}` } : {}; }
-  function friendlyTitle(){ heroTitle.textContent = currentGuest?.name ? `${currentGuest.name}, your week on Korčula awaits.` : 'Your week on Korčula begins here.'; }
+  function friendlyTitle(){ heroTitle.textContent = currentGuest?.name ? `${currentGuest.name} your week on Korčula awaits.` : 'Your week on Korčula begins here.'; }
   function setClaimMessage(text){ claimMessage.textContent=text; claimMessage.hidden = !text; }
   function flightBoard(){ return cachedBoard || readLocalBoard(); }
   function dinnerPlan(){ return cachedDinner || readLocalDinner(); }
@@ -587,9 +587,10 @@
   function openDashboard(){ hideHomeContent(); if(!currentGuest || !savedFlights()){ openDialog('tripInfo'); return; } closeDialog(); closeTripInfoModal(); closeDinnerPickerModal(false); closeDinnerPlansModal(false); closeCalendarViewModal(false); renderDashboard(); dashboard.hidden=false; dashboard.classList.add('open'); }
   function closeDash(){ dashboard.classList.remove('open'); setTimeout(()=>{ if(!dashboard.classList.contains('open')) dashboard.hidden=true; syncHomeVisibility(); },240); }
   openGate.addEventListener('click', () => currentGuest ? openTripInfo() : openDialog()); closeGate.addEventListener('click', closeGateAction); gate.addEventListener('click', e=>{ if(e.target===gate) closeDialog(); }); if(closeTripInfo) closeTripInfo.addEventListener('click', closeTripInfoModal); tripInfo.addEventListener('click', e=>{ if(e.target===tripInfo) closeTripInfoModal(); }); openFlights.addEventListener('click', openDashboard); openDinnerPlansButton.addEventListener('click',openDinnerPlans); openCalendarViewButton.addEventListener('click',openCalendarView); flightStatusChip.addEventListener('click',()=>{ if(savedFlights()) openDashboard(); else openDialog('tripInfo'); }); dinnerStatusChip.addEventListener('click',()=>openDinnerPicker('tripInfo')); myDinnerCard.addEventListener('click',()=>openDinnerPicker('tripInfo')); myFlightCard.addEventListener('click',()=>{ if(savedFlights()) openDashboard(); else openDialog('tripInfo'); }); calendarStatusChip.addEventListener('click',addTripToCalendar); dinnerForm.addEventListener('submit', async e=>{ e.preventDefault(); if(!dinnerForm.reportValidity()) return; try{ await saveDinnerPlan(); closeDinnerPicker(); showToast('Dinner night saved'); } catch(err){ console.error(err); showToast(err.message || 'Could not save dinner night'); } }); closeDinnerPickerButton.addEventListener('click',()=>closeDinnerPicker()); dinnerPicker.addEventListener('click', e=>{ if(e.target===dinnerPicker) closeDinnerPicker(); }); closeDinnerPlansButton.addEventListener('click',()=>closeDinnerPlans()); dinnerPlans.addEventListener('click', e=>{ if(e.target===dinnerPlans) closeDinnerPlans(); }); closeCalendarViewButton.addEventListener('click',()=>closeCalendarView()); calendarView.addEventListener('click', e=>{ if(e.target===calendarView) closeCalendarView(); }); closeDashboard.addEventListener('click',()=>{ closeDash(); openTripInfo(); }); dashboard.addEventListener('click', e=>{ if(e.target===dashboard) closeDash(); }); arrivalsTab.addEventListener('click',()=>setBoardMode('arrivals')); departuresTab.addEventListener('click',()=>setBoardMode('departures')); copyFlightsFrom.addEventListener('change',()=>copyFlightDetailsFrom(copyFlightsFrom.value)); fields.name.addEventListener('change',()=>{ const selected=fields.name.value; if(selected) localStorage.setItem(NAME_KEY, selected); const local=flightBoard()[selected]; if(local) fillForm(local); loadRemoteState(selected); });
-  function tokenFromUrlHash(){
+  function tokenFromAuthRedirect(){
     const hash=new URLSearchParams((window.location.hash || '').replace(/^#/, ''));
-    return hash.get('access_token') || '';
+    const query=new URLSearchParams(window.location.search);
+    return hash.get('access_token') || query.get('access_token') || '';
   }
   function rememberAuthToken(token){
     if(!token) return;
@@ -604,7 +605,7 @@
     currentGuest=payload.guest; fields.name.value=currentGuest.name; claimNameSelect.value=currentGuest.name; localStorage.setItem(NAME_KEY,currentGuest.name); localStorage.removeItem(PENDING_CLAIM_KEY); friendlyTitle(); setPrimaryCta(); return currentGuest;
   }
   async function refreshAuthState(){
-    rememberAuthToken(tokenFromUrlHash() || localStorage.getItem('korculaAuthToken') || '');
+    rememberAuthToken(tokenFromAuthRedirect() || localStorage.getItem('korculaAuthToken') || '');
     const claimFromUrl=new URLSearchParams(window.location.search).get('claim') || '';
     const pendingName=claimFromUrl || localStorage.getItem(PENDING_CLAIM_KEY) || '';
     if(authToken && pendingName){

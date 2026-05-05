@@ -41,6 +41,18 @@ test('homepage countdown counts calendar midnights, not trip start hour', () => 
   assert.doesNotMatch(html, /Math\.ceil\(Math\.max\(0, villaStart - new Date\(\)\) \/ 86400000\)/);
 });
 
+test('magic-link auth personalizes the homepage headline after claim', () => {
+  assert.match(html, /<h1 id="heroTitle">Your week on Korčula begins here\.<\/h1>/);
+  assert.match(html, /function friendlyTitle\(\)/);
+  assert.match(html, /\$\{currentGuest\.name\} your week on Korčula awaits\./);
+  assert.match(html, /function tokenFromAuthRedirect\(\)/);
+  assert.match(html, /new URLSearchParams\(window\.location\.search\)/);
+  assert.match(html, /return hash\.get\('access_token'\) \|\| query\.get\('access_token'\) \|\| ''/);
+  assert.match(html, /rememberAuthToken\(tokenFromAuthRedirect\(\) \|\| localStorage\.getItem\('korculaAuthToken'\) \|\| ''\)/);
+  assert.match(html, /claimProfile\(pendingName\)/);
+  assert.match(html, /friendlyTitle\(\)/);
+});
+
 test('trip info heading is a friendly greeting and todo chips show completion icons', () => {
   assert.doesNotMatch(html, />Trip dashboard<\/h2>/);
   assert.doesNotMatch(html, /Your home base for flights, dinner responsibilities, tasks, and the useful trip stuff\./);
