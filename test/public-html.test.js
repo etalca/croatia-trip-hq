@@ -59,6 +59,8 @@ test('hero video is configured for Safari-friendly autoplay on load', () => {
   assert.match(html, /video\.setAttribute\('muted',''\)/);
   assert.match(html, /window\.addEventListener\('pageshow',nudgeVideo/);
   assert.match(html, /video\.play\(\)\.catch/);
+  assert.match(html, /function markVideoReady\(\)\{ if\(video\.readyState>=2\)\{ ready=true; video\.classList\.add\('video-ready'\); \} \}/);
+  assert.match(html, /markVideoReady\(\); nudgeVideo\(\);/);
 });
 
 test('mobile hero uses dynamic viewport and cover video sizing without safe-area height constraints', () => {
