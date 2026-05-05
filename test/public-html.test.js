@@ -57,6 +57,15 @@ test('hero video is configured for Safari-friendly autoplay on load', () => {
   assert.match(html, /video\.play\(\)\.catch/);
 });
 
+test('mobile hero crops in for iPhone 15 Pro Max so the video covers the full viewport', () => {
+  assert.match(html, /#stage \{[^}]*position: fixed;[^}]*inset: 0;[^}]*min-height: 100svh;[^}]*overflow: hidden;/s);
+  assert.match(html, /@media \(max-width: 760px\) \{\n    \.poster-img, video \{ object-position: 66% 44%; transform: scale\(1\.18\); transform-origin: center center; \}/);
+  assert.match(html, /uniform float u_mobileZoom;/);
+  assert.match(html, /mediaUv=\(mediaUv-\.5\)\/u_mobileZoom\+\.5;/);
+  assert.match(html, /mobileZoom:gl\.getUniformLocation\(prog,'u_mobileZoom'\)/);
+  assert.match(html, /gl\.uniform1f\(loc\.mobileZoom, mobileQuery\.matches \? 1\.18 : 1\.0\)/);
+});
+
 test('homepage countdown counts calendar midnights, not trip start hour', () => {
   assert.match(html, /const villaStartDate='2026-06-27'/);
   assert.match(html, /function daysUntilTrip\(now=new Date\(\)\)/);
