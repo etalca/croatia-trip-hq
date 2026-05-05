@@ -26,19 +26,32 @@ test('copy-flight logic copies flight fields but not notes or current guest name
   assert.match(html, /copyFlightsFrom\.addEventListener\('change',\(\)=>copyFlightDetailsFrom\(copyFlightsFrom\.value\)\)/);
 });
 
-test('hero video is configured for aggressive autoplay on load', () => {
-  assert.match(html, /<video id="waterVideo"[^>]*autoplay/);
-  assert.match(html, /video\.muted=true; video\.playsInline=true; video\.autoplay=true;/);
+test('hero video is configured for Safari-friendly autoplay on load', () => {
+  assert.match(html, /<video id="waterVideo"[^>]*src="assets\/hero-water-3-browser\.mp4"[^>]*muted[^>]*playsinline[^>]*autoplay/);
+  assert.match(html, /video\.defaultMuted=true; video\.muted=true; video\.playsInline=true; video\.autoplay=true;/);
+  assert.match(html, /video\.setAttribute\('muted',''\)/);
+  assert.match(html, /window\.addEventListener\('pageshow',nudgeVideo/);
   assert.match(html, /video\.play\(\)\.catch/);
 });
 
-test('trip info is a personalized dashboard with a close x and dinner planning controls', () => {
-  assert.match(html, /id="closeTripInfo"[^>]*aria-label="Close"[^>]*>×<\/button>/);
-  assert.match(html, /id="dashboardGuestName"/);
-  assert.match(html, /id="myDinnerCard"/);
-  assert.match(html, /id="dinnerBoard"/);
+test('trip info heading is personalized and todo chips show completion icons', () => {
+  assert.doesNotMatch(html, />Trip dashboard<\/h2>/);
+  assert.doesNotMatch(html, /Your home base for flights, dinner responsibilities, tasks, and the useful trip stuff\./);
+  assert.match(html, /<h2 class="dashboard-name" id="dashboardGuestName">Your dashboard<\/h2>/);
+  assert.match(html, /class="todo-chip/);
+  assert.match(html, /function todoIcon\(done\)/);
+  assert.match(html, /Dinner claimed/);
+  assert.match(html, /Claim a dinner/);
+  assert.match(html, /✓/);
+  assert.match(html, /○/);
+});
+
+test('dinner claiming excludes checkout day and has no notes field', () => {
   assert.match(html, /id="dinnerForm"/);
   assert.match(html, /id="dinnerDate"/);
   assert.match(html, /id="dinnerPartner"/);
   assert.match(html, /id="dinnerPlanType"/);
+  assert.doesNotMatch(html, /id="dinnerNotes"/);
+  assert.doesNotMatch(html, /'2026-07-04'/);
+  assert.doesNotMatch(html, /dinnerNotes/);
 });

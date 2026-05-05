@@ -3,7 +3,7 @@ const path = require('node:path');
 const { CREW, canonicalCrewName, safeGuest, sendJson, getSupabase } = require('../lib/trip-store');
 const { getAuthUserFromRequest, resolveGuestForAuthUser } = require('../lib/trip-auth');
 
-const DINNER_DATES = ['2026-06-27','2026-06-28','2026-06-29','2026-06-30','2026-07-01','2026-07-02','2026-07-03','2026-07-04'];
+const DINNER_DATES = ['2026-06-27','2026-06-28','2026-06-29','2026-06-30','2026-07-01','2026-07-02','2026-07-03'];
 const LOCAL_MEALS_PATH = process.env.MEALS_DATA_PATH || path.join(process.cwd(), 'Server', 'meals-data.json');
 
 function emptyMeals() {
@@ -81,10 +81,9 @@ async function saveSupabaseMeal(supabase, person, body) {
   if (!date || !partner || partner === person) throw Object.assign(new Error('Choose a dinner night and co-lead.'), { statusCode: 400 });
   const planType = normalizePlanType(body.planType);
   const title = String(body.title || '').trim().slice(0, 120);
-  const notes = String(body.notes || '').trim().slice(0, 500);
-  const { data: slot, error: slotError } = await supabase
+    const { data: slot, error: slotError } = await supabase
     .from('dinner_slots')
-    .upsert({ dinner_date: date, title, notes, plan_type: planType }, { onConflict: 'dinner_date' })
+    .upsert({ dinner_date: date, title, notes: '', plan_type: planType }, { onConflict: 'dinner_date' })
     .select('id')
     .single();
   if (slotError) throw slotError;
@@ -106,7 +105,7 @@ function saveLocalMeal(person, body) {
   slot.leads = [person, partner];
   slot.planType = normalizePlanType(body.planType);
   slot.title = String(body.title || '').trim().slice(0, 120);
-  slot.notes = String(body.notes || '').trim().slice(0, 500);
+  slot.notes = '';
   return writeLocalMeals(meals);
 }
 
