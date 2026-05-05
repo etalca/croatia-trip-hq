@@ -72,10 +72,12 @@ test('homepage secondary CTA advances after calendar todo and falls back to trip
   assert.match(html, /localStorage\.setItem\(CALENDAR_KEY,'true'\); renderTripDashboard\(\); setPrimaryCta\(\);/);
 });
 
-test('planning call notice floats over the horizon with calendar link text', () => {
+test('planning call notice floats above the horizon in three subtle lines', () => {
   assert.match(html, /<div class="planning-call"/);
-  assert.match(html, /Next group planning call: Tuesday, May 12, 6:30 p\.m\. PDT/);
-  assert.match(html, /<a href="#" id="addPlanningCall">Add to calendar<\/a>/);
+  assert.match(html, /<span>Next group planning call<\/span><span>Tuesday, May 12, 6:30 p\.m\. PDT<\/span><a href="#" id="addPlanningCall">Add to calendar<\/a>/);
+  assert.match(html, /\.planning-call \{[^}]*top: 36%;[^}]*opacity: \.58;/s);
+  assert.match(html, /\.planning-call a \{[^}]*color: inherit;[^}]*opacity: \.72;/s);
+  assert.match(html, /\.planning-call a:hover, \.planning-call a:focus-visible \{[^}]*opacity: 1;/s);
   assert.match(html, /function addPlanningCallToCalendar\(\)/);
   assert.match(html, /SUMMARY:Next group planning call/);
   assert.match(html, /DTSTART:20260513T013000Z/);
@@ -90,7 +92,7 @@ test('dinner claiming and dinner plans are separate windows, not stuffed into th
   assert.match(html, /id="openDinnerPlans"/);
   assert.match(html, /function openDinnerPlans\(\)/);
   assert.match(html, /function closeDinnerPlans\(\)/);
-  assert.match(html, /function openDinnerPicker\(\)/);
+  assert.match(html, /function openDinnerPicker\(backTarget='tripInfo'\)/);
   assert.match(html, /function closeDinnerPicker\(\)/);
   assert.ok(
     html.indexOf('id="dinnerPicker"') > html.indexOf('id="tripInfo"'),
@@ -106,19 +108,22 @@ test('dinner claiming and dinner plans are separate windows, not stuffed into th
   assert.doesNotMatch(tripInfoBlock, /id="dinnerBoard"/);
 });
 
-test('dashboard calendar view contains only dinner responsibilities and check-in/out timing', () => {
+test('dashboard itinerary view uses a week-view calendar layout with core trip events', () => {
   const tripInfoBlock = html.slice(html.indexOf('id="tripInfo"'), html.indexOf('id="dinnerPicker"'));
   assert.match(tripInfoBlock, /id="openCalendarView"/);
-  assert.match(tripInfoBlock, /<span>Calendar<\/span><span>Dinner responsibilities, check-in, and checkout\.<\/span>/);
+  assert.match(tripInfoBlock, /<span>Itinerary<\/span><span>View an overview of what each day will hold\.<\/span>/);
   assert.match(html, /id="calendarView"/);
   assert.match(html, /aria-labelledby="calendarViewTitle"/);
+  assert.match(html, /<h2 id="calendarViewTitle">Itinerary<\/h2>/);
   assert.match(html, /id="calendarItems"/);
+  assert.match(html, /\.calendar-week \{/);
+  assert.match(html, /\.calendar-day \{/);
   assert.match(html, /function renderCalendarView\(\)/);
   assert.match(html, /Check-in/);
-  assert.match(html, /June 27, 2026/);
+  assert.match(html, /June 27, 2026|month:'long', day:'numeric', year:'numeric'/);
   assert.match(html, /3:00 p\.m\./);
   assert.match(html, /Checkout/);
-  assert.match(html, /July 4, 2026/);
+  assert.match(html, /July 4, 2026|month:'long', day:'numeric', year:'numeric'/);
   assert.match(html, /10:00 a\.m\./);
   assert.match(html, /dinnerPlan\(\)\.slots\.filter\(slot=>\(slot\.leads \|\| \[\]\)\.length\)/);
   const calendarBlock = html.slice(html.indexOf('id="calendarView"'), html.indexOf('id="dashboard"'));
@@ -128,8 +133,8 @@ test('dashboard calendar view contains only dinner responsibilities and check-in
 
 test('todo chips and dashboard cards route to the right detail windows', () => {
   assert.match(html, /flightStatusChip\.addEventListener\('click',\(\)=>\{ if\(savedFlights\(\)\) openDashboard\(\); else openDialog\('tripInfo'\); \}\)/);
-  assert.match(html, /dinnerStatusChip\.addEventListener\('click',openDinnerPicker\)/);
-  assert.match(html, /myDinnerCard\.addEventListener\('click',openDinnerPicker\)/);
+  assert.match(html, /dinnerStatusChip\.addEventListener\('click',\(\)=>openDinnerPicker\('tripInfo'\)\)/);
+  assert.match(html, /myDinnerCard\.addEventListener\('click',\(\)=>openDinnerPicker\('tripInfo'\)\)/);
   assert.match(html, /calendarStatusChip\.addEventListener\('click',addTripToCalendar\)/);
   assert.match(html, /openDinnerPlansButton\.addEventListener\('click',openDinnerPlans\)/);
   assert.match(html, /openCalendarViewButton\.addEventListener\('click',openCalendarView\)/);
@@ -137,7 +142,7 @@ test('todo chips and dashboard cards route to the right detail windows', () => {
 
 test('dinner summary card is a clickable dinner picker shortcut', () => {
   assert.match(html, /<button class="personal-card" id="myDinnerCard" type="button"/);
-  assert.match(html, /myDinnerCard\.addEventListener\('click',openDinnerPicker\)/);
+  assert.match(html, /myDinnerCard\.addEventListener\('click',\(\)=>openDinnerPicker\('tripInfo'\)\)/);
   assert.match(html, /myDinnerCard=document\.getElementById\('myDinnerCard'\)/);
 });
 
@@ -187,13 +192,20 @@ test('dinner claiming excludes checkout day and has no notes field', () => {
   assert.match(html, /id="dinnerPartner"/);
   assert.match(html, /id="dinnerPlanType"/);
   assert.doesNotMatch(html, /id="dinnerNotes"/);
-  assert.doesNotMatch(html, /'2026-07-04'/);
+  const dinnerDatesDecl = html.match(/const dinnerDates=\[[^\]]+\]/)?.[0] || '';
+  assert.doesNotMatch(dinnerDatesDecl, /'2026-07-04'/);
   assert.doesNotMatch(html, /dinnerNotes/);
 });
 
-test('dinner plans cards use hierarchy, smaller dates, and hover claim or edit actions', () => {
-  assert.match(html, /\.dinner-date \{[^}]*font-size: 11px;/s);
-  assert.match(html, /\.dinner-date strong \{[^}]*font-size: 16px;/s);
+test('dinner plans cards use clear hierarchy, fixed date tiles, and contextual actions', () => {
+  assert.match(html, /\.dinner-night \{[^}]*align-items: center;/s);
+  assert.match(html, /\.dinner-date \{[^}]*align-self: center;[^}]*height: 54px;[^}]*padding: 6px 4px;[^}]*font-size: 10px;/s);
+  assert.match(html, /\.dinner-date strong \{[^}]*font-size: 14px;/s);
+  assert.match(html, /\.dinner-main \{[^}]*justify-content: center;/s);
+  assert.match(html, /\.dinner-night\.is-open \.dinner-main \{[^}]*place-items: center start;/s);
+  assert.match(html, /\.dinner-owners \{[^}]*color: white;[^}]*font-size: 15px;/s);
+  assert.match(html, /\.dinner-plan \{[^}]*rgba\(255,255,255,\.68\);[^}]*font-size: 12px;/s);
+  assert.match(html, /\.dinner-title \{[^}]*rgba\(255,255,255,\.54\);[^}]*font-size: 11px;/s);
   assert.match(html, /\.dinner-action \{[^}]*opacity: 0;/s);
   assert.match(html, /\.dinner-night:hover \.dinner-action, \.dinner-night:focus-within \.dinner-action/);
   assert.match(html, /const isMyDinner=\(slot\.leads \|\| \[\]\)\.includes\(currentGuest\?\.name\)/);
@@ -201,7 +213,19 @@ test('dinner plans cards use hierarchy, smaller dates, and hover claim or edit a
   assert.match(html, /const details=claimed \? `<div class="dinner-plan">\$\{escapeHtml\(planLabel\(slot\.planType \|\| 'undecided'\)\)\}<\/div><div class="dinner-title">\$\{escapeHtml\(title\)\}<\/div>` : ''/);
   assert.match(html, /const leads=claimed \? \(slot\.leads \|\| \[\]\)\.join\(' \+ '\) : 'Open'/);
   assert.match(html, /dinnerBoard\.querySelectorAll\('\.dinner-action'\)\.forEach/);
-  assert.match(html, /openDinnerPickerForDate\(btn\.dataset\.date\)/);
+  assert.match(html, /openDinnerPickerForDate\(btn\.dataset\.date,'dinnerPlans'\)/);
+});
+
+
+test('modal back buttons return to the last screen instead of always the dashboard', () => {
+  assert.match(html, /let returnTarget='tripInfo'/);
+  assert.match(html, /function setReturnTarget\(target\)/);
+  assert.match(html, /function returnToLastScreen\(\)/);
+  assert.match(html, /function openDinnerPickerForDate\(date, backTarget='tripInfo'\)/);
+  assert.match(html, /closeDinnerPickerModal\(true\)/);
+  assert.match(html, /if\(returnTarget==='dinnerPlans'\) openDinnerPlans\(\);/);
+  assert.match(html, /if\(returnTarget==='calendarView'\) openCalendarView\(\);/);
+  assert.match(html, /if\(returnTarget==='dashboard'\) openDashboard\(\);/);
 });
 
 test('dinner form surfaces duplicate-assignment errors without closing the picker', () => {
