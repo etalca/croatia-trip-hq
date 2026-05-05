@@ -5,7 +5,7 @@ const crypto = require('node:crypto');
 
 const ROOT = path.resolve(__dirname, '..');
 const WEB = path.join(ROOT, 'Website');
-const DB_PATH = process.env.DATA_PATH || path.join(__dirname, 'trip-data.json');
+const DB_PATH = process.env.DATA_PATH || '/var/data/trip-data.json';
 const PORT = Number(process.env.PORT || 8787);
 
 const CREW = ['Tanner','David','Jacob G.','Jacob M.','Mikaela','Candace','Kaelin','Mark','Amanda','Ellie','Erika','Andie','Zach','Kait','Nick'];
