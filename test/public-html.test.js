@@ -61,13 +61,15 @@ test('hero video is configured for Safari-friendly autoplay on load', () => {
   assert.match(html, /video\.play\(\)\.catch/);
 });
 
-test('mobile hero crops in for iPhone 15 Pro Max so the video covers the full viewport', () => {
-  assert.match(html, /#stage \{[^}]*position: fixed;[^}]*inset: 0;[^}]*min-height: 100svh;[^}]*overflow: hidden;/s);
-  assert.match(html, /@media \(max-width: 760px\) \{\n    \.poster-img, video \{ object-position: 66% 44%; transform: scale\(1\.18\); transform-origin: center center; \}/);
+test('mobile hero crops in for iPhone 15 Pro so the video covers the full viewport and safe-area chin', () => {
+  assert.match(html, /<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" \/>/);
+  assert.match(html, /#stage \{[^}]*position: fixed;[^}]*top: 0;[^}]*right: 0;[^}]*bottom: calc\(env\(safe-area-inset-bottom, 0px\) \* -1\);[^}]*left: 0;[^}]*height: calc\(100dvh \+ env\(safe-area-inset-bottom, 0px\)\);[^}]*min-height: 100svh;[^}]*overflow: hidden;/s);
+  assert.match(html, /\.poster-img, video, canvas \{[^}]*min-height: calc\(100dvh \+ env\(safe-area-inset-bottom, 0px\)\);/s);
+  assert.match(html, /@media \(max-width: 760px\) \{\n    \.poster-img, video \{ object-position: 66% 38%; transform: scale\(1\.32\); transform-origin: center center; \}/);
   assert.match(html, /uniform float u_mobileZoom;/);
   assert.match(html, /mediaUv=\(mediaUv-\.5\)\/u_mobileZoom\+\.5;/);
   assert.match(html, /mobileZoom:gl\.getUniformLocation\(prog,'u_mobileZoom'\)/);
-  assert.match(html, /gl\.uniform1f\(loc\.mobileZoom, mobileQuery\.matches \? 1\.18 : 1\.0\)/);
+  assert.match(html, /gl\.uniform1f\(loc\.mobileZoom, mobileQuery\.matches \? 1\.32 : 1\.0\)/);
 });
 
 test('homepage countdown counts calendar midnights, not trip start hour', () => {
