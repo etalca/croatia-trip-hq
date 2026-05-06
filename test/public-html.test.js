@@ -72,7 +72,8 @@ test('hero video is configured for Safari-friendly autoplay on load', () => {
 test('safe-area insets are applied only to overlays and modal shells', () => {
   assert.match(html, /<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" \/>/);
   assert.doesNotMatch(html, /<meta name="theme-color" media="\(max-width: 760px\)" content="#a8bbc4" \/>/);
-  assert.doesNotMatch(html, /<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" \/>/);
+  assert.match(html, /<meta name="apple-mobile-web-app-capable" content="yes" \/>/);
+  assert.match(html, /<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" \/>/);
   assert.match(html, /\.countdown \{[^}]*top: calc\(clamp\(22px, 4vw, 48px\) \+ env\(safe-area-inset-top\)\);[^}]*left: calc\(clamp\(22px, 4vw, 52px\) \+ env\(safe-area-inset-left\)\);/s);
   assert.match(html, /\.address \{[^}]*top: calc\(clamp\(22px, 4vw, 48px\) \+ env\(safe-area-inset-top\)\);[^}]*right: calc\(clamp\(22px, 4vw, 52px\) \+ env\(safe-area-inset-right\)\);/s);
   assert.match(html, /\.hero-content \{[^}]*padding: calc\(32px \+ env\(safe-area-inset-top\)\) calc\(32px \+ env\(safe-area-inset-right\)\) calc\(32px \+ env\(safe-area-inset-bottom\)\) calc\(32px \+ env\(safe-area-inset-left\)\);/s);
