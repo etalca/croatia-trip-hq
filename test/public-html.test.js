@@ -222,12 +222,12 @@ test('dashboard embeds itinerary directly with floating header instead of a wrap
 });
 
 test('dashboard itinerary cards use subtle expand icons to open an iCal-style day window', () => {
-  assert.match(html, /const DINNER_TIME='7–8 p\.m\.'/);
+  assert.match(html, /const DINNER_TIME='7–9 p\.m\.'/);
   assert.match(html, /const DINNER_HOUR='7:00 p\.m\.'/);
-  assert.match(html, /dinnerDates\.forEach\(date=>eventsByDate\[date\]\.push/);
-  assert.match(html, /const claimedDinner=dinners\.find\(slot=>slot\.date===date\)/);
-  assert.match(html, /claimedDinner \? `\$\{DINNER_TIME\} · \$\{\(claimedDinner\.leads \|\| \[\]\)\.join\(' \+ '\)\}/);
-  assert.match(html, /: `\$\{DINNER_TIME\} · Dinner placeholder`/);
+  assert.match(html, /dinners\.forEach\(slot=>eventsByDate\[slot\.date\]\?\.push/);
+  assert.doesNotMatch(html, /const claimedDinner=dinners\.find\(slot=>slot\.date===date\)/);
+  assert.match(html, /`\$\{DINNER_TIME\} · \$\{\(slot\.leads \|\| \[\]\)\.join\(' \+ '\)\}/);
+  assert.doesNotMatch(html, /Dinner placeholder/);
   assert.match(html, /id="dayView"/);
   assert.match(html, /id="dayViewTimeline"/);
   assert.match(html, /id="closeDayView"/);
@@ -417,6 +417,16 @@ test('mobile dashboard keeps todo chips sticky while trip cards and itinerary sc
   assert.match(html, /#tripInfo \.trip-info-scroll \{ flex: 1 1 auto; overflow-y: auto; min-height: 0; display: grid; gap: 10px; scrollbar-width: none; -ms-overflow-style: none; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; \}/);
   assert.match(html, /#tripInfo \.calendar-list \{ overflow: visible; min-height: auto; \}/);
   assert.match(html, /#tripInfo \.trip-info-scroll::-webkit-scrollbar \{ width: 0; height: 0; display: none; \}/);
+});
+
+test('itinerary only renders claimed dinners as two-hour Dinner events', () => {
+  assert.match(html, /const dinners=dinnerPlan\(\)\.slots\.filter\(slot=>\(slot\.leads \|\| \[\]\)\.length\)/);
+  assert.match(html, /dinners\.forEach\(slot=>eventsByDate\[slot\.date\]\?\.push\(\{title:'Dinner'/);
+  assert.match(html, /meta:`\$\{DINNER_TIME\} · \$\{\(slot\.leads \|\| \[\]\)\.join\(' \+ '\)\}/);
+  assert.match(html, /hour:DINNER_HOUR,duration:120/);
+  assert.doesNotMatch(html, /Dinner responsibility/);
+  assert.doesNotMatch(html, /Dinner placeholder/);
+  assert.doesNotMatch(html, /dinnerDates\.forEach\(date=>eventsByDate\[date\]\.push/);
 });
 
 test('day view titles omit year and hide edge navigation instead of disabling it', () => {
