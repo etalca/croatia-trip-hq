@@ -82,7 +82,7 @@ test('safe-area insets are applied only to overlays and modal shells', () => {
   assert.match(html, /@media \(max-width: 760px\) \{[\s\S]*?\.hero-content \{ padding: calc\(22px \+ env\(safe-area-inset-top\)\) calc\(22px \+ env\(safe-area-inset-right\)\) calc\(22px \+ env\(safe-area-inset-bottom\)\) calc\(22px \+ env\(safe-area-inset-left\)\); \}/);
 });
 
-test('mobile hero uses dynamic viewport and cover video sizing without safe-area height constraints', () => {
+test('mobile hero bleeds video under the iOS Home Screen bottom safe area', () => {
   assert.match(html, /<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" \/>/);
   assert.match(html, /html, body \{ margin: 0; width: 100%; min-height: 100%; overflow: hidden; background: #04151d;/);
   assert.doesNotMatch(html, /--hero-vh/);
@@ -98,11 +98,11 @@ test('mobile hero uses dynamic viewport and cover video sizing without safe-area
   assert.match(html, /#waterVideo\.video-ready \{ opacity: 1 !important; \}/);
   assert.match(html, /#gl\.webgl-ready \{ opacity: 1 !important; \}/);
   assert.doesNotMatch(html, /#gl \{[^}]*transition:/s);
-  assert.match(html, /@media \(max-width: 760px\) \{\n    #waterVideo \{ position: fixed; inset: 0; object-fit: cover; object-position: center; transform: none; transform-origin: center center; z-index: 3; \}\n    #gl \{ display: none; \}/);
+  assert.match(html, /@media \(max-width: 760px\) \{\n    #waterVideo \{ position: fixed; top: 0; right: 0; bottom: calc\(-1 \* env\(safe-area-inset-bottom\)\); left: 0; height: calc\(100% \+ env\(safe-area-inset-bottom\)\); object-fit: cover; object-position: center; transform: none; transform-origin: center center; z-index: 3; \}\n    #gl \{ display: none; \}/);
   assert.match(html, /function desiredVideoSource\(\)\{ return mobileQuery\.matches \? \(video\.dataset\.mobileSrc\|\|desktopVideoSrc\) : desktopVideoSrc; \}/);
   assert.match(html, /function applyMediaSource\(\)\{ const posterSrc=mobileQuery\.matches \? \(video\.dataset\.mobilePoster\|\|desktopPosterSrc\) : desktopPosterSrc; if\(posterImg\.getAttribute\('src'\)!==posterSrc\) posterImg\.src=posterSrc; poster\.src=posterSrc; video\.setAttribute\('poster',posterSrc\); \}/);
   assert.doesNotMatch(html, /#stage \{[^}]*env\(safe-area-inset/s);
-  assert.doesNotMatch(html, /#waterVideo \{[^}]*env\(safe-area-inset/s);
+  assert.doesNotMatch(html, /#waterVideo \{[^}]*env\(safe-area-inset-top|#waterVideo \{[^}]*env\(safe-area-inset-left|#waterVideo \{[^}]*env\(safe-area-inset-right/s);
   assert.doesNotMatch(html, /#gl \{[^}]*env\(safe-area-inset/s);
 });
 
