@@ -83,18 +83,21 @@ test('safe-area insets are applied only to overlays and modal shells', () => {
 
 test('mobile hero uses dynamic viewport and cover video sizing without safe-area height constraints', () => {
   assert.match(html, /<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" \/>/);
-  assert.match(html, /html, body \{[^}]*min-height: 100dvh;[^}]*height: var\(--hero-vh, 100dvh\);[^}]*overflow: hidden;/s);
-  assert.doesNotMatch(html, /#stage \{[^}]*100vh/s);
-  assert.match(html, /#stage \{[^}]*position: fixed;[^}]*top: 0;[^}]*left: 0;[^}]*right: 0;[^}]*width: 100vw;[^}]*height: var\(--hero-vh, 100dvh\);[^}]*min-height: 100dvh;[^}]*overflow: hidden;/s);
-  assert.match(html, /@supports \(height: 100lvh\) \{ #stage \{ height: var\(--hero-vh, 100lvh\); min-height: 100lvh; \} \}/);
-  assert.match(html, /\.poster-img, #waterVideo, #gl \{[^}]*position: absolute;[^}]*inset: 0;[^}]*width: 100%;[^}]*height: 100%;[^}]*min-width: 100%;[^}]*min-height: 100%;/s);
+  assert.match(html, /html, body \{ margin: 0; width: 100%; min-height: 100%; overflow: hidden; background: #04151d;/);
+  assert.doesNotMatch(html, /--hero-vh/);
+  assert.doesNotMatch(html, /\b100dvh\b/);
+  assert.doesNotMatch(html, /\b100lvh\b/);
+  assert.match(html, /#stage \{ position: fixed; inset: 0; overflow: hidden; background: #04151d; \}/);
+  assert.doesNotMatch(html, /@supports \(height: 100lvh\)/);
+  assert.match(html, /\.poster-img, #waterVideo, #gl \{ position: absolute; inset: 0; width: 100%; height: 100%; display: block; \}/);
+  assert.doesNotMatch(html, /min-width: 100%; min-height: 100%;/);
   assert.match(html, /\.poster-img, #waterVideo \{[^}]*object-fit: cover;[^}]*object-position: center;/s);
   assert.match(html, /#waterVideo \{[^}]*z-index: 1;[^}]*opacity: 1;/s);
   assert.doesNotMatch(html, /#waterVideo \{[^}]*opacity: 0;/s);
   assert.match(html, /#waterVideo\.video-ready \{ opacity: 1 !important; \}/);
   assert.match(html, /#gl\.webgl-ready \{ opacity: 1 !important; \}/);
   assert.doesNotMatch(html, /#gl \{[^}]*transition:/s);
-  assert.match(html, /@media \(max-width: 760px\) \{\n    #stage, \.poster-img, #waterVideo \{ height: 100lvh; min-height: 100lvh; \}\n    #waterVideo \{ position: fixed; inset: 0; width: 100vw; height: 100lvh; object-fit: cover; object-position: center; transform: none; transform-origin: center center; z-index: 3; \}\n    #gl \{ display: none; \}/);
+  assert.match(html, /@media \(max-width: 760px\) \{\n    #waterVideo \{ position: fixed; inset: 0; object-fit: cover; object-position: center; transform: none; transform-origin: center center; z-index: 3; \}\n    #gl \{ display: none; \}/);
   assert.match(html, /function desiredVideoSource\(\)\{ return mobileQuery\.matches \? \(video\.dataset\.mobileSrc\|\|desktopVideoSrc\) : desktopVideoSrc; \}/);
   assert.match(html, /function applyMediaSource\(\)\{ const posterSrc=mobileQuery\.matches \? \(video\.dataset\.mobilePoster\|\|desktopPosterSrc\) : desktopPosterSrc; if\(posterImg\.getAttribute\('src'\)!==posterSrc\) posterImg\.src=posterSrc; poster\.src=posterSrc; video\.setAttribute\('poster',posterSrc\); \}/);
   assert.doesNotMatch(html, /#stage \{[^}]*env\(safe-area-inset/s);
@@ -103,9 +106,10 @@ test('mobile hero uses dynamic viewport and cover video sizing without safe-area
 });
 
 test('webgl hero canvas follows the full fixed hero box on iPhone URL-bar changes', () => {
-  assert.match(html, /function setHeroViewport\(\)\{ const vv=window\.visualViewport; const h=Math\.ceil\(Math\.max\(window\.innerHeight\|\|0, vv\?\.height\|\|0\)\); document\.documentElement\.style\.setProperty\('--hero-vh',`\$\{h\}px`\); \}/);
-  assert.match(html, /setHeroViewport\(\);/);
+  assert.doesNotMatch(html, /function setHeroViewport\(/);
+  assert.doesNotMatch(html, /setProperty\('--hero-vh'/);
   assert.match(html, /function heroViewportHeight\(\)\{ const stageRect=document\.getElementById\('stage'\)\?\.getBoundingClientRect\(\); return Math\.ceil\(stageRect\?\.height \|\| window\.visualViewport\?\.height \|\| window\.innerHeight\); \}/);
+  assert.match(html, /function resize\(\)\{ dpr=Math\.min\(2,window\.devicePixelRatio\|\|1\); width=Math\.ceil\(heroViewportWidth\(\)\*dpr\); height=Math\.ceil\(heroViewportHeight\(\)\*dpr\); canvas\.width=width; canvas\.height=height; gl\.viewport\(0,0,width,height\); \}/);
   assert.match(html, /height=Math\.ceil\(heroViewportHeight\(\)\*dpr\)/);
   assert.match(html, /window\.visualViewport\?\.addEventListener\('resize',resize,\{passive:true\}\)/);
   assert.match(html, /window\.visualViewport\?\.addEventListener\('scroll',resize,\{passive:true\}\)/);
