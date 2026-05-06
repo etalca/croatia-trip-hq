@@ -573,7 +573,7 @@
     return { remote:true };
   }
   function nextHomeTodoCta(){ if(localStorage.getItem(CALENDAR_KEY)!=='true') return 'Add to calendar'; if(!savedFlights()) return 'Add flight details'; if(!findMyDinner()) return 'Claim a dinner'; return 'Add songs to trip playlist'; }
-  function setPrimaryCta(){ friendlyTitle(); openGate.textContent = currentGuest ? 'View trip dashboard' : 'Let’s go'; addCalendar.textContent=nextHomeTodoCta(); }
+  function setPrimaryCta(){ friendlyTitle(); openGate.textContent = currentGuest ? 'Trip dashboard' : 'Let’s go'; addCalendar.textContent=nextHomeTodoCta(); }
   function fillForm(data){ if(!data) return; Object.entries(fields).forEach(([k,el])=>{ if(data[k] !== undefined) el.value=data[k]; }); syncFlightDetailsVisibility(); }
   const copyFlightKeys=['flightStatus','arrivalDate','arrivalAirport','arrivalTime','arrivalFlight','departureDate','departureAirport','departureTime','departureFlight'];
   function hasCopyableFlights(d){ return !!d && copyFlightKeys.some(key=>String(d[key] || '').trim()); }

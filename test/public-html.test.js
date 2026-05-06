@@ -117,6 +117,11 @@ test('magic-link auth personalizes the homepage headline after claim', () => {
   assert.match(html, /friendlyTitle\(\)/);
 });
 
+test('claimed homepage primary CTA says Trip dashboard without visit copy', () => {
+  assert.match(html, /openGate\.textContent = currentGuest \? 'Trip dashboard' : 'Let’s go'/);
+  assert.doesNotMatch(html, /View trip dashboard/);
+});
+
 test('trip info heading is a friendly greeting and todo chips show completion icons', () => {
   assert.doesNotMatch(html, />Trip dashboard<\/h2>/);
   assert.doesNotMatch(html, /Your home base for flights, dinner responsibilities, tasks, and the useful trip stuff\./);
