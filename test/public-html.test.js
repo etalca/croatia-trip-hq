@@ -362,6 +362,9 @@ test('main dashboard is a hub with only dinner, flight, and embedded itinerary c
   assert.match(html, /You’re responsible for dinner on/);
   assert.match(html, /Your flight arrives in/);
   assert.match(html, /function flightCompanionSummary\(current, board\)/);
+  assert.match(html, /function formatNameList\(names\)\{ if\(names\.length<=1\) return names\[0\]\|\|''; if\(names\.length===2\) return `\$\{names\[0\]\} and \$\{names\[1\]\}`; return `\$\{names\.slice\(0,-1\)\.join\(', '\)\}, and \$\{names\.at\(-1\)\}`; \}/);
+  assert.match(html, /return `with \$\{formatNameList\(companions\)\}`/);
+  assert.doesNotMatch(html, /companions\.join\(' \+ '\)/);
   assert.match(html, /function normalizedFlightNumber\(value\)/);
   assert.match(html, /normalizedFlightNumber\(item\.arrivalFlight\)===flightNumber/);
   assert.match(html, /myFlightTitle\.textContent=countdownFor\(flights,'arrivals'\)/);

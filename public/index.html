@@ -599,7 +599,8 @@
   function todoIcon(done){ return done ? '✓' : '○'; }
   function renderTodoChip(el, done, doneText, todoText){ el.classList.toggle('done',done); el.innerHTML=`<span class="todo-mark" aria-hidden="true">${todoIcon(done)}</span>${escapeHtml(done ? doneText : todoText)}`; }
   function normalizedFlightNumber(value){ return (value || '').toUpperCase().replace(/[^A-Z0-9]/g,''); }
-  function flightCompanionSummary(current, board){ if(!current?.arrivalDate) return 'by yourself'; const flightNumber=normalizedFlightNumber(current.arrivalFlight); const companions=Object.values(board || {}).filter(item=>{ if(!item || item.name===current.name) return false; if(flightNumber) return normalizedFlightNumber(item.arrivalFlight)===flightNumber; return item.arrivalDate===current.arrivalDate && (item.arrivalTime || '')===(current.arrivalTime || ''); }).map(item=>item.name).filter(Boolean); if(!companions.length) return 'by yourself'; return `with ${companions.join(' + ')}`; }
+  function formatNameList(names){ if(names.length<=1) return names[0]||''; if(names.length===2) return `${names[0]} and ${names[1]}`; return `${names.slice(0,-1).join(', ')}, and ${names.at(-1)}`; }
+  function flightCompanionSummary(current, board){ if(!current?.arrivalDate) return 'by yourself'; const flightNumber=normalizedFlightNumber(current.arrivalFlight); const companions=Object.values(board || {}).filter(item=>{ if(!item || item.name===current.name) return false; if(flightNumber) return normalizedFlightNumber(item.arrivalFlight)===flightNumber; return item.arrivalDate===current.arrivalDate && (item.arrivalTime || '')===(current.arrivalTime || ''); }).map(item=>item.name).filter(Boolean); if(!companions.length) return 'by yourself'; return `with ${formatNameList(companions)}`; }
   let returnTarget='tripInfo';
   function setReturnTarget(target){ returnTarget=target || 'tripInfo'; }
   function keepModalOverlay(){ document.body.classList.add('modal-open'); }
