@@ -69,6 +69,12 @@ test('hero video is configured for Safari-friendly autoplay on load', () => {
   assert.match(html, /function frame\(now\)\{ markVideoReady\(\); const t=now\*\.001;/);
 });
 
+test('mobile hero asks iOS browser chrome to blend with the video instead of dark safe-area bars', () => {
+  assert.match(html, /<meta name="theme-color" media="\(max-width: 760px\)" content="#a8bbc4" \/>/);
+  assert.match(html, /<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" \/>/);
+  assert.match(html, /@media \(max-width: 760px\) \{\n    html, body, #stage \{ background: #a8bbc4; \}\n/s);
+});
+
 test('mobile hero uses dynamic viewport and cover video sizing without safe-area height constraints', () => {
   assert.match(html, /<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" \/>/);
   assert.match(html, /html, body \{[^}]*min-height: 100dvh;[^}]*height: var\(--hero-vh, 100dvh\);[^}]*overflow: hidden;/s);
@@ -82,7 +88,7 @@ test('mobile hero uses dynamic viewport and cover video sizing without safe-area
   assert.match(html, /#waterVideo\.video-ready \{ opacity: 1 !important; \}/);
   assert.match(html, /#gl\.webgl-ready \{ opacity: 1 !important; \}/);
   assert.doesNotMatch(html, /#gl \{[^}]*transition:/s);
-  assert.match(html, /@media \(max-width: 760px\) \{\n    #stage, \.poster-img, #waterVideo \{ height: 100lvh; min-height: 100lvh; \}\n    #waterVideo \{ position: fixed; inset: 0; width: 100vw; height: 100lvh; object-fit: cover; object-position: center; transform: none; transform-origin: center center; z-index: 3; \}\n    #gl \{ display: none; \}/);
+  assert.match(html, /@media \(max-width: 760px\) \{\n    html, body, #stage \{ background: #a8bbc4; \}\n    #stage, \.poster-img, #waterVideo \{ height: 100lvh; min-height: 100lvh; \}\n    #waterVideo \{ position: fixed; inset: 0; width: 100vw; height: 100lvh; object-fit: cover; object-position: center; transform: none; transform-origin: center center; z-index: 3; \}\n    #gl \{ display: none; \}/);
   assert.match(html, /function desiredVideoSource\(\)\{ return mobileQuery\.matches \? \(video\.dataset\.mobileSrc\|\|desktopVideoSrc\) : desktopVideoSrc; \}/);
   assert.match(html, /function applyMediaSource\(\)\{ const posterSrc=mobileQuery\.matches \? \(video\.dataset\.mobilePoster\|\|desktopPosterSrc\) : desktopPosterSrc; if\(posterImg\.getAttribute\('src'\)!==posterSrc\) posterImg\.src=posterSrc; poster\.src=posterSrc; video\.setAttribute\('poster',posterSrc\); \}/);
   assert.doesNotMatch(html, /\.hero-content \{[^}]*padding:[^}]*env\(safe-area-inset-bottom/s);

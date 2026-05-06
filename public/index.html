@@ -3,6 +3,8 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" media="(max-width: 760px)" content="#a8bbc4" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 <title>Korčula — Friends Trip in Croatia</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -313,6 +315,7 @@
   .fallback { position: fixed; inset: 0; display: grid; place-items: center; padding: 30px; color: rgba(255,255,255,.8); text-align: center; background: #061923; visibility: hidden; z-index: 30; }
   .fallback.show { visibility: visible; }
   @media (max-width: 760px) {
+    html, body, #stage { background: #a8bbc4; }
     #stage, .poster-img, #waterVideo { height: 100lvh; min-height: 100lvh; }
     #waterVideo { position: fixed; inset: 0; width: 100vw; height: 100lvh; object-fit: cover; object-position: center; transform: none; transform-origin: center center; z-index: 3; }
     #gl { display: none; }
