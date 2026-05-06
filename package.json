@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "vercel dev",
     "start": "node Server/server.js",
-    "test": "node --test"
+    "test": "node --test",
+    "deploy:staging": "npm test && vercel deploy --target=preview --yes",
+    "deploy:production": "node scripts/blocked-production-deploy.js"
   },
   "engines": {
     "node": ">=20"
