@@ -202,6 +202,10 @@ test('FaceTime call notice spreads across desktop bottom and uses Pacific-time c
   assert.doesNotMatch(html, /DTSTART:20260513T013000Z/);
 });
 
+test('dinner idea input is capped at the longest existing submitted idea', () => {
+  assert.match(html, /<label for="dinnerTitle">Dinner idea<\/label><input id="dinnerTitle" maxlength="120" placeholder="Seafood night, konoba reservation…">/);
+});
+
 test('dinner claiming and dinner plans are separate windows, not stuffed into the main dashboard', () => {
   assert.match(html, /id="dinnerPicker"/);
   assert.match(html, /aria-labelledby="dinnerPickerTitle"/);
