@@ -71,10 +71,10 @@ test('hero video is configured for Safari-friendly autoplay on load', () => {
 
 test('mobile hero uses dynamic viewport and cover video sizing without safe-area height constraints', () => {
   assert.match(html, /<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" \/>/);
-  assert.match(html, /html, body \{[^}]*min-height: 100dvh;[^}]*height: 100dvh;[^}]*overflow: hidden;/s);
+  assert.match(html, /html, body \{[^}]*min-height: 100dvh;[^}]*height: var\(--hero-vh, 100dvh\);[^}]*overflow: hidden;/s);
   assert.doesNotMatch(html, /#stage \{[^}]*100vh/s);
-  assert.match(html, /#stage \{[^}]*position: fixed;[^}]*top: calc\(-1 \* env\(safe-area-inset-top, 0px\)\);[^}]*bottom: calc\(-1 \* env\(safe-area-inset-bottom, 0px\)\);[^}]*left: 0;[^}]*right: 0;[^}]*width: 100vw;[^}]*height: auto;[^}]*min-height: calc\(100dvh \+ env\(safe-area-inset-top, 0px\) \+ env\(safe-area-inset-bottom, 0px\)\);[^}]*overflow: hidden;/s);
-  assert.match(html, /@supports \(height: 100lvh\) \{ #stage \{ min-height: max\(100dvh, 100lvh\); \} \}/);
+  assert.match(html, /#stage \{[^}]*position: fixed;[^}]*top: 0;[^}]*left: 0;[^}]*right: 0;[^}]*width: 100vw;[^}]*height: var\(--hero-vh, 100dvh\);[^}]*min-height: 100dvh;[^}]*overflow: hidden;/s);
+  assert.match(html, /@supports \(height: 100lvh\) \{ #stage \{ height: var\(--hero-vh, 100lvh\); min-height: 100lvh; \} \}/);
   assert.match(html, /\.poster-img, #waterVideo, #gl \{[^}]*position: absolute;[^}]*inset: 0;[^}]*width: 100%;[^}]*height: 100%;[^}]*min-width: 100%;[^}]*min-height: 100%;/s);
   assert.match(html, /\.poster-img, #waterVideo \{[^}]*object-fit: cover;[^}]*object-position: center;/s);
   assert.match(html, /#waterVideo \{[^}]*z-index: 1;[^}]*opacity: 1;/s);
@@ -90,12 +90,16 @@ test('mobile hero uses dynamic viewport and cover video sizing without safe-area
 });
 
 test('webgl hero canvas follows the full fixed hero box on iPhone URL-bar changes', () => {
+  assert.match(html, /function setHeroViewport\(\)\{ const vv=window\.visualViewport; const h=Math\.ceil\(Math\.max\(window\.innerHeight\|\|0, vv\?\.height\|\|0\)\); document\.documentElement\.style\.setProperty\('--hero-vh',`\$\{h\}px`\); \}/);
+  assert.match(html, /setHeroViewport\(\);/);
   assert.match(html, /function heroViewportHeight\(\)\{ const stageRect=document\.getElementById\('stage'\)\?\.getBoundingClientRect\(\); return Math\.ceil\(stageRect\?\.height \|\| window\.visualViewport\?\.height \|\| window\.innerHeight\); \}/);
   assert.match(html, /height=Math\.ceil\(heroViewportHeight\(\)\*dpr\)/);
   assert.match(html, /window\.visualViewport\?\.addEventListener\('resize',resize,\{passive:true\}\)/);
   assert.match(html, /window\.visualViewport\?\.addEventListener\('scroll',resize,\{passive:true\}\)/);
   assert.match(html, /gl\.uniform1f\(loc\.mobileZoom, 1\.0\)/);
   assert.match(html, /gl\.uniform1f\(loc\.mobileShift, 0\.0\)/);
+  assert.match(html, /function heroLayoutSnapshot\(\)\{/);
+  assert.match(html, /if\(new URLSearchParams\(location\.search\)\.has\('heroDebug'\)\) setInterval\(\(\)=>console\.table\(heroLayoutSnapshot\(\)\.chainFromVideoUp\),1000\)/);
   assert.match(html, /mobileQuery\.addEventListener\?\.\('change',\(\)=>\{ applyMediaSource\(\); attachVideoSource\(\); \}\)/);
 });
 
