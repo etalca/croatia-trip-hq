@@ -32,7 +32,7 @@
   .poster-img { z-index: 0; }
   #waterVideo { z-index: 1; opacity: 1; }
   #waterVideo.video-ready { opacity: 1 !important; }
-  #gl { z-index: 2; opacity: 0; transition: opacity .2s ease; }
+  #gl { z-index: 2; opacity: 0; }
   #gl.webgl-ready { opacity: 1 !important; }
   .shade { position: fixed; inset: 0; pointer-events: none; background:
     radial-gradient(circle at 50% 47%, rgba(255,255,255,.03), transparent 30%),
@@ -311,7 +311,7 @@
   .fallback { position: fixed; inset: 0; display: grid; place-items: center; padding: 30px; color: rgba(255,255,255,.8); text-align: center; background: #061923; visibility: hidden; z-index: 30; }
   .fallback.show { visibility: visible; }
   @media (max-width: 760px) {
-    .poster-img, #waterVideo { object-position: 0% center; transform: scale(1.32); transform-origin: center center; }
+    .poster-img, #waterVideo { object-position: center; transform: none; transform-origin: center center; }
     .countdown { top: max(18px, env(safe-area-inset-top)); left: 16px; }
     .countdown span { font-size: 12px; }
     .address { top: max(18px, env(safe-area-inset-top)); right: 16px; max-width: 50vw; font-size: 12px; }
@@ -380,7 +380,7 @@
 <body>
 <div id="stage">
   <img class="poster-img" src="assets/hero-water-3-poster.jpg" alt="" aria-hidden="true">
-  <video id="waterVideo" src="assets/hero-water-3-browser.mp4" data-src="assets/hero-water-3-browser.mp4" poster="assets/hero-water-3-poster.jpg" muted playsinline autoplay loop preload="auto"></video>
+  <video id="waterVideo" src="assets/hero-water-3-browser.mp4" data-src="assets/hero-water-3-browser.mp4" data-desktop-src="assets/hero-water-3-browser.mp4" data-mobile-src="assets/right.mp4" data-mobile-poster="assets/right-poster.jpg" poster="assets/hero-water-3-poster.jpg" muted playsinline autoplay loop preload="auto"></video>
   <canvas id="gl"></canvas>
 </div>
 <div class="shade"></div>
@@ -695,8 +695,10 @@
 
   const canvas = document.getElementById('gl');
   const video = document.getElementById('waterVideo');
+  const posterImg = document.querySelector('.poster-img');
+  const desktopPosterSrc = video.getAttribute('poster') || posterImg.getAttribute('src');
   const poster = new Image();
-  poster.src = 'assets/hero-water-3-poster.jpg';
+  poster.src = desktopPosterSrc;
   const fallback = document.getElementById('fallback');
   const controls = {
     distortion: { value: '0.016' },
@@ -730,15 +732,20 @@
   function fadeDisturbance(){ dctx.globalCompositeOperation='source-over'; dctx.fillStyle=`rgba(0,0,0,${1-Number(controls.fade.value)})`; dctx.fillRect(0,0,256,256); }
   let ready=false, posterReady=false, posterUploaded=false;
   poster.onload = () => { posterReady = true; };
-  const sourceUrl = video.currentSrc || video.src || video.dataset.src;
+  const desktopVideoSrc = video.dataset.desktopSrc || video.dataset.src || video.getAttribute('src');
+  function desiredVideoSource(){ return mobileQuery.matches ? (video.dataset.mobileSrc||desktopVideoSrc) : desktopVideoSrc; }
+  function applyMediaSource(){ const posterSrc=mobileQuery.matches ? (video.dataset.mobilePoster||desktopPosterSrc) : desktopPosterSrc; if(posterImg.getAttribute('src')!==posterSrc) posterImg.src=posterSrc; poster.src=posterSrc; video.setAttribute('poster',posterSrc); }
   function markVideoReady(){ if(video.readyState>=2){ ready=true; video.classList.add('video-ready'); } }
   function nudgeVideo(){ video.defaultMuted=true; video.muted=true; video.playsInline=true; video.autoplay=true; video.setAttribute('muted',''); video.setAttribute('playsinline',''); video.setAttribute('autoplay',''); markVideoReady(); video.play().then(markVideoReady).catch(()=>{}); }
   function attachVideoSource(){
+    applyMediaSource();
+    const sourceUrl = desiredVideoSource();
+    if(video.getAttribute('src') !== sourceUrl){ ready=false; posterUploaded=false; video.classList.remove('video-ready'); canvas.classList.remove('webgl-ready'); video.src = sourceUrl; video.dataset.src = sourceUrl; video.load(); }
     nudgeVideo();
-    if(!video.getAttribute('src')) video.src = sourceUrl;
     if(video.readyState < 1) video.load();
     markVideoReady(); nudgeVideo();
   }
+  mobileQuery.addEventListener?.('change',()=>{ applyMediaSource(); attachVideoSource(); });
   video.addEventListener('canplay',()=>{ markVideoReady(); nudgeVideo(); });
   video.addEventListener('loadedmetadata',()=>{ markVideoReady(); nudgeVideo(); });
   video.addEventListener('loadeddata',()=>{ markVideoReady(); nudgeVideo(); });
@@ -748,7 +755,7 @@
   window.addEventListener('pageshow',nudgeVideo,{passive:true}); window.addEventListener('focus',nudgeVideo,{passive:true});
   window.addEventListener('click',nudgeVideo,{once:true}); window.addEventListener('touchstart',nudgeVideo,{once:true,passive:true}); window.addEventListener('load',nudgeVideo,{once:true});
   attachVideoSource();
-  function frame(now){ markVideoReady(); const t=now*.001; fadeDisturbance(); addImpulse(); gl.useProgram(prog); gl.uniform2f(loc.resolution,width,height); gl.uniform2f(loc.videoSize,video.videoWidth||poster.naturalWidth||3324,video.videoHeight||poster.naturalHeight||2492); gl.uniform1f(loc.distortion,Number(controls.distortion.value)); gl.uniform1f(loc.shimmer,Number(controls.shimmer.value)); gl.uniform1f(loc.warmth,Number(controls.warmth.value)); gl.uniform1f(loc.waterline,Number(controls.waterline.value)); gl.uniform1f(loc.time,t); gl.uniform1f(loc.mobileShift, mobileQuery.matches ? -0.5 : 0.0); gl.uniform1f(loc.mobileZoom, mobileQuery.matches ? 1.32 : 1.0); gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,false); gl.activeTexture(gl.TEXTURE1); gl.bindTexture(gl.TEXTURE_2D,disturbTex); gl.texImage2D(gl.TEXTURE_2D,0,gl.LUMINANCE,gl.LUMINANCE,gl.UNSIGNED_BYTE,dCanvas); gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,true); gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D,videoTex); if(ready && video.readyState>=2){ try{ gl.texImage2D(gl.TEXTURE_2D,0,gl.RGB,gl.RGB,gl.UNSIGNED_BYTE,video); posterUploaded=true; canvas.classList.add('webgl-ready'); }catch(err){} } else if(posterReady && !posterUploaded){ try{ gl.texImage2D(gl.TEXTURE_2D,0,gl.RGB,gl.RGB,gl.UNSIGNED_BYTE,poster); posterUploaded=true; }catch(err){} } gl.drawArrays(gl.TRIANGLES,0,6); requestAnimationFrame(frame); } requestAnimationFrame(frame);
+  function frame(now){ markVideoReady(); const t=now*.001; fadeDisturbance(); addImpulse(); gl.useProgram(prog); gl.uniform2f(loc.resolution,width,height); gl.uniform2f(loc.videoSize,video.videoWidth||poster.naturalWidth||3324,video.videoHeight||poster.naturalHeight||2492); gl.uniform1f(loc.distortion,Number(controls.distortion.value)); gl.uniform1f(loc.shimmer,Number(controls.shimmer.value)); gl.uniform1f(loc.warmth,Number(controls.warmth.value)); gl.uniform1f(loc.waterline,Number(controls.waterline.value)); gl.uniform1f(loc.time,t); gl.uniform1f(loc.mobileShift, 0.0); gl.uniform1f(loc.mobileZoom, 1.0); gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,false); gl.activeTexture(gl.TEXTURE1); gl.bindTexture(gl.TEXTURE_2D,disturbTex); gl.texImage2D(gl.TEXTURE_2D,0,gl.LUMINANCE,gl.LUMINANCE,gl.UNSIGNED_BYTE,dCanvas); gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,true); gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D,videoTex); if(ready && video.readyState>=2){ try{ gl.texImage2D(gl.TEXTURE_2D,0,gl.RGB,gl.RGB,gl.UNSIGNED_BYTE,video); posterUploaded=true; canvas.classList.add('webgl-ready'); }catch(err){} } else if(posterReady && !posterUploaded){ try{ gl.texImage2D(gl.TEXTURE_2D,0,gl.RGB,gl.RGB,gl.UNSIGNED_BYTE,poster); posterUploaded=true; }catch(err){} } gl.drawArrays(gl.TRIANGLES,0,6); requestAnimationFrame(frame); } requestAnimationFrame(frame);
 })();
 </script>
 </body>

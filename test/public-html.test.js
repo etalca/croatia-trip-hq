@@ -54,7 +54,9 @@ test('not booked flight status collapses optional flight details and saves statu
 });
 
 test('hero video is configured for Safari-friendly autoplay on load', () => {
-  assert.match(html, /<video id="waterVideo"[^>]*src="assets\/hero-water-3-browser\.mp4"[^>]*muted[^>]*playsinline[^>]*autoplay/);
+  assert.match(html, /<video id="waterVideo"[^>]*src="assets\/hero-water-3-browser\.mp4"[^>]*data-desktop-src="assets\/hero-water-3-browser\.mp4"[^>]*data-mobile-src="assets\/right\.mp4"[^>]*data-mobile-poster="assets\/right-poster\.jpg"[^>]*muted[^>]*playsinline[^>]*autoplay/);
+  assert.ok(fs.existsSync('public/assets/right.mp4'));
+  assert.ok(fs.existsSync('public/assets/right-poster.jpg'));
   assert.match(html, /video\.defaultMuted=true; video\.muted=true; video\.playsInline=true; video\.autoplay=true;/);
   assert.match(html, /video\.setAttribute\('muted',''\)/);
   assert.match(html, /window\.addEventListener\('pageshow',nudgeVideo/);
@@ -78,7 +80,10 @@ test('mobile hero uses dynamic viewport and cover video sizing without safe-area
   assert.doesNotMatch(html, /#waterVideo \{[^}]*opacity: 0;/s);
   assert.match(html, /#waterVideo\.video-ready \{ opacity: 1 !important; \}/);
   assert.match(html, /#gl\.webgl-ready \{ opacity: 1 !important; \}/);
-  assert.match(html, /@media \(max-width: 760px\) \{\n    \.poster-img, #waterVideo \{ object-position: 0% center; transform: scale\(1\.32\); transform-origin: center center; \}/);
+  assert.doesNotMatch(html, /#gl \{[^}]*transition:/s);
+  assert.match(html, /@media \(max-width: 760px\) \{\n    \.poster-img, #waterVideo \{ object-position: center; transform: none; transform-origin: center center; \}/);
+  assert.match(html, /function desiredVideoSource\(\)\{ return mobileQuery\.matches \? \(video\.dataset\.mobileSrc\|\|desktopVideoSrc\) : desktopVideoSrc; \}/);
+  assert.match(html, /function applyMediaSource\(\)\{ const posterSrc=mobileQuery\.matches \? \(video\.dataset\.mobilePoster\|\|desktopPosterSrc\) : desktopPosterSrc; if\(posterImg\.getAttribute\('src'\)!==posterSrc\) posterImg\.src=posterSrc; poster\.src=posterSrc; video\.setAttribute\('poster',posterSrc\); \}/);
   assert.doesNotMatch(html, /\.hero-content \{[^}]*padding:[^}]*env\(safe-area-inset-bottom/s);
   assert.doesNotMatch(html, /#stage \{[^}]*bottom: calc\(env\(safe-area-inset-bottom/s);
 });
@@ -88,8 +93,9 @@ test('webgl hero canvas follows the actual visual viewport on iPhone URL-bar cha
   assert.match(html, /height=Math\.ceil\(viewportHeight\(\)\*dpr\)/);
   assert.match(html, /window\.visualViewport\?\.addEventListener\('resize',resize,\{passive:true\}\)/);
   assert.match(html, /window\.visualViewport\?\.addEventListener\('scroll',resize,\{passive:true\}\)/);
-  assert.match(html, /gl\.uniform1f\(loc\.mobileZoom, mobileQuery\.matches \? 1\.32 : 1\.0\)/);
-  assert.match(html, /gl\.uniform1f\(loc\.mobileShift, mobileQuery\.matches \? -0\.5 : 0\.0\)/);
+  assert.match(html, /gl\.uniform1f\(loc\.mobileZoom, 1\.0\)/);
+  assert.match(html, /gl\.uniform1f\(loc\.mobileShift, 0\.0\)/);
+  assert.match(html, /mobileQuery\.addEventListener\?\.\('change',\(\)=>\{ applyMediaSource\(\); attachVideoSource\(\); \}\)/);
 });
 
 test('homepage countdown counts calendar midnights, not trip start hour', () => {
