@@ -150,9 +150,11 @@ test('homepage secondary CTA advances after calendar todo and falls back to trip
   assert.match(html, /return 'Add flight details'/);
   assert.match(html, /return 'Claim a dinner'/);
   assert.match(html, /return 'Add songs to trip playlist'/);
+  assert.match(html, /if\(next==='Claim a dinner'\) return openDinnerPlans\(\)/);
+  assert.doesNotMatch(html, /if\(next==='Claim a dinner'\) return openDinnerPicker\('tripInfo'\)/);
   assert.match(html, /window\.open\(PLAYLIST_URL,'_blank','noreferrer'\)/);
   assert.match(html, /localStorage\.setItem\(CALENDAR_KEY,'true'\); renderTripDashboard\(\); setPrimaryCta\(\);/);
-  assert.match(html, /cacheDinnerPlan\(data\.meals \|\| dinnerPlan\(\)\); renderTripDashboard\(\); setPrimaryCta\(\);/);
+  assert.match(html, /cacheDinnerPlan\(data\.meals \|\| dinnerPlan\(\)\); populateDinnerSelectors\(\); renderTripDashboard\(\); setPrimaryCta\(\);/);
 });
 
 test('FaceTime call notice spreads across desktop bottom and uses Pacific-time calendar invite', () => {
@@ -267,19 +269,30 @@ test('dashboard itinerary cards use subtle expand icons to open an iCal-style da
 
 test('todo chips and summary cards route to the right detail windows', () => {
   assert.match(html, /flightStatusChip\.addEventListener\('click',\(\)=>\{ if\(savedFlights\(\)\) openDashboard\(\); else openDialog\('tripInfo'\); \}\)/);
-  assert.match(html, /dinnerStatusChip\.addEventListener\('click',\(\)=>openDinnerPicker\('tripInfo'\)\)/);
-  assert.match(html, /myDinnerCard\.addEventListener\('click',\(\)=>\{ if\(findMyDinner\(\)\) openDinnerPlans\(\); else openDinnerPicker\('tripInfo'\); \}\)/);
+  assert.match(html, /dinnerStatusChip\.addEventListener\('click',openDinnerPlans\)/);
+  assert.match(html, /myDinnerCard\.addEventListener\('click',openDinnerPlans\)/);
   assert.match(html, /myFlightCard\.addEventListener\('click',\(\)=>\{ if\(savedFlights\(\)\) openDashboard\(\); else openDialog\('tripInfo'\); \}\)/);
   assert.match(html, /calendarStatusChip\.addEventListener\('click',addTripToCalendar\)/);
+  assert.doesNotMatch(html, /dinnerStatusChip\.addEventListener\('click',\(\)=>openDinnerPicker\('tripInfo'\)\)/);
+  assert.doesNotMatch(html, /myDinnerCard\.addEventListener\('click',\(\)=>\{ if\(findMyDinner\(\)\) openDinnerPlans\(\); else openDinnerPicker\('tripInfo'\); \}\)/);
   assert.doesNotMatch(html, /openDinnerPlansButton\.addEventListener\('click',openDinnerPlans\)/);
   assert.doesNotMatch(html, /openCalendarViewButton\.addEventListener\('click',openCalendarView\)/);
 });
 
-test('dinner summary card opens plans after claimed dinner and picker before claiming', () => {
+test('dinner summary card always opens plans so guests can see claimed nights before claiming', () => {
   assert.match(html, /<button class="personal-card" id="myDinnerCard" type="button"/);
   assert.match(html, /<img class="dashboard-card-expand" src="assets\/Expand icon\.svg" alt="" aria-hidden="true">\s*<p class="dashboard-kicker" id="myDinnerKicker">Your dinner night<\/p>/);
-  assert.match(html, /myDinnerCard\.addEventListener\('click',\(\)=>\{ if\(findMyDinner\(\)\) openDinnerPlans\(\); else openDinnerPicker\('tripInfo'\); \}\)/);
+  assert.match(html, /myDinnerCard\.addEventListener\('click',openDinnerPlans\)/);
+  assert.match(html, /dinnerStatusChip\.addEventListener\('click',openDinnerPlans\)/);
   assert.match(html, /myDinnerCard=document\.getElementById\('myDinnerCard'\)/);
+});
+
+test('dinner selector excludes nights already claimed by other guests', () => {
+  assert.match(html, /function dinnerDateIsSelectable\(date\)/);
+  assert.match(html, /const slot=dinnerPlan\(\)\.slots\.find\(slot=>slot\.date===date\)/);
+  assert.match(html, /return !slot \|\| !\(slot\.leads \|\| \[\]\)\.length \|\| \(slot\.leads \|\| \[\]\)\.includes\(currentGuest\?\.name\)/);
+  assert.match(html, /dinnerDates\.filter\(dinnerDateIsSelectable\)\.forEach\(date=>/);
+  assert.match(html, /cacheDinnerPlan\(data\.meals \|\| dinnerPlan\(\)\); populateDinnerSelectors\(\); renderTripDashboard\(\); setPrimaryCta\(\);/);
 });
 
 test('trip dashboard clickable cards show expand affordances and scroll below sticky todos', () => {
@@ -459,6 +472,6 @@ test('clear then save clears dinner responsibility and makes dinner todo incompl
   assert.match(html, /if\(dinnerClearRequested\) return true/);
   assert.match(html, /const payload=dinnerClearRequested \? \{ clear:true, token:guestToken \} : \{ date:dinnerDate\.value, partner:dinnerPartner\.value, planType:dinnerPlanType\.value, title:dinnerTitle\.value\.trim\(\), token:guestToken \}/);
   assert.match(html, /dinnerClearRequested=false; delete dinnerForm\.dataset\.clearRequested/);
-  assert.match(html, /cacheDinnerPlan\(data\.meals \|\| dinnerPlan\(\)\); renderTripDashboard\(\); setPrimaryCta\(\);/);
+  assert.match(html, /cacheDinnerPlan\(data\.meals \|\| dinnerPlan\(\)\); populateDinnerSelectors\(\); renderTripDashboard\(\); setPrimaryCta\(\);/);
   assert.match(html, /const hasOutstandingTodos=!flights \|\| !myDinner \|\| localStorage\.getItem\(CALENDAR_KEY\)!=='true'/);
 });
