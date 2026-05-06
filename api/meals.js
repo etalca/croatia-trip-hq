@@ -5,12 +5,25 @@ const { getAuthUserFromRequest, resolveGuestForAuthUser } = require('../lib/trip
 
 const DINNER_DATES = ['2026-06-27','2026-06-28','2026-06-29','2026-06-30','2026-07-01','2026-07-02','2026-07-03'];
 const LOCAL_MEALS_PATH = process.env.MEALS_DATA_PATH || path.join(process.cwd(), 'Server', 'meals-data.json');
+const OTHER_PLAN_TYPE_SENTINEL = '__plan_type:other__';
 
 function emptyMeals() {
   return { slots: DINNER_DATES.map(date => ({ date, leads: [], planType: 'undecided', title: '', notes: '' })) };
 }
 function normalizePlanType(value) {
   return ['reservation', 'cook', 'undecided', 'other'].includes(value) ? value : 'undecided';
+}
+function supabasePlanFields(planType, options = {}) {
+  const normalized = normalizePlanType(planType);
+  if (normalized === 'other' && options.legacyConstraintFallback) return { plan_type: 'undecided', notes: OTHER_PLAN_TYPE_SENTINEL };
+  return { plan_type: normalized, notes: '' };
+}
+function planTypeFromSupabaseRow(row) {
+  if (row?.notes === OTHER_PLAN_TYPE_SENTINEL) return 'other';
+  return normalizePlanType(row?.plan_type || 'undecided');
+}
+function isLegacyPlanTypeConstraintError(error) {
+  return error?.code === '23514' && String(error?.message || '').includes('dinner_slots_plan_type_check');
 }
 function normalizeMeals(value) {
   const byDate = new Map((value?.slots || []).map(slot => [slot.date, slot]));
@@ -20,9 +33,9 @@ function normalizeMeals(value) {
       return {
         date,
         leads: Array.isArray(slot.leads) ? slot.leads.filter(Boolean).slice(0, 3) : [],
-        planType: normalizePlanType(slot.planType),
+        planType: planTypeFromSupabaseRow(slot.plan_type !== undefined ? slot : { plan_type: slot.planType, notes: slot.notes }),
         title: String(slot.title || '').slice(0, 120),
-        notes: String(slot.notes || '').slice(0, 500),
+        notes: slot.notes === OTHER_PLAN_TYPE_SENTINEL ? '' : String(slot.notes || '').slice(0, 500),
       };
     }),
   };
@@ -74,7 +87,7 @@ async function readSupabaseMeals(supabase) {
     slots: (slotsResult.data || []).map(slot => ({
       date: slot.dinner_date,
       leads: leadsBySlot.get(slot.id) || [],
-      planType: slot.plan_type || 'undecided',
+      planType: planTypeFromSupabaseRow(slot),
       title: slot.title || '',
       notes: slot.notes || '',
     })),
@@ -129,16 +142,23 @@ async function saveSupabaseMeal(supabase, person, body) {
     const { error: oldResetError } = await supabase.from('dinner_slots').update({ title: '', notes: '', plan_type: 'undecided' }).eq('id', oldSlot.id);
     if (oldResetError) throw oldResetError;
   }
+  const planFields = supabasePlanFields(planType);
   const { data: slot, error: slotError } = await supabase
     .from('dinner_slots')
-    .upsert({ dinner_date: date, title, notes: '', plan_type: planType }, { onConflict: 'dinner_date' })
+    .upsert({ dinner_date: date, title, ...planFields }, { onConflict: 'dinner_date' })
     .select('id')
     .single();
-  if (slotError) throw slotError;
+  if (slotError && !(planType === 'other' && isLegacyPlanTypeConstraintError(slotError))) throw slotError;
+  const resolvedSlot = slotError ? await supabase
+    .from('dinner_slots')
+    .upsert({ dinner_date: date, title, ...supabasePlanFields(planType, { legacyConstraintFallback: true }) }, { onConflict: 'dinner_date' })
+    .select('id')
+    .single() : { data: slot, error: null };
+  if (resolvedSlot.error) throw resolvedSlot.error;
   const leads = [person, partner];
   const { error: clearError } = await supabase.from('dinner_signups').delete().eq('role', 'cook').in('guest_name', leads);
   if (clearError) throw clearError;
-  const rows = leads.map(guestName => ({ dinner_slot_id: slot.id, guest_name: guestName, role: 'cook', notes: '' }));
+  const rows = leads.map(guestName => ({ dinner_slot_id: resolvedSlot.data.id, guest_name: guestName, role: 'cook', notes: '' }));
   const { error: insertError } = await supabase.from('dinner_signups').insert(rows);
   if (insertError) throw insertError;
   return readSupabaseMeals(supabase);
@@ -184,4 +204,4 @@ module.exports = async function handler(req, res) {
   }
 };
 
-module.exports._private = { DINNER_DATES, normalizeMeals, dinnerAssignmentError, clearMealForPerson, saveLocalMeal };
+module.exports._private = { DINNER_DATES, normalizeMeals, dinnerAssignmentError, clearMealForPerson, saveLocalMeal, supabasePlanFields, planTypeFromSupabaseRow };

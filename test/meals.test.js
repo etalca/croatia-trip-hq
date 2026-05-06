@@ -58,3 +58,36 @@ test('saveLocalMeal lets the current guest edit their own dinner without duplica
   if (oldPath === undefined) delete process.env.MEALS_DATA_PATH; else process.env.MEALS_DATA_PATH = oldPath;
   delete require.cache[require.resolve('../api/meals')];
 });
+
+test('Supabase dinner rows can round-trip Other even before the database constraint is migrated', () => {
+  assert.deepEqual(
+    _private.supabasePlanFields('other'),
+    { plan_type: 'other', notes: '' },
+  );
+  assert.deepEqual(
+    _private.supabasePlanFields('other', { legacyConstraintFallback: true }),
+    { plan_type: 'undecided', notes: '__plan_type:other__' },
+  );
+  assert.equal(
+    _private.planTypeFromSupabaseRow({ plan_type: 'undecided', notes: '__plan_type:other__' }),
+    'other',
+  );
+  assert.deepEqual(
+    _private.normalizeMeals({ slots: [{ date: '2026-06-27', plan_type: 'undecided', notes: '__plan_type:other__' }] }).slots[0],
+    { date: '2026-06-27', leads: [], planType: 'other', title: '', notes: '' },
+  );
+});
+
+test('dinner plan type migrations allow Other in the database constraint', () => {
+  const fs = require('node:fs');
+  const path = require('node:path');
+  const migrationsDir = path.join(__dirname, '..', 'supabase', 'migrations');
+  const sql = fs.readdirSync(migrationsDir)
+    .filter(file => file.endsWith('.sql'))
+    .sort()
+    .map(file => fs.readFileSync(path.join(migrationsDir, file), 'utf8'))
+    .join('\n');
+
+  assert.match(sql, /drop constraint if exists dinner_slots_plan_type_check/i);
+  assert.match(sql, /check \(plan_type in \('reservation', 'cook', 'undecided', 'other'\)\)/i);
+});
