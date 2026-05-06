@@ -69,10 +69,16 @@ test('hero video is configured for Safari-friendly autoplay on load', () => {
   assert.match(html, /function frame\(now\)\{ markVideoReady\(\); const t=now\*\.001;/);
 });
 
-test('mobile hero asks iOS browser chrome to blend with the video instead of dark safe-area bars', () => {
-  assert.match(html, /<meta name="theme-color" media="\(max-width: 760px\)" content="#a8bbc4" \/>/);
-  assert.match(html, /<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" \/>/);
-  assert.match(html, /@media \(max-width: 760px\) \{\n    html, body, #stage \{ background: #a8bbc4; \}\n/s);
+test('safe-area insets are applied only to overlays and modal shells', () => {
+  assert.match(html, /<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" \/>/);
+  assert.doesNotMatch(html, /<meta name="theme-color" media="\(max-width: 760px\)" content="#a8bbc4" \/>/);
+  assert.doesNotMatch(html, /<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" \/>/);
+  assert.match(html, /\.countdown \{[^}]*top: calc\(clamp\(22px, 4vw, 48px\) \+ env\(safe-area-inset-top\)\);[^}]*left: calc\(clamp\(22px, 4vw, 52px\) \+ env\(safe-area-inset-left\)\);/s);
+  assert.match(html, /\.address \{[^}]*top: calc\(clamp\(22px, 4vw, 48px\) \+ env\(safe-area-inset-top\)\);[^}]*right: calc\(clamp\(22px, 4vw, 52px\) \+ env\(safe-area-inset-right\)\);/s);
+  assert.match(html, /\.hero-content \{[^}]*padding: calc\(32px \+ env\(safe-area-inset-top\)\) calc\(32px \+ env\(safe-area-inset-right\)\) calc\(32px \+ env\(safe-area-inset-bottom\)\) calc\(32px \+ env\(safe-area-inset-left\)\);/s);
+  assert.match(html, /\.gate \{[^}]*padding: calc\(22px \+ env\(safe-area-inset-top\)\) calc\(22px \+ env\(safe-area-inset-right\)\) calc\(22px \+ env\(safe-area-inset-bottom\)\) calc\(22px \+ env\(safe-area-inset-left\)\);/s);
+  assert.match(html, /\.dashboard \{[^}]*padding: calc\(22px \+ env\(safe-area-inset-top\)\) calc\(22px \+ env\(safe-area-inset-right\)\) calc\(22px \+ env\(safe-area-inset-bottom\)\) calc\(22px \+ env\(safe-area-inset-left\)\);/s);
+  assert.match(html, /@media \(max-width: 760px\) \{[\s\S]*?\.hero-content \{ padding: calc\(22px \+ env\(safe-area-inset-top\)\) calc\(22px \+ env\(safe-area-inset-right\)\) calc\(22px \+ env\(safe-area-inset-bottom\)\) calc\(22px \+ env\(safe-area-inset-left\)\); \}/);
 });
 
 test('mobile hero uses dynamic viewport and cover video sizing without safe-area height constraints', () => {
@@ -88,11 +94,12 @@ test('mobile hero uses dynamic viewport and cover video sizing without safe-area
   assert.match(html, /#waterVideo\.video-ready \{ opacity: 1 !important; \}/);
   assert.match(html, /#gl\.webgl-ready \{ opacity: 1 !important; \}/);
   assert.doesNotMatch(html, /#gl \{[^}]*transition:/s);
-  assert.match(html, /@media \(max-width: 760px\) \{\n    html, body, #stage \{ background: #a8bbc4; \}\n    #stage, \.poster-img, #waterVideo \{ height: 100lvh; min-height: 100lvh; \}\n    #waterVideo \{ position: fixed; inset: 0; width: 100vw; height: 100lvh; object-fit: cover; object-position: center; transform: none; transform-origin: center center; z-index: 3; \}\n    #gl \{ display: none; \}/);
+  assert.match(html, /@media \(max-width: 760px\) \{\n    #stage, \.poster-img, #waterVideo \{ height: 100lvh; min-height: 100lvh; \}\n    #waterVideo \{ position: fixed; inset: 0; width: 100vw; height: 100lvh; object-fit: cover; object-position: center; transform: none; transform-origin: center center; z-index: 3; \}\n    #gl \{ display: none; \}/);
   assert.match(html, /function desiredVideoSource\(\)\{ return mobileQuery\.matches \? \(video\.dataset\.mobileSrc\|\|desktopVideoSrc\) : desktopVideoSrc; \}/);
   assert.match(html, /function applyMediaSource\(\)\{ const posterSrc=mobileQuery\.matches \? \(video\.dataset\.mobilePoster\|\|desktopPosterSrc\) : desktopPosterSrc; if\(posterImg\.getAttribute\('src'\)!==posterSrc\) posterImg\.src=posterSrc; poster\.src=posterSrc; video\.setAttribute\('poster',posterSrc\); \}/);
-  assert.doesNotMatch(html, /\.hero-content \{[^}]*padding:[^}]*env\(safe-area-inset-bottom/s);
-  assert.doesNotMatch(html, /#stage \{[^}]*bottom: calc\(env\(safe-area-inset-bottom/s);
+  assert.doesNotMatch(html, /#stage \{[^}]*env\(safe-area-inset/s);
+  assert.doesNotMatch(html, /#waterVideo \{[^}]*env\(safe-area-inset/s);
+  assert.doesNotMatch(html, /#gl \{[^}]*env\(safe-area-inset/s);
 });
 
 test('webgl hero canvas follows the full fixed hero box on iPhone URL-bar changes', () => {

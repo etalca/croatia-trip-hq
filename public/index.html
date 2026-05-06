@@ -3,8 +3,6 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<meta name="theme-color" media="(max-width: 760px)" content="#a8bbc4" />
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 <title>Korčula — Friends Trip in Croatia</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -43,8 +41,8 @@
   }
   .countdown {
     position: fixed;
-    top: clamp(22px, 4vw, 48px);
-    left: clamp(22px, 4vw, 52px);
+    top: calc(clamp(22px, 4vw, 48px) + env(safe-area-inset-top));
+    left: calc(clamp(22px, 4vw, 52px) + env(safe-area-inset-left));
     z-index: 4;
     display: grid;
     gap: 2px;
@@ -55,8 +53,8 @@
   .countdown span { color: var(--muted-white); font-size: 13px; font-weight: 400; }
   .address {
     position: fixed;
-    top: clamp(22px, 4vw, 48px);
-    right: clamp(22px, 4vw, 52px);
+    top: calc(clamp(22px, 4vw, 48px) + env(safe-area-inset-top));
+    right: calc(clamp(22px, 4vw, 52px) + env(safe-area-inset-right));
     z-index: 4;
     max-width: min(320px, 44vw);
     text-align: right;
@@ -79,7 +77,7 @@
     z-index: 3;
     display: grid;
     place-items: center;
-    padding: 32px;
+    padding: calc(32px + env(safe-area-inset-top)) calc(32px + env(safe-area-inset-right)) calc(32px + env(safe-area-inset-bottom)) calc(32px + env(safe-area-inset-left));
     pointer-events: none;
   }
   body.modal-open .hero-content, body.modal-open .planning-call { opacity: 0 !important; visibility: hidden; pointer-events: none; }
@@ -128,7 +126,7 @@
     z-index: 10;
     display: grid;
     place-items: center;
-    padding: 22px;
+    padding: calc(22px + env(safe-area-inset-top)) calc(22px + env(safe-area-inset-right)) calc(22px + env(safe-area-inset-bottom)) calc(22px + env(safe-area-inset-left));
     background: rgba(4,17,23,.18);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
@@ -187,7 +185,7 @@
     z-index: 9;
     display: grid;
     place-items: center;
-    padding: 22px;
+    padding: calc(22px + env(safe-area-inset-top)) calc(22px + env(safe-area-inset-right)) calc(22px + env(safe-area-inset-bottom)) calc(22px + env(safe-area-inset-left));
     background: rgba(4,17,23,.18);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
@@ -315,22 +313,20 @@
   .fallback { position: fixed; inset: 0; display: grid; place-items: center; padding: 30px; color: rgba(255,255,255,.8); text-align: center; background: #061923; visibility: hidden; z-index: 30; }
   .fallback.show { visibility: visible; }
   @media (max-width: 760px) {
-    html, body, #stage { background: #a8bbc4; }
     #stage, .poster-img, #waterVideo { height: 100lvh; min-height: 100lvh; }
     #waterVideo { position: fixed; inset: 0; width: 100vw; height: 100lvh; object-fit: cover; object-position: center; transform: none; transform-origin: center center; z-index: 3; }
     #gl { display: none; }
-    .countdown { top: max(18px, env(safe-area-inset-top)); left: 16px; }
     .countdown span { font-size: 12px; }
-    .address { top: max(18px, env(safe-area-inset-top)); right: 16px; max-width: 50vw; font-size: 12px; }
+    .address { max-width: 50vw; font-size: 12px; }
     .planning-call { left: 50%; right: auto; top: calc(34% - 50px); bottom: auto; transform: translate(-50%, -50%); width: min(88vw, 340px); grid-template-columns: 1fr; gap: 2px; align-items: center; font-size: 12px; }
     .planning-call span:first-child, .planning-call a { text-align: center; justify-self: center; }
-    .hero-content { padding: 22px; }
+    .hero-content { padding: calc(22px + env(safe-area-inset-top)) calc(22px + env(safe-area-inset-right)) calc(22px + env(safe-area-inset-bottom)) calc(22px + env(safe-area-inset-left)); }
     .center { gap: 18px; }
     h1 { max-width: 330px; font-size: clamp(28px, 8vw, 34px); }
     .actions { width: min(100%, 330px); gap: 9px; }
     .pill { min-height: 44px; height: 44px; padding: 0 16px; }
     .pill:hover { transform: none; }
-    .gate, .dashboard { place-items: stretch; padding: max(10px, env(safe-area-inset-top)) 10px max(10px, env(safe-area-inset-bottom)); }
+    .gate, .dashboard { place-items: stretch; }
     .gate.auth-mode { place-items: center; }
     .gate.auth-mode .panel { width: min(100%, 380px); max-height: none; min-height: 0; align-self: center; }
     .panel, .dashboard-card { width: 100%; max-height: calc(100svh - 20px); border-radius: 20px; padding: 16px; }
