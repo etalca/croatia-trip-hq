@@ -82,7 +82,7 @@ test('mobile hero uses dynamic viewport and cover video sizing without safe-area
   assert.match(html, /#waterVideo\.video-ready \{ opacity: 1 !important; \}/);
   assert.match(html, /#gl\.webgl-ready \{ opacity: 1 !important; \}/);
   assert.doesNotMatch(html, /#gl \{[^}]*transition:/s);
-  assert.match(html, /@media \(max-width: 760px\) \{\n    \.poster-img, #waterVideo \{ object-position: center; transform: none; transform-origin: center center; \}/);
+  assert.match(html, /@media \(max-width: 760px\) \{\n    #stage, \.poster-img, #waterVideo \{ height: 100lvh; min-height: 100lvh; \}\n    #waterVideo \{ position: fixed; inset: 0; width: 100vw; height: 100lvh; object-fit: cover; object-position: center; transform: none; transform-origin: center center; z-index: 3; \}\n    #gl \{ display: none; \}/);
   assert.match(html, /function desiredVideoSource\(\)\{ return mobileQuery\.matches \? \(video\.dataset\.mobileSrc\|\|desktopVideoSrc\) : desktopVideoSrc; \}/);
   assert.match(html, /function applyMediaSource\(\)\{ const posterSrc=mobileQuery\.matches \? \(video\.dataset\.mobilePoster\|\|desktopPosterSrc\) : desktopPosterSrc; if\(posterImg\.getAttribute\('src'\)!==posterSrc\) posterImg\.src=posterSrc; poster\.src=posterSrc; video\.setAttribute\('poster',posterSrc\); \}/);
   assert.doesNotMatch(html, /\.hero-content \{[^}]*padding:[^}]*env\(safe-area-inset-bottom/s);

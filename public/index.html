@@ -313,7 +313,9 @@
   .fallback { position: fixed; inset: 0; display: grid; place-items: center; padding: 30px; color: rgba(255,255,255,.8); text-align: center; background: #061923; visibility: hidden; z-index: 30; }
   .fallback.show { visibility: visible; }
   @media (max-width: 760px) {
-    .poster-img, #waterVideo { object-position: center; transform: none; transform-origin: center center; }
+    #stage, .poster-img, #waterVideo { height: 100lvh; min-height: 100lvh; }
+    #waterVideo { position: fixed; inset: 0; width: 100vw; height: 100lvh; object-fit: cover; object-position: center; transform: none; transform-origin: center center; z-index: 3; }
+    #gl { display: none; }
     .countdown { top: max(18px, env(safe-area-inset-top)); left: 16px; }
     .countdown span { font-size: 12px; }
     .address { top: max(18px, env(safe-area-inset-top)); right: 16px; max-width: 50vw; font-size: 12px; }
