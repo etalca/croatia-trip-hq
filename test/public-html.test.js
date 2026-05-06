@@ -524,3 +524,52 @@ test('clear then save clears dinner responsibility and makes dinner todo incompl
   assert.match(html, /cacheDinnerPlan\(data\.meals \|\| dinnerPlan\(\)\); populateDinnerSelectors\(\); renderTripDashboard\(\); setPrimaryCta\(\);/);
   assert.match(html, /const hasOutstandingTodos=!flights \|\| !myDinner \|\| localStorage\.getItem\(CALENDAR_KEY\)!=='true'/);
 });
+
+test('trip prep planner adds a personal checklist and preference prompts to the dashboard', () => {
+  const tripInfoBlock = html.slice(html.indexOf('id="tripInfo"'), html.indexOf('id="dinnerPicker"'));
+  assert.match(tripInfoBlock, /id="prepStatusChip"/);
+  assert.match(tripInfoBlock, /id="myPrepCard"/);
+  assert.match(html, /id="prepPlanner"/);
+  assert.match(html, /aria-labelledby="prepPlannerTitle"/);
+  assert.match(html, /id="prepChecklist"/);
+  assert.match(html, /data-prep-item="passport"/);
+  assert.match(html, /data-prep-item="swimsuit"/);
+  assert.match(html, /data-prep-item="adapter"/);
+  assert.match(html, /data-prep-item="sunscreen"/);
+  assert.match(html, /data-prep-item="transport"/);
+  assert.match(html, /id="dietaryNotes"/);
+  assert.match(html, /id="tripWish"/);
+  assert.match(html, /id="activityInterest"/);
+  assert.match(html, /Boat day/);
+  assert.match(html, /Quiet beach time/);
+});
+
+test('trip prep state is saved locally and participates in todos and homepage CTA', () => {
+  assert.match(html, /const PREP_CHECKLIST_KEY='korculaPrepChecklist'/);
+  assert.match(html, /const TRIP_PREFERENCES_KEY='korculaTripPreferences'/);
+  assert.match(html, /const prepItems=\[/);
+  assert.match(html, /function prepStorageSuffix\(\)/);
+  assert.match(html, /function prepStorageKey\(base\)/);
+  assert.match(html, /function readPrepChecklist\(\)/);
+  assert.match(html, /function savePrepChecklist\(items\)/);
+  assert.match(html, /function prepComplete\(\)/);
+  assert.match(html, /function readTripPreferences\(\)/);
+  assert.match(html, /function saveTripPreferences\(prefs\)/);
+  assert.match(html, /function renderPrepPlanner\(\)/);
+  assert.match(html, /function saveTripPrep\(\)/);
+  assert.match(html, /renderTodoChip\(prepStatusChip, prepComplete\(\), 'Trip prep done', 'Finish trip prep'\)/);
+  assert.match(html, /if\(!prepComplete\(\)\) return 'Finish trip prep'/);
+  assert.match(html, /if\(next==='Finish trip prep'\) return openPrepPlanner\(\)/);
+  assert.match(html, /prepStatusChip\.addEventListener\('click',openPrepPlanner\)/);
+  assert.match(html, /myPrepCard\.addEventListener\('click',openPrepPlanner\)/);
+});
+
+test('itinerary includes curated planning prompts without changing claimed-dinner behavior', () => {
+  assert.match(html, /const activityEvents=\[/);
+  assert.match(html, /title:'Grocery run'/);
+  assert.match(html, /title:'Boat day candidate'/);
+  assert.match(html, /title:'Beach afternoon'/);
+  assert.match(html, /activityEvents\.forEach\(event=>eventsByDate\[event\.date\]\?\.push\(event\)\)/);
+  assert.match(html, /dinners\.forEach\(slot=>eventsByDate\[slot\.date\]\?\.push\(\{title:'Dinner'/);
+  assert.doesNotMatch(html, /Dinner placeholder/);
+});
