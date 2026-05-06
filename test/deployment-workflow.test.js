@@ -26,6 +26,7 @@ test('Vercel has a guarded staging-first deployment workflow', () => {
 
   const docs = fs.readFileSync(path.join(root, 'DEPLOYMENT.md'), 'utf8');
   assert.match(docs, /staging/i);
-  assert.match(docs, /croatia-trip-hq-git-staging-tanners-projects-899bf962\.vercel\.app/);
+  assert.match(docs, /croatia-trip-hq-env-staging-tanners-projects-899bf962\.vercel\.app/);
+  assert.match(docs, /staging\.croatia\.tannerbegin\.com/);
   assert.match(docs, /Do not run `vercel --prod`/);
 });

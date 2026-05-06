@@ -5,7 +5,8 @@ Croatia Trip HQ is now public with the friend group. Do not deploy directly to p
 ## Environments
 
 - **Production:** https://croatia.tannerbegin.com
-- **Staging:** https://croatia-trip-hq-git-staging-tanners-projects-899bf962.vercel.app
+- **Staging:** https://croatia-trip-hq-env-staging-tanners-projects-899bf962.vercel.app
+- **Friendly staging domain:** https://staging.croatia.tannerbegin.com — attached in Vercel to the `staging` environment; DNS still needs `staging.croatia` CNAME → `9c2abffe66bf00bb.vercel-dns-017.com.` at the domain host before it resolves.
 - **Feature previews:** Vercel preview URLs from feature branches or `vercel deploy --target=preview`.
 
 ## Rules
