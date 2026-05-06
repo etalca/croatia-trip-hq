@@ -257,6 +257,10 @@ test('dashboard itinerary cards use subtle expand icons to open an iCal-style da
   assert.match(html, /const moreIndicator=needsExpand \? '<div class="calendar-more" aria-label="More events">•••<\/div>' : ''/);
   assert.match(html, /\$\{events\}\$\{moreIndicator\}/);
   assert.match(html, /\.calendar-expand-icon \{[^}]*position: absolute;[^}]*top: 8px;[^}]*right: 8px;[^}]*width: 22px;[^}]*height: 22px;[^}]*opacity: \.2;/s);
+  assert.match(html, /note:slot\.title \|\| ''/);
+  assert.match(html, /\$\{event\.note \? `<small>\$\{escapeHtml\(event\.note\)\}<\/small>` : ''\}/);
+  assert.doesNotMatch(html, /No plans yet/);
+  assert.doesNotMatch(html, /This day is open\./);
   assert.match(html, /\.calendar-more \{[^}]*font-size: 9px;[^}]*line-height: 1;[^}]*color: rgba\(255,255,255,\.54\);/s);
   assert.match(html, /\.day-view-timeline/);
   assert.match(html, /\.day-view-card \{[^}]*overflow: hidden;[^}]*min-height: 0;/s);
