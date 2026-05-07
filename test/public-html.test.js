@@ -235,7 +235,7 @@ test('dashboard embeds itinerary directly with floating header instead of a wrap
   assert.doesNotMatch(tripInfoBlock, /id="openCalendarView"/);
   assert.doesNotMatch(tripInfoBlock, /<button class="info-card"/);
   assert.doesNotMatch(tripInfoBlock, /<section class="embedded-itinerary" aria-label="Trip itinerary">/);
-  assert.match(tripInfoBlock, /<div class="itinerary-heading"><h3>Itinerary<\/h3><p>The calendar will fill up as people select their dinner responsibilities and activities are scheduled\.<\/p><\/div>\s*<section class="calendar-list embedded-itinerary" id="calendarItems" aria-label="Trip itinerary"><\/section>/);
+  assert.match(tripInfoBlock, /<div class="itinerary-heading"><h3>Itinerary<\/h3><p>Proposed group activities appear here as blocks\. If something looks fun, sign up to mark yourself in\.<\/p><\/div>\s*<section class="calendar-list embedded-itinerary" id="calendarItems" aria-label="Trip itinerary"><\/section>/);
   assert.match(tripInfoBlock, /id="calendarItems"/);
   assert.doesNotMatch(html, /\.embedded-itinerary \{[^}]*border:/);
   assert.doesNotMatch(html, /\.embedded-itinerary \{[^}]*background:/);
@@ -334,10 +334,10 @@ test('dinner selector excludes nights already claimed by other guests', () => {
 test('trip dashboard clickable cards show expand affordances and scroll below sticky todos', () => {
   const tripInfoBlock = html.slice(html.indexOf('id="tripInfo"'), html.indexOf('id="dinnerPicker"'));
   assert.match(tripInfoBlock, /<header><div><h2 class="dashboard-name" id="dashboardGuestName">Hi<\/h2><div class="dashboard-status"/);
-  assert.match(tripInfoBlock, /<div class="trip-info-scroll">\s*<div class="dashboard-hero">/);
+  assert.match(tripInfoBlock, /<div class="trip-info-scroll">[\s\S]*?<div class="dashboard-hero">/);
   assert.match(tripInfoBlock, /id="myDinnerCard"[\s\S]*?<img class="dashboard-card-expand" src="assets\/Expand icon\.svg" alt="" aria-hidden="true">/);
   assert.match(tripInfoBlock, /id="myFlightCard"[\s\S]*?<img class="dashboard-card-expand" src="assets\/Expand icon\.svg" alt="" aria-hidden="true">/);
-  assert.match(tripInfoBlock, /<section class="calendar-list embedded-itinerary" id="calendarItems" aria-label="Trip itinerary"><\/section>\s*<\/div>/);
+  assert.match(tripInfoBlock, /<section class="calendar-list embedded-itinerary" id="calendarItems" aria-label="Trip itinerary"><\/section>[\s\S]*?<\/section>/);
   assert.match(html, /#tripInfo \.dashboard-card header \{ flex: 0 0 auto; \}/);
   assert.match(html, /#tripInfo \.trip-info-scroll \{ flex: 1 1 auto; overflow-y: auto; min-height: 0; display: grid; gap: 10px; scrollbar-width: none; -ms-overflow-style: none; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; \}/);
   assert.match(html, /#tripInfo \.calendar-list \{ overflow: visible; min-height: auto; \}/);
@@ -450,8 +450,8 @@ test('mobile dashboard keeps todo chips sticky while trip cards and itinerary sc
   assert.match(html, /dashboardGuestName\.textContent=name \? `Hi, \$\{name\}\. \$\{hasOutstandingTodos \? 'You have a task to complete\.' : 'You’re all caught up\.'\}` : 'Hi'/);
   const tripInfoBlock = html.slice(html.indexOf('id="tripInfo"'), html.indexOf('id="dinnerPicker"'));
   assert.match(tripInfoBlock, /<header><div><h2 class="dashboard-name" id="dashboardGuestName">Hi<\/h2><div class="dashboard-status"/);
-  assert.match(tripInfoBlock, /<div class="trip-info-scroll">\s*<div class="dashboard-hero">/);
-  assert.match(tripInfoBlock, /<section class="calendar-list embedded-itinerary" id="calendarItems" aria-label="Trip itinerary"><\/section>\s*<\/div>/);
+  assert.match(tripInfoBlock, /<div class="trip-info-scroll">[\s\S]*?<div class="dashboard-hero">/);
+  assert.match(tripInfoBlock, /<section class="calendar-list embedded-itinerary" id="calendarItems" aria-label="Trip itinerary"><\/section>[\s\S]*?<\/section>/);
   assert.match(html, /#tripInfo \.dashboard-card header \{ flex: 0 0 auto; \}/);
   assert.match(html, /#tripInfo \.trip-info-scroll \{ flex: 1 1 auto; overflow-y: auto; min-height: 0; display: grid; gap: 10px; scrollbar-width: none; -ms-overflow-style: none; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; \}/);
   assert.match(html, /#tripInfo \.calendar-list \{ overflow: visible; min-height: auto; \}/);
@@ -564,32 +564,41 @@ test('trip prep state is saved locally and participates in todos and homepage CT
   assert.match(html, /myPrepCard\.addEventListener\('click',openPrepPlanner\)/);
 });
 
-test('itinerary includes curated planning prompts without changing claimed-dinner behavior', () => {
-  assert.match(html, /const activityEvents=\[/);
-  assert.match(html, /title:'Grocery run'/);
-  assert.match(html, /title:'Boat day candidate'/);
-  assert.match(html, /title:'Beach afternoon'/);
-  assert.match(html, /activityEvents\.forEach\(event=>eventsByDate\[event\.date\]\?\.push\(event\)\)/);
+test('itinerary includes proposed group activities with opt-in signups', () => {
+  assert.match(html, /const ACTIVITY_SIGNUPS_KEY='korculaActivitySignups'/);
+  assert.match(html, /const activityEvents=\[\{id:'grocery-run'/);
+  assert.match(html, /id:'boat-day'/);
+  assert.match(html, /id:'beach-afternoon'/);
+  assert.match(html, /function activitySignups\(\)/);
+  assert.match(html, /function signedUpForActivity\(activityId\)/);
+  assert.match(html, /function toggleActivitySignup\(activityId\)/);
+  assert.match(html, /function activitySignupSummary\(activityId\)/);
+  assert.match(html, /data-activity-signup="\$\{escapeHtml\(event\.id\)\}"/);
+  assert.match(html, /Sign up/);
+  assert.match(html, /You're in/);
+  assert.match(html, /calendarItems\.querySelectorAll\('\[data-activity-signup\]'\)\.forEach/);
   assert.match(html, /dinners\.forEach\(slot=>eventsByDate\[slot\.date\]\?\.push\(\{title:'Dinner'/);
   assert.doesNotMatch(html, /Dinner placeholder/);
 });
 
-test('people directory exposes clickable guest profiles with shared trip info', () => {
-  assert.match(html, /id="myPeopleCard"/);
-  assert.match(html, /id="peopleDirectory"/);
-  assert.match(html, /id="peopleList"/);
-  assert.match(html, /id="profileDetail"/);
+test('people profiles live in a dashboard tab instead of a dashboard card', () => {
+  const tripInfoBlock = html.slice(html.indexOf('id="tripInfo"'), html.indexOf('id="dinnerPicker"'));
+  assert.match(tripInfoBlock, /id="tripTabs"/);
+  assert.match(tripInfoBlock, /id="overviewTab"/);
+  assert.match(tripInfoBlock, /id="peopleTab"/);
+  assert.match(tripInfoBlock, /id="overviewPanel"/);
+  assert.match(tripInfoBlock, /id="peoplePanel"/);
+  assert.match(tripInfoBlock, /id="peopleList"/);
+  assert.doesNotMatch(tripInfoBlock, /id="myPeopleCard"/);
+  assert.match(html, /function setTripTab\(tab\)/);
   assert.match(html, /function profileSummary\(person, board, dinner\)/);
   assert.match(html, /function renderPeopleDirectory\(\)/);
   assert.match(html, /function openProfileDetail\(name\)/);
   assert.match(html, /data-profile="\$\{escapeHtml\(person\)\}"/);
   assert.match(html, /aria-label="View profile for \$\{escapeHtml\(person\)\}"/);
-  assert.match(html, /profileArrival/);
-  assert.match(html, /profileDeparture/);
-  assert.match(html, /profileDinner/);
-  assert.match(html, /profileNotes/);
   assert.match(html, /peopleList\.querySelectorAll\('\[data-profile\]'\)\.forEach/);
-  assert.match(html, /myPeopleCard\.addEventListener\('click',openPeopleDirectory\)/);
+  assert.match(html, /peopleTab\.addEventListener\('click',\(\)=>setTripTab\('people'\)\)/);
+  assert.doesNotMatch(html, /myPeopleCard\.addEventListener/);
 });
 
 test('staging review mode enters the trip dashboard without magic-link signup', () => {
