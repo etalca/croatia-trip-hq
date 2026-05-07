@@ -583,6 +583,8 @@ test('itinerary activity RSVPs show attendee names, declined state, and editable
   assert.match(html, /data-activity-decline="\$\{escapeHtml\(activityId\)\}" aria-pressed="\$\{state==='declined'\?'true':'false'\}"/);
   assert.match(html, /activity-signup is-primary \$\{state==='signed'\?'is-selected':''\}/);
   assert.match(html, /activity-signup is-muted \$\{state==='declined'\?'is-selected':''\}/);
+  assert.match(html, /\$\{state==='signed'\?'Signed up':'Sign up'\}/);
+  assert.match(html, /\$\{state==='declined'\?'Declined':'Decline'\}/);
   assert.match(html, /\.activity-signup\.is-selected/);
   assert.match(html, /activity-card-actions/);
   assert.match(html, /activity-attendees/);
@@ -598,6 +600,9 @@ test('itinerary activity RSVPs show attendee names, declined state, and editable
   assert.match(html, /function renderDayEventDetail\(event, full\)/);
   assert.match(html, /id="dayEventDetail"/);
   assert.match(html, /id="dayEventDetailActions"/);
+  const detailMarkup = html.slice(html.indexOf('id="dayEventDetail"'), html.indexOf('id="prepPlanner"'));
+  assert.doesNotMatch(detailMarkup, /id="closeDayEventDetailButton"/);
+  assert.doesNotMatch(detailMarkup, /aria-label="Close event details">×/);
   assert.match(html, /dayEventDetailActions\.innerHTML=event\.id\?renderActivityActions\(event\.id\):''/);
   assert.match(html, /dayViewTimeline\.querySelectorAll\('\[data-day-event\]'\)\.forEach/);
   const expandedEventFunction = html.slice(html.indexOf('function renderExpandedDayEvent'), html.indexOf('function renderDayEventDetail'));
@@ -645,8 +650,8 @@ test('people profiles live in an animated fit-content dashboard tab control', ()
   assert.match(html, /\.board-tab-indicator/);
   assert.match(html, /transition: transform \.24s ease, width \.24s ease/);
   assert.match(html, /@media \(max-width: 760px\) \{[\s\S]*\.trip-info-scroll \{[^}]*position: relative/);
-  assert.match(html, /@media \(max-width: 760px\) \{[\s\S]*\.trip-tabs \{[^}]*position: absolute[^}]*bottom: max\(8px, env\(safe-area-inset-bottom\)\)[^}]*left: 50%[^}]*transform: translateX\(-50%\)[^}]*z-index: 4/);
-  assert.match(html, /@media \(max-width: 760px\) \{[\s\S]*\.trip-tab-panel \{[^}]*padding-bottom: 64px/);
+  assert.match(html, /@media \(max-width: 760px\) \{[\s\S]*\.trip-tabs \{[^}]*position: absolute[^}]*bottom: max\(-17px, calc\(env\(safe-area-inset-bottom\) - 17px\)\)[^}]*left: 50%[^}]*transform: translateX\(-50%\)[^}]*z-index: 4/);
+  assert.match(html, /@media \(max-width: 760px\) \{[\s\S]*\.trip-tab-panel \{[^}]*padding-bottom: 82px/);
   assert.doesNotMatch(html, /@media \(max-width: 760px\) \{[\s\S]*\.trip-tabs \{[^}]*margin-bottom: 10px/);
   assert.match(html, /#tripInfo \.trip-info-scroll \{[^}]*display: flex/);
   assert.match(html, /#tripInfo \.trip-info-scroll \{[^}]*overflow: hidden/);
