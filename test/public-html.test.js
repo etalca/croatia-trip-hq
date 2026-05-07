@@ -554,6 +554,31 @@ test('custom event form scrolls on short viewports and summarizes invitees natur
   assert.doesNotMatch(html, /No attendees yet/);
 });
 
+test('open invite custom events prompt a share message with a deep event link', () => {
+  assert.match(html, /function openInviteShareMessage\(event\)/);
+  assert.match(html, /I just added \$\{event\.title\} to the calendar\. Sign up if you’re interested!/);
+  assert.match(html, /function customEventShareUrl\(event\)/);
+  assert.match(html, /calendarEvent/);
+  assert.match(html, /encodeSharedEvent\(event\)/);
+  assert.match(html, /navigator\.share\(\{ title:event\.title, text:openInviteShareMessage\(event\), url:customEventShareUrl\(event\) \}\)/);
+  assert.match(html, /promptShareOpenInviteEvent\(event\)/);
+  assert.match(html, /if\(event\.inviteMode==='open'\)/);
+});
+
+test('shared custom event links import the event and open signup or decline actions', () => {
+  assert.match(html, /function decodeSharedEvent\(value\)/);
+  assert.match(html, /function importSharedCalendarEventFromUrl\(\)/);
+  assert.match(html, /new URLSearchParams\(window\.location\.search\)\.get\('calendarEvent'\)/);
+  assert.match(html, /saveCustomEvents\(\[event, \.\.\.events\.filter\(item=>item\.id!==event\.id\)\]\)/);
+  assert.match(html, /function openLinkedCalendarEvent\(eventId\)/);
+  assert.match(html, /openDayView\(event\.date\)/);
+  assert.match(html, /openDayEventDetail\(index\)/);
+  assert.match(html, /function setCustomEventDecline\(eventId\)/);
+  assert.match(html, /data-custom-event-decline/);
+  assert.match(html, />Decline<\/button>/);
+  assert.match(html, /openLinkedCalendarEvent\(sharedEventId\)/);
+});
+
 test('overlapping day-view events are grouped into side-by-side pressure columns', () => {
   assert.match(html, /function eventsOverlap\(a,b\)/);
   assert.match(html, /function layoutDayViewEvents\(events\)/);
