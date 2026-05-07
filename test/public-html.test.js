@@ -564,32 +564,57 @@ test('trip prep state is saved locally and participates in todos and homepage CT
   assert.match(html, /myPrepCard\.addEventListener\('click',openPrepPlanner\)/);
 });
 
-test('itinerary includes proposed group activities with opt-in signups', () => {
+test('itinerary activity RSVPs show attendee names, declined state, and editable choices', () => {
   assert.match(html, /const ACTIVITY_SIGNUPS_KEY='korculaActivitySignups'/);
+  assert.match(html, /const ACTIVITY_DECLINES_KEY='korculaActivityDeclines'/);
   assert.match(html, /const activityEvents=\[\{id:'grocery-run'/);
   assert.match(html, /id:'boat-day'/);
   assert.match(html, /id:'beach-afternoon'/);
   assert.match(html, /function activitySignups\(\)/);
-  assert.match(html, /function signedUpForActivity\(activityId\)/);
-  assert.match(html, /function toggleActivitySignup\(activityId\)/);
-  assert.match(html, /function activitySignupSummary\(activityId\)/);
-  assert.match(html, /data-activity-signup="\$\{escapeHtml\(event\.id\)\}"/);
+  assert.match(html, /function activityDeclines\(\)/);
+  assert.match(html, /function activityRsvpState\(activityId\)/);
+  assert.match(html, /function setActivityRsvp\(activityId, choice\)/);
+  assert.match(html, /function activityAttendeeNames\(activityId\)/);
+  assert.match(html, /function activityAttendeeSummary\(activityId\)/);
+  assert.match(html, /data-activity-signup="\$\{escapeHtml\(activityId\)\}"/);
+  assert.match(html, /data-activity-decline="\$\{escapeHtml\(activityId\)\}"/);
+  assert.match(html, /activity-card-actions/);
+  assert.match(html, /activity-attendees/);
+  assert.match(html, /is-activity \$\{activityStateClass\(event\.id\)\}/);
+  assert.match(html, /\.calendar-event\.is-activity\.is-pending/);
+  assert.match(html, /border-style: dashed/);
+  assert.match(html, /\.calendar-event\.is-activity\.is-signed/);
+  assert.match(html, /border-style: solid/);
+  assert.match(html, /\.calendar-event\.is-activity\.is-declined strong/);
+  assert.match(html, /text-decoration: line-through/);
   assert.match(html, /Sign up/);
-  assert.match(html, /You're in/);
+  assert.match(html, /Decline/);
+  assert.doesNotMatch(html, /You're in/);
   assert.match(html, /calendarItems\.querySelectorAll\('\[data-activity-signup\]'\)\.forEach/);
+  assert.match(html, /calendarItems\.querySelectorAll\('\[data-activity-decline\]'\)\.forEach/);
   assert.match(html, /dinners\.forEach\(slot=>eventsByDate\[slot\.date\]\?\.push\(\{title:'Dinner'/);
   assert.doesNotMatch(html, /Dinner placeholder/);
 });
 
-test('people profiles live in a dashboard tab instead of a dashboard card', () => {
+test('people profiles live in an animated fit-content dashboard tab control', () => {
   const tripInfoBlock = html.slice(html.indexOf('id="tripInfo"'), html.indexOf('id="dinnerPicker"'));
   assert.match(tripInfoBlock, /id="tripTabs"/);
+  assert.match(tripInfoBlock, /id="tripTabIndicator"/);
   assert.match(tripInfoBlock, /id="overviewTab"/);
   assert.match(tripInfoBlock, /id="peopleTab"/);
+  assert.match(tripInfoBlock, /id="tripTabPanels"/);
   assert.match(tripInfoBlock, /id="overviewPanel"/);
   assert.match(tripInfoBlock, /id="peoplePanel"/);
   assert.match(tripInfoBlock, /id="peopleList"/);
   assert.doesNotMatch(tripInfoBlock, /id="myPeopleCard"/);
+  assert.match(html, /\.board-tabs \{[^}]*width: fit-content/);
+  assert.match(html, /\.board-tab-indicator/);
+  assert.match(html, /transition: transform \.24s ease, width \.24s ease/);
+  assert.match(html, /\.trip-tab-panels/);
+  assert.match(html, /transition: left \.28s ease/);
+  assert.match(html, /tripTabs\.style\.setProperty\('--trip-tab-index', people \? '1' : '0'\)/);
+  assert.match(html, /tripTabPanels\.style\.left=people \? '-100%' : '0%'/);
+  assert.match(html, /tripTabIndicator\.style\.transform=`translateX\(\$\{active\.offsetLeft\}px\)`/);
   assert.match(html, /function setTripTab\(tab\)/);
   assert.match(html, /function profileSummary\(person, board, dinner\)/);
   assert.match(html, /function renderPeopleDirectory\(\)/);
