@@ -574,6 +574,24 @@ test('itinerary includes curated planning prompts without changing claimed-dinne
   assert.doesNotMatch(html, /Dinner placeholder/);
 });
 
+test('people directory exposes clickable guest profiles with shared trip info', () => {
+  assert.match(html, /id="myPeopleCard"/);
+  assert.match(html, /id="peopleDirectory"/);
+  assert.match(html, /id="peopleList"/);
+  assert.match(html, /id="profileDetail"/);
+  assert.match(html, /function profileSummary\(person, board, dinner\)/);
+  assert.match(html, /function renderPeopleDirectory\(\)/);
+  assert.match(html, /function openProfileDetail\(name\)/);
+  assert.match(html, /data-profile="\$\{escapeHtml\(person\)\}"/);
+  assert.match(html, /aria-label="View profile for \$\{escapeHtml\(person\)\}"/);
+  assert.match(html, /profileArrival/);
+  assert.match(html, /profileDeparture/);
+  assert.match(html, /profileDinner/);
+  assert.match(html, /profileNotes/);
+  assert.match(html, /peopleList\.querySelectorAll\('\[data-profile\]'\)\.forEach/);
+  assert.match(html, /myPeopleCard\.addEventListener\('click',openPeopleDirectory\)/);
+});
+
 test('staging review mode enters the trip dashboard without magic-link signup', () => {
   assert.match(html, /const REVIEW_NAME_KEY='reviewName'/);
   assert.match(html, /const DEFAULT_STAGING_REVIEW_NAME='Tanner'/);
