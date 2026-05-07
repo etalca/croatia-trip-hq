@@ -565,6 +565,27 @@ test('open invite custom events prompt a share message with a deep event link', 
   assert.match(html, /if\(event\.inviteMode==='open'\)/);
 });
 
+test('custom event time ranges include spaces around the dash', () => {
+  assert.match(html, /function formatEventTimeRange\(startTime,endTime\)\{ return `\$\{formatClock\(startTime\)\} – \$\{formatClock\(endTime\)\}`; \}/);
+  assert.doesNotMatch(html, /formatClock\(startTime\)\}–\$\{formatClock\(endTime\)/);
+});
+
+test('custom event detail lets creators edit and delete instead of showing joined', () => {
+  assert.match(html, /data-custom-event-edit/);
+  assert.match(html, />Edit<\/button>/);
+  assert.match(html, /id="deleteCustomEvent"/);
+  assert.match(html, /type="button" id="deleteCustomEvent"/);
+  assert.match(html, /function openEventPlanner\(date='', eventId=''\)/);
+  assert.match(html, /let editingCustomEventId=''/);
+  assert.match(html, /function fillCustomEventForm\(event\)/);
+  assert.match(html, /function deleteCustomEvent\(\)/);
+  assert.match(html, /saveCustomEvents\(customEvents\(\)\.filter\(event=>event\.id!==editingCustomEventId\)\)/);
+  assert.match(html, /deleteCustomEventButton\.addEventListener\('click',deleteCustomEvent\)/);
+  assert.match(html, /dayEventDetailActions\.querySelectorAll\('\[data-custom-event-edit\]'\)/);
+  assert.match(html, /data-custom-event-calendar/);
+  assert.doesNotMatch(html, />Joined<\/button>/);
+});
+
 test('shared custom event links import the event and open signup or decline actions', () => {
   assert.match(html, /function decodeSharedEvent\(value\)/);
   assert.match(html, /function importSharedCalendarEventFromUrl\(\)/);
@@ -575,7 +596,7 @@ test('shared custom event links import the event and open signup or decline acti
   assert.match(html, /openDayEventDetail\(index\)/);
   assert.match(html, /function setCustomEventDecline\(eventId\)/);
   assert.match(html, /data-custom-event-decline/);
-  assert.match(html, />Decline<\/button>/);
+  assert.match(html, /\$\{declined\?'Declined':'Decline'\}/);
   assert.match(html, /openLinkedCalendarEvent\(sharedEventId\)/);
 });
 
