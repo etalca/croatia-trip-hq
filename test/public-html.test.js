@@ -235,7 +235,8 @@ test('dashboard embeds itinerary directly with floating header instead of a wrap
   assert.doesNotMatch(tripInfoBlock, /id="openCalendarView"/);
   assert.doesNotMatch(tripInfoBlock, /<button class="info-card"/);
   assert.doesNotMatch(tripInfoBlock, /<section class="embedded-itinerary" aria-label="Trip itinerary">/);
-  assert.match(tripInfoBlock, /<div class="itinerary-heading"><h3>Itinerary<\/h3><p>Proposed group activities appear here as blocks\. Add your own as invite-only plans or open invites people can join\.<\/p><button class="secondary-action" id="openEventPlanner" type="button">Add calendar event<\/button><\/div>\s*<section class="calendar-list embedded-itinerary" id="calendarItems" aria-label="Trip itinerary"><\/section>/);
+  assert.match(tripInfoBlock, /<div class="itinerary-heading"><h3>Itinerary<\/h3><p>Proposed group activities appear here as blocks\. Add your own as invite-only plans or open invites people can join\.<\/p><button class="secondary-action" id="openEventPlanner" type="button">Add event<\/button><\/div>\s*<section class="calendar-list embedded-itinerary" id="calendarItems" aria-label="Trip itinerary"><\/section>/);
+  assert.doesNotMatch(tripInfoBlock, />Add calendar event<\/button>/);
   assert.match(tripInfoBlock, /id="calendarItems"/);
   assert.doesNotMatch(html, /\.embedded-itinerary \{[^}]*border:/);
   assert.doesNotMatch(html, /\.embedded-itinerary \{[^}]*background:/);
@@ -265,7 +266,12 @@ test('dashboard itinerary cards use subtle expand icons to open an iCal-style da
   assert.match(html, /id="closeDayView"/);
   assert.match(html, /id="previousDayView"/);
   assert.match(html, /id="nextDayView"/);
+  assert.match(html, /<button class="day-view-add-event" id="dayViewAddEvent" type="button">Add event<\/button>/);
   assert.match(html, /<div class="day-view-nav" id="dayViewNav" aria-label="Change day"><button class="back" id="previousDayView" type="button">Previous day<\/button><button class="back" id="nextDayView" type="button">Next day<\/button><\/div>/);
+  assert.match(html, /dayViewAddEventButton=document\.getElementById\('dayViewAddEvent'\)/);
+  assert.match(html, /dayViewAddEventButton\.addEventListener\('click',\(\)=>openEventPlanner\(activeDayViewDate\)\)/);
+  assert.match(html, /\.day-view-add-event \{[^}]*position: absolute;[^}]*left: 20px;[^}]*bottom: 20px;/s);
+  assert.match(html, /\.day-event-detail:not\(\[hidden\]\) ~ \.day-view-add-event \{ display: none; \}/);
   assert.match(html, /function openDayView\(date\)/);
   assert.match(html, /let activeDayViewDate=''/);
   assert.match(html, /function closeDayView\(\)/);
