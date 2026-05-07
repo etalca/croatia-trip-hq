@@ -406,6 +406,9 @@
     .dashboard-card { min-height: min(680px, calc(100svh - 20px)); }
     #tripInfo { place-items: center; }
     #tripInfo .dashboard-card { height: calc(100svh - 20px); min-height: 0; max-height: calc(100svh - 20px); align-self: center; }
+    #tripInfo .dashboard-card header { position: relative; display: block; padding-right: 56px; overflow: visible; }
+    #tripInfo .dashboard-card header > div { overflow: visible; width: 100%; max-width: 100%; }
+    #tripInfo .dashboard-card header .close { position: absolute; top: 0; right: 0; }
     .trip-info-grid { grid-template-columns: 1fr; gap: 10px; padding: 2px 2px 1px; overflow-y: auto; min-height: 0; }
     #tripInfo .trip-info-scroll { gap: 10px; }
     .info-card { min-height: 86px; padding: 14px; border-radius: 16px; transform: none !important; }
@@ -427,7 +430,7 @@
     .arrival-actions .notes-toggle { width: 25.5px; height: 25.5px; min-height: 0; flex: 0 0 25.5px; }
     .arrival-countdown { white-space: normal; }
     .arrival-notes { grid-column: 1 / -1; width: calc(100% + 104px); max-width: calc(100% + 104px); padding: 10px 12px; border-radius: 13px; }
-    #tripInfo .dashboard-status { width: calc(100% + 74px); max-width: calc(100% + 74px); }
+    #tripInfo .dashboard-status { width: calc(100% + 56px); max-width: calc(100% + 56px); }
     .dashboard-status { flex-wrap: nowrap; overflow-x: auto; overflow-y: hidden; max-height: 30px; white-space: nowrap; touch-action: pan-x; scrollbar-width: none; -ms-overflow-style: none; }
     .dashboard-status::-webkit-scrollbar { width: 0; height: 0; display: none; }
     .dashboard-status .todo-chip { flex: 0 0 auto; }
