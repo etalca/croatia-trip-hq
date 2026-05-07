@@ -339,7 +339,7 @@ test('trip dashboard clickable cards show expand affordances and scroll below st
   assert.match(tripInfoBlock, /id="myFlightCard"[\s\S]*?<img class="dashboard-card-expand" src="assets\/Expand icon\.svg" alt="" aria-hidden="true">/);
   assert.match(tripInfoBlock, /<section class="calendar-list embedded-itinerary" id="calendarItems" aria-label="Trip itinerary"><\/section>[\s\S]*?<\/section>/);
   assert.match(html, /#tripInfo \.dashboard-card header \{ flex: 0 0 auto; \}/);
-  assert.match(html, /#tripInfo \.trip-info-scroll \{ flex: 1 1 auto; overflow-y: auto; min-height: 0; display: grid; gap: 10px; scrollbar-width: none; -ms-overflow-style: none; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; \}/);
+  assert.match(html, /#tripInfo \.trip-info-scroll \{ flex: 1 1 auto; overflow: hidden; min-height: 0; display: flex; flex-direction: column; gap: 10px; scrollbar-width: none; -ms-overflow-style: none; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; \}/);
   assert.match(html, /#tripInfo \.calendar-list \{ overflow: visible; min-height: auto; \}/);
   assert.match(html, /#tripInfo \.trip-info-scroll::-webkit-scrollbar \{ width: 0; height: 0; display: none; \}/);
   assert.match(html, /\.personal-card \{[^}]*position: relative;[^}]*padding: 14px 42px 14px 14px;/s);
@@ -453,7 +453,7 @@ test('mobile dashboard keeps todo chips sticky while trip cards and itinerary sc
   assert.match(tripInfoBlock, /<div class="trip-info-scroll">[\s\S]*?<div class="dashboard-hero">/);
   assert.match(tripInfoBlock, /<section class="calendar-list embedded-itinerary" id="calendarItems" aria-label="Trip itinerary"><\/section>[\s\S]*?<\/section>/);
   assert.match(html, /#tripInfo \.dashboard-card header \{ flex: 0 0 auto; \}/);
-  assert.match(html, /#tripInfo \.trip-info-scroll \{ flex: 1 1 auto; overflow-y: auto; min-height: 0; display: grid; gap: 10px; scrollbar-width: none; -ms-overflow-style: none; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; \}/);
+  assert.match(html, /#tripInfo \.trip-info-scroll \{ flex: 1 1 auto; overflow: hidden; min-height: 0; display: flex; flex-direction: column; gap: 10px; scrollbar-width: none; -ms-overflow-style: none; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; \}/);
   assert.match(html, /#tripInfo \.calendar-list \{ overflow: visible; min-height: auto; \}/);
   assert.match(html, /#tripInfo \.trip-info-scroll::-webkit-scrollbar \{ width: 0; height: 0; display: none; \}/);
 });
@@ -617,8 +617,12 @@ test('people profiles live in an animated fit-content dashboard tab control', ()
   assert.match(html, /\.board-tabs \{[^}]*width: fit-content/);
   assert.match(html, /\.board-tab-indicator/);
   assert.match(html, /transition: transform \.24s ease, width \.24s ease/);
-  assert.match(html, /\.trip-tab-viewport \{[^}]*overflow: hidden/);
-  assert.match(html, /\.trip-tab-panel \{[^}]*transition: transform \.28s ease, opacity \.22s ease/);
+  assert.match(html, /#tripInfo \.trip-info-scroll \{[^}]*display: flex/);
+  assert.match(html, /#tripInfo \.trip-info-scroll \{[^}]*overflow: hidden/);
+  assert.match(html, /\.trip-tab-viewport \{[^}]*flex: 1 1 auto[^}]*overflow: hidden/);
+  assert.match(html, /\.trip-tab-panels \{[^}]*position: absolute[^}]*inset: 0[^}]*height: 100%[^}]*min-height: 0[^}]*overflow: hidden/);
+  assert.match(html, /\.trip-tab-panel \{[^}]*height: 100%[^}]*max-height: 100%[^}]*overflow-y: auto[^}]*transition: transform \.28s ease, opacity \.22s ease/);
+  assert.match(html, /\.trip-tab-panel::-webkit-scrollbar/);
   assert.match(html, /\.trip-tab-panel\.is-exiting-left/);
   assert.match(html, /\.trip-tab-panel\.is-entering-right/);
   assert.doesNotMatch(html, /grid-template-columns: 100% 100%/);
@@ -627,8 +631,14 @@ test('people profiles live in an animated fit-content dashboard tab control', ()
   assert.match(html, /currentTripTabPanel\.hidden=true/);
   assert.match(html, /nextPanel\.hidden=false/);
   assert.match(html, /setTimeout\(\(\)=>\{ currentTripTabPanel\.hidden=true/);
+  assert.match(html, /function syncTripTabIndicator\(active=overviewTab\)/);
+  assert.match(html, /requestAnimationFrame\(\(\)=>syncTripTabIndicator\(active\)\)/);
   assert.match(html, /setTripTab\('overview'\)/);
   assert.match(html, /setTripTab\('people'\)/);
+  assert.match(html, /@media \(max-width: 760px\) \{[\s\S]*\.trip-tabs \{[^}]*align-self: flex-start[^}]*width: fit-content/);
+  assert.match(html, /@media \(max-width: 760px\) \{[\s\S]*#tripInfo \.dashboard-card \{[^}]*height: calc\(100svh - 20px\)[^}]*max-height: calc\(100svh - 20px\)/);
+  assert.match(html, /@media \(max-width: 760px\) \{[\s\S]*\.trip-tabs \.board-tab-indicator \{[^}]*display: none/);
+  assert.match(html, /@media \(max-width: 760px\) \{[\s\S]*\.trip-tabs \.board-tab.active \{[^}]*background: rgba\(255,255,255,\.80\)[^}]*color: var\(--ink\)/);
   assert.match(html, /tripTabIndicator\.style\.transform=`translateX\(\$\{active\.offsetLeft\}px\)`/);
   assert.match(html, /function setTripTab\(tab\)/);
   assert.match(html, /function profileSummary\(person, board, dinner\)/);
@@ -639,6 +649,12 @@ test('people profiles live in an animated fit-content dashboard tab control', ()
   assert.match(html, /peopleList\.querySelectorAll\('\[data-profile\]'\)\.forEach/);
   assert.match(html, /peopleTab\.addEventListener\('click',\(\)=>setTripTab\('people'\)\)/);
   assert.doesNotMatch(html, /myPeopleCard\.addEventListener/);
+});
+
+test('mobile flight form preserves focus outline inside the scroll container', () => {
+  assert.match(html, /@media \(max-width: 760px\) \{[\s\S]*form \{[^}]*padding: 7px 7px 3px[^}]*margin: -7px 0 0[^}]*overflow-x: hidden/);
+  assert.match(html, /@media \(max-width: 760px\) \{[\s\S]*\.field \{[^}]*min-width: 0[^}]*padding: 3px/);
+  assert.match(html, /\.pill:focus-visible, \.close:focus-visible, \.back:focus-visible, \.todo-chip:focus-visible, input:focus, select:focus, textarea:focus \{ outline: 2px solid rgba\(255,255,255,\.78\); outline-offset: 2px; \}/);
 });
 
 test('staging review mode enters the trip dashboard without magic-link signup', () => {
