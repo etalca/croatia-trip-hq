@@ -235,7 +235,7 @@ test('dashboard embeds itinerary directly with floating header instead of a wrap
   assert.doesNotMatch(tripInfoBlock, /id="openCalendarView"/);
   assert.doesNotMatch(tripInfoBlock, /<button class="info-card"/);
   assert.doesNotMatch(tripInfoBlock, /<section class="embedded-itinerary" aria-label="Trip itinerary">/);
-  assert.match(tripInfoBlock, /<div class="itinerary-heading"><h3>Itinerary<\/h3><p>Proposed group activities appear here as blocks\. If something looks fun, sign up to mark yourself in\.<\/p><\/div>\s*<section class="calendar-list embedded-itinerary" id="calendarItems" aria-label="Trip itinerary"><\/section>/);
+  assert.match(tripInfoBlock, /<div class="itinerary-heading"><h3>Itinerary<\/h3><p>Proposed group activities appear here as blocks\. Add your own as invite-only plans or open invites people can join\.<\/p><button class="secondary-action" id="openEventPlanner" type="button">Add calendar event<\/button><\/div>\s*<section class="calendar-list embedded-itinerary" id="calendarItems" aria-label="Trip itinerary"><\/section>/);
   assert.match(tripInfoBlock, /id="calendarItems"/);
   assert.doesNotMatch(html, /\.embedded-itinerary \{[^}]*border:/);
   assert.doesNotMatch(html, /\.embedded-itinerary \{[^}]*background:/);
@@ -278,7 +278,7 @@ test('dashboard itinerary cards use subtle expand icons to open an iCal-style da
   assert.match(html, /previousDayViewButton\.addEventListener\('click',\(\)=>moveDayView\(-1\)\)/);
   assert.match(html, /nextDayViewButton\.addEventListener\('click',\(\)=>moveDayView\(1\)\)/);
   assert.match(html, /function eventBlockStyle\(event\)/);
-  assert.match(html, /top:\$\{Math\.max\(0, parseEventMinute\(event\)-480\)\*DAY_VIEW_PX_PER_MINUTE\}px/);
+  assert.match(html, /top:\$\{Math\.max\(0, parseEventMinute\(event\)-DAY_VIEW_START_MINUTE\)\*DAY_VIEW_PX_PER_MINUTE\}px/);
   assert.match(html, /height:\$\{Math\.max\(34, eventDurationMinutes\(event\)\*DAY_VIEW_PX_PER_MINUTE\)\}px/);
   assert.match(html, /<button class="calendar-expand-icon" type="button" title="View full day" aria-label="View full day for \$\{escapeHtml\(full\)\}" data-date="\$\{escapeHtml\(date\)\}"><img src="assets\/Expand icon\.svg" alt=""><\/button>/);
   assert.match(html, /const moreIndicator=needsExpand \? '<div class="calendar-more" aria-label="More events">•••<\/div>' : ''/);
@@ -286,6 +286,7 @@ test('dashboard itinerary cards use subtle expand icons to open an iCal-style da
   assert.match(html, /\.calendar-expand-icon \{[^}]*position: absolute;[^}]*top: 8px;[^}]*right: 8px;[^}]*width: 22px;[^}]*height: 22px;[^}]*opacity: \.2;/s);
   assert.match(html, /note:slot\.title \|\| ''/);
   assert.match(html, /\$\{event\.note \? `<small>\$\{escapeHtml\(event\.note\)\}<\/small>` : ''\}/);
+  assert.match(html, /\$\{event\.description \? `<small>\$\{escapeHtml\(event\.description\)\}<\/small>` : ''\}/);
   assert.doesNotMatch(html, /No plans yet/);
   assert.doesNotMatch(html, /This day is open\./);
   assert.match(html, /\.calendar-more \{[^}]*font-size: 9px;[^}]*line-height: 1;[^}]*color: rgba\(255,255,255,\.54\);/s);
@@ -490,6 +491,56 @@ test('day view titles omit year and hide edge navigation instead of disabling it
   assert.doesNotMatch(html, /nextDayViewButton\.disabled=index>=allDays\.length-1/);
 });
 
+
+test('hour-by-hour day view spans 6 AM through 10 PM', () => {
+  assert.match(html, /const DAY_VIEW_START_MINUTE=6\*60/);
+  assert.match(html, /const DAY_VIEW_END_MINUTE=22\*60/);
+  assert.match(html, /const DAY_VIEW_HOUR_COUNT=\(DAY_VIEW_END_MINUTE-DAY_VIEW_START_MINUTE\)\/60/);
+  assert.match(html, /const DAY_VIEW_HOUR_LABEL_COUNT=DAY_VIEW_HOUR_COUNT\+1/);
+  assert.match(html, /\.day-view-timeline \{[^}]*min-height: 1020px;/s);
+  assert.match(html, /\.day-view-hours \{[^}]*grid-template-rows: repeat\(17, 60px\)/s);
+  assert.match(html, /function dayViewHours\(\)\{ return Array\.from\(\{length:DAY_VIEW_HOUR_LABEL_COUNT\}/);
+  assert.match(html, /const hour=6\+i/);
+  assert.match(html, /parseEventMinute\(event\)-DAY_VIEW_START_MINUTE/);
+  assert.doesNotMatch(html, /parseEventMinute\(event\)-480/);
+  assert.doesNotMatch(html, /Array\.from\(\{length:14\}/);
+});
+
+test('custom calendar event form captures title, time range, invite mode, invitees, attendees, and description', () => {
+  assert.match(html, /id="eventPlanner"/);
+  assert.match(html, /id="eventForm"/);
+  assert.match(html, /<label for="eventTitle">Title<\/label><input id="eventTitle"/);
+  assert.match(html, /<label for="eventStartTime">Start time<\/label><input id="eventStartTime" type="time" required>/);
+  assert.match(html, /<label for="eventEndTime">End time<\/label><input id="eventEndTime" type="time" required>/);
+  assert.match(html, /<label for="eventDescription">Description<\/label><textarea id="eventDescription"/);
+  assert.match(html, /<label for="eventInviteMode">Invite type<\/label><select id="eventInviteMode" required>/);
+  assert.match(html, /<option value="open">Open invite<\/option>/);
+  assert.match(html, /<option value="invite-only">Invite only<\/option>/);
+  assert.match(html, /id="eventInvitees" multiple/);
+  assert.match(html, /function populateEventInvitees\(\)/);
+  assert.match(html, /function syncEventInviteMode\(\)/);
+  assert.match(html, /eventInviteMode\.addEventListener\('change',syncEventInviteMode\)/);
+  assert.match(html, /eventForm\.addEventListener\('submit',saveCustomEvent\)/);
+});
+
+test('custom calendar events render with title, time range, attendees, description, visibility, open signup, and calendar download', () => {
+  assert.match(html, /const CUSTOM_EVENTS_KEY='korculaCustomCalendarEvents'/);
+  assert.match(html, /const CUSTOM_EVENT_SIGNUPS_KEY='korculaCustomCalendarEventSignups'/);
+  assert.match(html, /function customEvents\(\)/);
+  assert.match(html, /function visibleCustomEvents\(\)/);
+  assert.match(html, /event\.inviteMode==='open' \|\| event\.creator===name \|\| \(event\.invitees \|\| \[\]\)\.includes\(name\)/);
+  assert.match(html, /customEventAttendeeNames\(event\)/);
+  assert.match(html, /formatEventTimeRange\(event\.startTime,event\.endTime\)/);
+  assert.match(html, /description:eventDescription\.value\.trim\(\)/);
+  assert.match(html, /renderCustomEventActions\(event\.id\)/);
+  assert.match(html, /data-custom-event-signup/);
+  assert.match(html, /function downloadCustomEventToCalendar\(event\)/);
+  assert.match(html, /DTSTART;TZID=Europe\/Zagreb:\$\{icsDateTime\(event\.date,event\.startTime\)\}/);
+  assert.match(html, /DTEND;TZID=Europe\/Zagreb:\$\{icsDateTime\(event\.date,event\.endTime\)\}/);
+  assert.match(html, /DESCRIPTION:\$\{icsEscape\(event\.description \|\| ''\)\}/);
+  assert.match(html, /data-custom-event-calendar/);
+});
+
 test('magic-link sign-up gate is compact and centered on mobile', () => {
   assert.match(html, /gate\.classList\.toggle\('auth-mode', !currentGuest\)/);
   assert.match(html, /@media \(max-width: 760px\) \{[\s\S]*\.gate\.auth-mode \{ place-items: center; \}[\s\S]*\.gate\.auth-mode \.panel \{ width: min\(100%, 380px\); max-height: none; min-height: 0; align-self: center; \}/);
@@ -619,7 +670,7 @@ test('itinerary activity RSVPs show attendee names, declined state, and editable
   assert.match(html, /activityRsvpState\(activityId\)==='declined'\?'<span class="activity-state-icon is-declined" aria-label="Declined">×<\/span>':''/);
   assert.doesNotMatch(html, /\.activity-state-icon \{[^}]*border-radius/);
   assert.doesNotMatch(html, /\.activity-state-icon\.is-declined \{[^}]*border:/);
-  assert.match(html, /function renderExpandedDayEvent\(event, full\)\{ return `[\s\S]*data-day-event="\$\{escapeHtml\(event\.id\|\|'\'\)\}"[\s\S]*renderActivityStateIcon\(event\.id\)[\s\S]*<\/article>`; \}/);
+  assert.match(html, /function renderExpandedDayEvent\(event, full\)\{ if\(event\.custom\)[\s\S]*return `[\s\S]*data-day-event="\$\{escapeHtml\(event\.id\|\|'\'\)\}"[\s\S]*renderActivityStateIcon\(event\.id\)[\s\S]*<\/article>`; \}/);
   assert.match(html, /function renderDayEventDetail\(event, full\)/);
   assert.match(html, /id="dayEventDetail"/);
   assert.match(html, /id="dayEventDetailActions"/);
@@ -630,7 +681,7 @@ test('itinerary activity RSVPs show attendee names, declined state, and editable
   const detailMarkup = html.slice(html.indexOf('id="dayEventDetail"'), html.indexOf('id="prepPlanner"'));
   assert.doesNotMatch(detailMarkup, /id="closeDayEventDetailButton"/);
   assert.doesNotMatch(detailMarkup, /aria-label="Close event details">×/);
-  assert.match(html, /dayEventDetailActions\.innerHTML=event\.id\?renderActivityActions\(event\.id\):''/);
+  assert.match(html, /dayEventDetailActions\.innerHTML=event\.custom\?renderCustomEventActions\(event\.id\):\(event\.id\?renderActivityActions\(event\.id\):''\)/);
   assert.match(html, /dayViewTimeline\.querySelectorAll\('\[data-day-event\]'\)\.forEach/);
   const expandedEventFunction = html.slice(html.indexOf('function renderExpandedDayEvent'), html.indexOf('function renderDayEventDetail'));
   assert.doesNotMatch(expandedEventFunction, /renderActivityActions\(event\.id\)/);
@@ -646,7 +697,7 @@ test('itinerary activity RSVPs show attendee names, declined state, and editable
   assert.match(html, /\.calendar-event\.is-activity\.is-declined/);
   assert.match(html, /opacity: \.58/);
   assert.match(html, /function activityDisplayTitle\(event\)/);
-  assert.match(html, /activityRsvpState\(event\.id\)==='declined' \? `DECLINED: \$\{event\.title\}` : event\.title/);
+  assert.match(html, /event\.id && !event\.custom && activityRsvpState\(event\.id\)==='declined' \? `DECLINED: \$\{event\.title\}` : event\.title/);
   assert.match(html, /\.calendar-event\.is-activity\.is-declined strong/);
   assert.match(html, /text-decoration: line-through/);
   assert.match(html, /Sign up/);
