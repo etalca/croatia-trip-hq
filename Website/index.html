@@ -368,7 +368,7 @@
   .day-view-event span, .day-view-event small { color: rgba(255,255,255,.68); font-size: 11px; line-height: 1.2; }
   .day-view-event small { color: rgba(255,255,255,.86); }
   .day-view-event[data-day-event] { cursor: pointer; }
-  .day-view-hover-actions { position: absolute; top: 8px; right: 8px; display: inline-flex; gap: 6px; align-items: center; justify-content: flex-end; opacity: 0; pointer-events: none; transition: none; }
+  .day-view-hover-actions { position: absolute; top: 50%; right: 8px; transform: translateY(-50%); display: inline-flex; gap: 6px; align-items: center; justify-content: flex-end; opacity: 0; pointer-events: none; transition: none; }
   .day-view-hover-actions .activity-card-actions, .day-view-hover-actions .calendar-event-actions { display: inline-flex; gap: 6px; align-items: center; justify-content: flex-end; }
   .day-view-hover-actions .activity-signup { height: 25.5px; min-height: 0; padding: 0 9px; font-size: 12px; white-space: nowrap; }
   .day-view-event:hover > .day-view-hover-actions, .day-view-event:focus-within > .day-view-hover-actions { opacity: 1 !important; pointer-events: auto; }

@@ -813,7 +813,7 @@ test('desktop day-view RSVP actions appear on hover beside eligible events', () 
   assert.match(html, /function renderDayViewEventActions\(event\)/);
   assert.match(html, /event\.custom\?renderCustomEventActions\(event\.id,'day-hover'\):\(event\.id\?renderActivityActions\(event\.id,'day-hover'\):''\)/);
   assert.match(html, /class="day-view-hover-actions"/);
-  assert.match(html, /\.day-view-hover-actions \{[^}]*position: absolute;[^}]*top: 8px;[^}]*right: 8px;[^}]*opacity: 0;[^}]*pointer-events: none;/s);
+  assert.match(html, /\.day-view-hover-actions \{[^}]*position: absolute;[^}]*top: 50%;[^}]*right: 8px;[^}]*transform: translateY\(-50%\);[^}]*opacity: 0;[^}]*pointer-events: none;/s);
   assert.match(html, /\.day-view-event:hover > \.day-view-hover-actions, \.day-view-event:focus-within > \.day-view-hover-actions \{[^}]*opacity: 1 !important;[^}]*pointer-events: auto;/s);
   assert.match(html, /@media \(max-width: 760px\) \{[\s\S]*\.day-view-hover-actions \{ display: none; \}/);
   assert.match(html, /renderActivityActions\(activityId, variant='detail'\)/);
