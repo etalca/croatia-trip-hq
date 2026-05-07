@@ -292,7 +292,7 @@ test('dashboard itinerary cards use subtle expand icons to open an iCal-style da
   assert.match(html, /\.calendar-expand-icon \{[^}]*position: absolute;[^}]*top: 8px;[^}]*right: 8px;[^}]*width: 22px;[^}]*height: 22px;[^}]*opacity: \.2;/s);
   assert.match(html, /note:slot\.title \|\| ''/);
   assert.match(html, /\$\{event\.note \? `<small>\$\{escapeHtml\(event\.note\)\}<\/small>` : ''\}/);
-  assert.match(html, /\$\{event\.description \? `<small>\$\{escapeHtml\(event\.description\)\}<\/small>` : ''\}/);
+  assert.match(html, /\$\{event\.description \? `<small>\$\{linkifyText\(event\.description\)\}<\/small>` : ''\}/);
   assert.doesNotMatch(html, /No plans yet/);
   assert.doesNotMatch(html, /This day is open\./);
   assert.match(html, /\.calendar-more \{[^}]*font-size: 9px;[^}]*line-height: 1;[^}]*color: rgba\(255,255,255,\.54\);/s);
@@ -582,7 +582,10 @@ test('custom event detail lets creators edit and delete instead of showing joine
   assert.match(html, /data-custom-event-edit/);
   assert.match(html, />Edit<\/button>/);
   assert.match(html, /id="deleteCustomEvent"/);
-  assert.match(html, /type="button" id="deleteCustomEvent"/);
+  assert.match(html, /type="button" id="deleteCustomEvent" hidden>Delete<\/button>/);
+  assert.doesNotMatch(html, />Delete event<\/button>/);
+  assert.match(html, /\.destructive-text \{[^}]*color: rgba\(255,107,107,\.72\) !important;[^}]*opacity: \.72;/s);
+  assert.match(html, /\.destructive-text:hover, \.destructive-text:focus-visible \{[^}]*color: #ff8f8f;[^}]*opacity: 1;/s);
   assert.match(html, /function openEventPlanner\(date='', eventId=''\)/);
   assert.match(html, /let editingCustomEventId=''/);
   assert.match(html, /function fillCustomEventForm\(event\)/);
@@ -592,6 +595,18 @@ test('custom event detail lets creators edit and delete instead of showing joine
   assert.match(html, /dayEventDetailActions\.querySelectorAll\('\[data-custom-event-edit\]'\)/);
   assert.match(html, /data-custom-event-calendar/);
   assert.doesNotMatch(html, />Joined<\/button>/);
+});
+
+test('custom event descriptions linkify pasted URLs safely in cards and detail', () => {
+  assert.match(html, /function linkifyText\(value\)/);
+  assert.match(html, /escapeHtml\(value\)/);
+  assert.match(html, /https?:\/\/[^\s<]+/);
+  assert.match(html, /<a href="\$\{safeHref\}" target="_blank" rel="noopener noreferrer">\$\{url\}<\/a>/);
+  assert.match(html, /\$\{event\.description \? `<span>\$\{linkifyText\(event\.description\)\}<\/span>` : ''\}/);
+  assert.match(html, /\$\{event\.description \? `<small>\$\{linkifyText\(event\.description\)\}<\/small>` : ''\}/);
+  assert.match(html, /dayEventDetailNote\.innerHTML=linkifyText\(event\.description \|\| event\.note \|\| ''\)/);
+  assert.match(html, /\.day-event-detail-note a, \.calendar-event a, \.day-view-event a \{[^}]*color: rgba\(255,255,255,\.86\);[^}]*text-decoration: underline;/s);
+  assert.doesNotMatch(html, /dayEventDetailNote\.textContent=event\.description \|\| event\.note \|\| ''/);
 });
 
 test('shared custom event links import the event and open signup or decline actions', () => {
@@ -737,8 +752,8 @@ test('itinerary activity RSVPs show attendee names, declined state, and editable
   assert.match(html, /\.activity-signup\.is-selected/);
   assert.match(html, /activity-card-actions/);
   assert.match(html, /data-activity-delete="\$\{escapeHtml\(activityId\)\}"/);
-  assert.match(html, /const deleteLink=variant==='detail'&&state==='declined'\?`<button class="activity-delete-link" type="button" data-activity-delete="\$\{escapeHtml\(activityId\)\}">Delete event<\/button>`:''/);
-  assert.match(html, /\.activity-delete-link \{[^}]*background: none[^}]*border: 0[^}]*color: #ff6b6b[^}]*text-decoration: underline[^}]*text-decoration-color: #ff6b6b/);
+  assert.match(html, /const deleteLink=variant==='detail'&&state==='declined'\?`<button class="activity-delete-link" type="button" data-activity-delete="\$\{escapeHtml\(activityId\)\}">Delete<\/button>`:''/);
+  assert.match(html, /\.activity-delete-link \{[^}]*background: none[^}]*border: 0[^}]*color: rgba\(255,107,107,\.72\)[^}]*opacity: \.72[^}]*text-decoration: underline[^}]*text-decoration-color: rgba\(255,107,107,\.62\)/);
   assert.doesNotMatch(html, /activity-delete-link[^}]*border-radius/);
   assert.match(html, /activity-attendees/);
   assert.match(html, /function renderCompactCalendarEvent\(event, full\)/);
