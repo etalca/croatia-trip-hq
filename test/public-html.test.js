@@ -449,13 +449,27 @@ test('mobile polish keeps touch actions visible and flight cards readable', () =
 test('mobile dashboard keeps todo chips sticky while trip cards and itinerary scroll', () => {
   assert.match(html, /dashboardGuestName\.textContent=name \? `Hi, \$\{name\}\. \$\{hasOutstandingTodos \? 'You have a task to complete\.' : 'You’re all caught up\.'\}` : 'Hi'/);
   const tripInfoBlock = html.slice(html.indexOf('id="tripInfo"'), html.indexOf('id="dinnerPicker"'));
-  assert.match(tripInfoBlock, /<header><div><h2 class="dashboard-name" id="dashboardGuestName">Hi<\/h2><div class="dashboard-status"/);
+  assert.match(tripInfoBlock, /<header><div><h2 class="dashboard-name" id="dashboardGuestName">Hi<\/h2><div class="dashboard-status" id="dashboardStatus"/);
+  assert.match(tripInfoBlock, /<button class="todo-chip todo-toggle" id="todoToggleChip" type="button" aria-expanded="false">Show done<\/button>/);
   assert.match(tripInfoBlock, /<div class="trip-info-scroll">[\s\S]*?<div class="dashboard-hero">/);
   assert.match(tripInfoBlock, /<section class="calendar-list embedded-itinerary" id="calendarItems" aria-label="Trip itinerary"><\/section>[\s\S]*?<\/section>/);
   assert.match(html, /#tripInfo \.dashboard-card header \{ flex: 0 0 auto; \}/);
   assert.match(html, /#tripInfo \.trip-info-scroll \{ flex: 1 1 auto; overflow: hidden; min-height: 0; display: flex; flex-direction: column; gap: 10px; scrollbar-width: none; -ms-overflow-style: none; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; \}/);
   assert.match(html, /#tripInfo \.calendar-list \{ overflow: visible; min-height: auto; \}/);
   assert.match(html, /#tripInfo \.trip-info-scroll::-webkit-scrollbar \{ width: 0; height: 0; display: none; \}/);
+});
+
+test('mobile todo chips collapse to one line and can expand completed tasks', () => {
+  assert.match(html, /function syncTodoChipCollapse\(\)\{/);
+  assert.match(html, /const todoDoneCount=\[flightStatusChip,dinnerStatusChip,calendarStatusChip,prepStatusChip\]\.filter\(chip=>chip\.classList\.contains\('done'\)\)\.length/);
+  assert.match(html, /todoToggleChip\.hidden=todoDoneCount===0/);
+  assert.match(html, /dashboardStatus\.classList\.toggle\('show-done', todoDoneExpanded\)/);
+  assert.match(html, /todoToggleChip\.setAttribute\('aria-expanded', String\(todoDoneExpanded\)\)/);
+  assert.match(html, /todoToggleChip\.textContent=todoDoneExpanded \? 'Hide done' : `Show \$\{todoDoneCount\} done`/);
+  assert.match(html, /todoToggleChip\.addEventListener\('click',\(\)=>\{ todoDoneExpanded=!todoDoneExpanded; syncTodoChipCollapse\(\); \}\)/);
+  assert.match(html, /@media \(max-width: 760px\) \{[\s\S]*\.dashboard-status \{[^}]*flex-wrap: nowrap;[^}]*overflow-x: auto;[^}]*max-height: 30px;[^}]*white-space: nowrap;/);
+  assert.match(html, /@media \(max-width: 760px\) \{[\s\S]*\.dashboard-status:not\(\.show-done\) \.todo-chip\.done \{ display: none; \}/);
+  assert.match(html, /@media \(max-width: 760px\) \{[\s\S]*\.dashboard-status\.show-done \{ max-height: none; flex-wrap: wrap; \}/);
 });
 
 test('itinerary only renders claimed dinners as two-hour Dinner events', () => {
