@@ -265,7 +265,7 @@ test('dashboard itinerary cards use subtle expand icons to open an iCal-style da
   assert.match(html, /id="closeDayView"/);
   assert.match(html, /id="previousDayView"/);
   assert.match(html, /id="nextDayView"/);
-  assert.match(html, /<div class="day-view-nav" aria-label="Change day"><button class="back" id="previousDayView" type="button">Previous day<\/button><button class="back" id="nextDayView" type="button">Next day<\/button><\/div>/);
+  assert.match(html, /<div class="day-view-nav" id="dayViewNav" aria-label="Change day"><button class="back" id="previousDayView" type="button">Previous day<\/button><button class="back" id="nextDayView" type="button">Next day<\/button><\/div>/);
   assert.match(html, /function openDayView\(date\)/);
   assert.match(html, /let activeDayViewDate=''/);
   assert.match(html, /function closeDayView\(\)/);
@@ -581,8 +581,9 @@ test('itinerary activity RSVPs show attendee names, declined state, and editable
   assert.match(html, /function renderActivityActions\(activityId\)\{ const state=activityRsvpState\(activityId\);/);
   assert.match(html, /data-activity-signup="\$\{escapeHtml\(activityId\)\}" aria-pressed="\$\{state==='signed'\?'true':'false'\}"/);
   assert.match(html, /data-activity-decline="\$\{escapeHtml\(activityId\)\}" aria-pressed="\$\{state==='declined'\?'true':'false'\}"/);
-  assert.match(html, /activity-signup is-primary \$\{state==='signed'\?'is-selected':''\}/);
-  assert.match(html, /activity-signup is-muted \$\{state==='declined'\?'is-selected':''\}/);
+  assert.match(html, /activity-signup is-primary \$\{state==='signed'\?'is-selected':''\} \$\{state==='declined'\?'is-unselected':''\}/);
+  assert.match(html, /activity-signup is-muted \$\{state==='declined'\?'is-selected':''\} \$\{state==='signed'\?'is-unselected':''\}/);
+  assert.match(html, /\.activity-signup\.is-unselected \{[^}]*opacity: \.2/);
   assert.match(html, /\$\{state==='signed'\?'Signed up':'Sign up'\}/);
   assert.match(html, /\$\{state==='declined'\?'Declined':'Decline'\}/);
   assert.match(html, /\.activity-signup\.is-selected/);
@@ -600,6 +601,10 @@ test('itinerary activity RSVPs show attendee names, declined state, and editable
   assert.match(html, /function renderDayEventDetail\(event, full\)/);
   assert.match(html, /id="dayEventDetail"/);
   assert.match(html, /id="dayEventDetailActions"/);
+  assert.match(html, /id="dayViewNav"/);
+  assert.match(html, /function setDayViewNavHidden\(hidden\)\{ dayViewNav\.hidden=hidden; \}/);
+  assert.match(html, /function closeDayEventDetail\(\)\{ activeDayEventIndex=-1; dayEventDetail\.hidden=true; setDayViewNavHidden\(false\); \}/);
+  assert.match(html, /function openDayEventDetail\(index\)\{ const event=activeDayViewEvents\[index\]; if\(event\)\{ activeDayEventIndex=index; setDayViewNavHidden\(true\); renderDayEventDetail\(event, activeDayViewFull\); \} \}/);
   const detailMarkup = html.slice(html.indexOf('id="dayEventDetail"'), html.indexOf('id="prepPlanner"'));
   assert.doesNotMatch(detailMarkup, /id="closeDayEventDetailButton"/);
   assert.doesNotMatch(detailMarkup, /aria-label="Close event details">×/);
@@ -650,7 +655,7 @@ test('people profiles live in an animated fit-content dashboard tab control', ()
   assert.match(html, /\.board-tab-indicator/);
   assert.match(html, /transition: transform \.24s ease, width \.24s ease/);
   assert.match(html, /@media \(max-width: 760px\) \{[\s\S]*\.trip-info-scroll \{[^}]*position: relative/);
-  assert.match(html, /@media \(max-width: 760px\) \{[\s\S]*\.trip-tabs \{[^}]*position: absolute[^}]*bottom: max\(-17px, calc\(env\(safe-area-inset-bottom\) - 17px\)\)[^}]*left: 50%[^}]*transform: translateX\(-50%\)[^}]*z-index: 4/);
+  assert.match(html, /@media \(max-width: 760px\) \{[\s\S]*\.trip-tabs \{[^}]*position: absolute[^}]*bottom: max\(-17px, calc\(env\(safe-area-inset-bottom\) - 17px\)\)[^}]*left: 50%[^}]*transform: translateX\(-50%\)[^}]*z-index: 40/);
   assert.match(html, /@media \(max-width: 760px\) \{[\s\S]*\.trip-tab-panel \{[^}]*padding-bottom: 82px/);
   assert.doesNotMatch(html, /@media \(max-width: 760px\) \{[\s\S]*\.trip-tabs \{[^}]*margin-bottom: 10px/);
   assert.match(html, /#tripInfo \.trip-info-scroll \{[^}]*display: flex/);
