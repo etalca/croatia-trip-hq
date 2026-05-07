@@ -241,6 +241,7 @@ test('dashboard embeds itinerary directly with floating header instead of a wrap
   assert.doesNotMatch(html, /\.embedded-itinerary \{[^}]*border:/);
   assert.doesNotMatch(html, /\.embedded-itinerary \{[^}]*background:/);
   assert.match(html, /\.itinerary-heading \{/);
+  assert.match(html, /\.itinerary-heading \.secondary-action \{[^}]*height: 25\.5px;[^}]*min-height: 0;/s);
   assert.match(html, /\.embedded-itinerary \{ display: grid; gap: 8px; padding-top: 5px; \}/);
   assert.match(html, /\.calendar-week \{/);
   assert.match(html, /\.calendar-day \{/);
@@ -270,7 +271,7 @@ test('dashboard itinerary cards use subtle expand icons to open an iCal-style da
   assert.match(html, /<div class="day-view-nav" id="dayViewNav" aria-label="Change day"><button class="back" id="previousDayView" type="button">Previous day<\/button><button class="back" id="nextDayView" type="button">Next day<\/button><\/div>/);
   assert.match(html, /dayViewAddEventButton=document\.getElementById\('dayViewAddEvent'\)/);
   assert.match(html, /dayViewAddEventButton\.addEventListener\('click',\(\)=>openEventPlanner\(activeDayViewDate\)\)/);
-  assert.match(html, /\.day-view-add-event \{[^}]*position: absolute;[^}]*left: 20px;[^}]*bottom: 20px;/s);
+  assert.match(html, /\.day-view-add-event \{[^}]*position: absolute;[^}]*left: 20px;[^}]*bottom: 20px;[^}]*height: 25\.5px;[^}]*min-height: 0;/s);
   assert.match(html, /\.day-event-detail:not\(\[hidden\]\) ~ \.day-view-add-event \{ display: none; \}/);
   assert.match(html, /function openDayView\(date\)/);
   assert.match(html, /let activeDayViewDate=''/);
@@ -619,7 +620,7 @@ test('shared custom event links import the event and open signup or decline acti
   assert.match(html, /openDayEventDetail\(index\)/);
   assert.match(html, /function setCustomEventDecline\(eventId\)/);
   assert.match(html, /data-custom-event-decline/);
-  assert.match(html, /\$\{declined&&variant==='detail'\?'Declined':'Decline'\}/);
+  assert.match(html, /\$\{declineLabel\}<\/button>/);
   assert.match(html, /openLinkedCalendarEvent\(sharedEventId\)/);
 });
 
@@ -747,8 +748,8 @@ test('itinerary activity RSVPs show attendee names, declined state, and editable
   assert.match(html, /activity-signup is-primary \$\{state==='signed'\?'is-selected':''\} \$\{state==='declined'\?'is-unselected':''\}/);
   assert.match(html, /activity-signup is-muted \$\{state==='declined'\?'is-selected':''\} \$\{state==='signed'\?'is-unselected':''\}/);
   assert.match(html, /\.activity-signup\.is-unselected \{[^}]*opacity: \.2/);
-  assert.match(html, /const signupLabel=variant==='day-hover'\?'Sign up':\(state==='signed'\?'Signed up':'Sign up'\)/);
-  assert.match(html, /const declineLabel=variant==='day-hover'\?'Decline':\(state==='declined'\?'Declined':'Decline'\)/);
+  assert.match(html, /const signupLabel=state==='signed'\?'Signed up':'Sign up'/);
+  assert.match(html, /const declineLabel=state==='declined'\?'Declined':'Decline'/);
   assert.match(html, /\.activity-signup\.is-selected/);
   assert.match(html, /activity-card-actions/);
   assert.match(html, /data-activity-delete="\$\{escapeHtml\(activityId\)\}"/);
@@ -817,9 +818,10 @@ test('desktop day-view RSVP actions appear on hover beside eligible events', () 
   assert.match(html, /\.day-view-event:hover > \.day-view-hover-actions, \.day-view-event:focus-within > \.day-view-hover-actions \{[^}]*opacity: 1 !important;[^}]*pointer-events: auto;/s);
   assert.match(html, /@media \(max-width: 760px\) \{[\s\S]*\.day-view-hover-actions \{ display: none; \}/);
   assert.match(html, /renderActivityActions\(activityId, variant='detail'\)/);
-  assert.match(html, /variant==='day-hover'\?'Sign up'/);
+  assert.doesNotMatch(html, /variant==='day-hover'\?'Sign up'/);
   assert.match(html, /renderCustomEventActions\(eventId, variant='detail'\)/);
-  assert.match(html, /variant==='day-hover'\?\(event\?\.inviteMode==='open'\?'Sign up':'Accept'\)/);
+  assert.match(html, /const signupLabel=variant==='day-hover'\?\(signed\?'Signed up':\(event\?\.inviteMode==='open'\?'Sign up':'Accept'\)\):\(signed\?'Going':'Join'\)/);
+  assert.match(html, /const declineLabel=variant==='day-hover'\?\(declined\?'Declined':'Decline'\):\(declined\?'Declined':'Decline'\)/);
   assert.match(html, /const signup=\(!isCreator && \(event\?\.inviteMode==='open'\|\|event\?\.inviteMode==='invite-only'\)\)/);
   assert.match(html, /dayViewTimeline\.querySelectorAll\('\[data-custom-event-signup\]'\)\.forEach/);
   assert.match(html, /dayViewTimeline\.querySelectorAll\('\[data-custom-event-decline\]'\)\.forEach/);
@@ -842,6 +844,8 @@ test('people profiles live in an animated fit-content dashboard tab control', ()
   assert.match(tripInfoBlock, /id="peopleList"/);
   assert.doesNotMatch(tripInfoBlock, /id="myPeopleCard"/);
   assert.match(html, /\.board-tabs \{[^}]*width: fit-content/);
+  assert.match(html, /\.trip-tabs \{[^}]*position: absolute;[^}]*bottom: 20px;[^}]*left: 50%;[^}]*transform: translateX\(-50%\);[^}]*z-index: 6;[^}]*margin: 0;/s);
+  assert.match(html, /#tripInfo \.dashboard-card \{[^}]*padding-bottom: 64px/s);
   assert.match(html, /\.board-tab-indicator/);
   assert.match(html, /transition: transform \.24s ease, width \.24s ease/);
   assert.match(html, /@media \(max-width: 760px\) \{[\s\S]*\.trip-info-scroll \{[^}]*position: relative/);
