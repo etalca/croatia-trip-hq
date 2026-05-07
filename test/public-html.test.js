@@ -580,6 +580,11 @@ test('itinerary activity RSVPs show attendee names, declined state, and editable
   assert.match(html, /data-activity-decline="\$\{escapeHtml\(activityId\)\}"/);
   assert.match(html, /activity-card-actions/);
   assert.match(html, /activity-attendees/);
+  assert.match(html, /function renderCompactCalendarEvent\(event, full\)/);
+  assert.match(html, /function renderExpandedDayEvent\(event, full\)/);
+  assert.match(html, /dayEvents\.map\(event=>renderCompactCalendarEvent\(event, full\)\)/);
+  assert.match(html, /function renderExpandedDayEvent\(event, full\)\{ return `[\s\S]*renderActivityActions\(event\.id\)[\s\S]*<\/article>`; \}/);
+  assert.doesNotMatch(html, /dayEvents\.map\(event=>`<article class="calendar-event[\s\S]*renderActivityActions\(event\.id\)/);
   assert.match(html, /is-activity \$\{activityStateClass\(event\.id\)\}/);
   assert.match(html, /\.activity-main \{[^}]*text-align: left/);
   assert.match(html, /\.calendar-event\.is-activity\.is-pending/);
@@ -597,8 +602,10 @@ test('itinerary activity RSVPs show attendee names, declined state, and editable
   assert.match(html, /Sign up/);
   assert.match(html, /Decline/);
   assert.doesNotMatch(html, /You're in/);
-  assert.match(html, /calendarItems\.querySelectorAll\('\[data-activity-signup\]'\)\.forEach/);
-  assert.match(html, /calendarItems\.querySelectorAll\('\[data-activity-decline\]'\)\.forEach/);
+  assert.match(html, /dayViewTimeline\.querySelectorAll\('\[data-activity-signup\]'\)\.forEach/);
+  assert.match(html, /dayViewTimeline\.querySelectorAll\('\[data-activity-decline\]'\)\.forEach/);
+  assert.doesNotMatch(html, /calendarItems\.querySelectorAll\('\[data-activity-signup\]'\)\.forEach/);
+  assert.doesNotMatch(html, /calendarItems\.querySelectorAll\('\[data-activity-decline\]'\)\.forEach/);
   assert.match(html, /dinners\.forEach\(slot=>eventsByDate\[slot\.date\]\?\.push\(\{title:'Dinner'/);
   assert.doesNotMatch(html, /Dinner placeholder/);
 });
