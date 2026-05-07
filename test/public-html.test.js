@@ -450,7 +450,6 @@ test('mobile dashboard keeps todo chips sticky while trip cards and itinerary sc
   assert.match(html, /dashboardGuestName\.textContent=name \? `Hi, \$\{name\}\. \$\{hasOutstandingTodos \? 'You have a task to complete\.' : 'You’re all caught up\.'\}` : 'Hi'/);
   const tripInfoBlock = html.slice(html.indexOf('id="tripInfo"'), html.indexOf('id="dinnerPicker"'));
   assert.match(tripInfoBlock, /<header><div><h2 class="dashboard-name" id="dashboardGuestName">Hi<\/h2><div class="dashboard-status" id="dashboardStatus"/);
-  assert.match(tripInfoBlock, /<button class="todo-chip todo-toggle" id="todoToggleChip" type="button" aria-expanded="false">Show done<\/button>/);
   assert.match(tripInfoBlock, /<div class="trip-info-scroll">[\s\S]*?<div class="dashboard-hero">/);
   assert.match(tripInfoBlock, /<section class="calendar-list embedded-itinerary" id="calendarItems" aria-label="Trip itinerary"><\/section>[\s\S]*?<\/section>/);
   assert.match(html, /#tripInfo \.dashboard-card header \{ flex: 0 0 auto; \}/);
@@ -459,17 +458,13 @@ test('mobile dashboard keeps todo chips sticky while trip cards and itinerary sc
   assert.match(html, /#tripInfo \.trip-info-scroll::-webkit-scrollbar \{ width: 0; height: 0; display: none; \}/);
 });
 
-test('mobile todo chips collapse to one line and can expand completed tasks', () => {
-  assert.match(html, /function syncTodoChipCollapse\(\)\{/);
-  assert.match(html, /const todoDoneCount=\[flightStatusChip,dinnerStatusChip,calendarStatusChip,prepStatusChip\]\.filter\(chip=>chip\.classList\.contains\('done'\)\)\.length/);
-  assert.match(html, /todoToggleChip\.hidden=todoDoneCount===0/);
-  assert.match(html, /dashboardStatus\.classList\.toggle\('show-done', todoDoneExpanded\)/);
-  assert.match(html, /todoToggleChip\.setAttribute\('aria-expanded', String\(todoDoneExpanded\)\)/);
-  assert.match(html, /todoToggleChip\.textContent=todoDoneExpanded \? 'Hide done' : `Show \$\{todoDoneCount\} done`/);
-  assert.match(html, /todoToggleChip\.addEventListener\('click',\(\)=>\{ todoDoneExpanded=!todoDoneExpanded; syncTodoChipCollapse\(\); \}\)/);
-  assert.match(html, /@media \(max-width: 760px\) \{[\s\S]*\.dashboard-status \{[^}]*flex-wrap: nowrap;[^}]*overflow-x: auto;[^}]*max-height: 30px;[^}]*white-space: nowrap;/);
-  assert.match(html, /@media \(max-width: 760px\) \{[\s\S]*\.dashboard-status:not\(\.show-done\) \.todo-chip\.done \{ display: none; \}/);
-  assert.match(html, /@media \(max-width: 760px\) \{[\s\S]*\.dashboard-status\.show-done \{ max-height: none; flex-wrap: wrap; \}/);
+test('mobile todo chips stay bounded and horizontally scrollable without pushing the title wide', () => {
+  assert.match(html, /\.dashboard-card header > div \{ min-width: 0; flex: 1 1 auto; overflow: hidden; \}/);
+  assert.match(html, /\.dashboard-name \{[^}]*overflow-wrap: anywhere/);
+  assert.match(html, /@media \(max-width: 760px\) \{[\s\S]*\.dashboard-status \{[^}]*width: 100%;[^}]*max-width: 100%;[^}]*flex-wrap: nowrap;[^}]*overflow-x: auto;[^}]*overflow-y: hidden;[^}]*max-height: 30px;[^}]*white-space: nowrap;[^}]*touch-action: pan-x;/);
+  assert.match(html, /@media \(max-width: 760px\) \{[\s\S]*\.dashboard-status \.todo-chip \{ flex: 0 0 auto; \}/);
+  assert.doesNotMatch(html, /dashboardStatus\.classList\.toggle\('show-done'/);
+  assert.doesNotMatch(html, /\.dashboard-status:not\(\.show-done\) \.todo-chip\.done \{ display: none; \}/);
 });
 
 test('itinerary only renders claimed dinners as two-hour Dinner events', () => {
@@ -679,8 +674,8 @@ test('people profiles live in an animated fit-content dashboard tab control', ()
   assert.match(html, /\.board-tab-indicator/);
   assert.match(html, /transition: transform \.24s ease, width \.24s ease/);
   assert.match(html, /@media \(max-width: 760px\) \{[\s\S]*\.trip-info-scroll \{[^}]*position: relative/);
-  assert.match(html, /@media \(max-width: 760px\) \{[\s\S]*\.trip-tabs \{[^}]*position: absolute[^}]*bottom: max\(-17px, calc\(env\(safe-area-inset-bottom\) - 17px\)\)[^}]*left: 50%[^}]*transform: translateX\(-50%\)[^}]*z-index: 0/);
-  assert.match(html, /@media \(max-width: 760px\) \{[\s\S]*\.trip-tab-panel \{[^}]*padding-bottom: 82px/);
+  assert.match(html, /@media \(max-width: 760px\) \{[\s\S]*\.trip-tabs \{[^}]*position: fixed[^}]*bottom: max\(14px, calc\(env\(safe-area-inset-bottom\) \+ 14px\)\)[^}]*left: 50%[^}]*transform: translateX\(-50%\)[^}]*z-index: 30[^}]*pointer-events: auto/);
+  assert.match(html, /@media \(max-width: 760px\) \{[\s\S]*\.trip-tab-panel \{[^}]*padding-bottom: 104px/);
   assert.doesNotMatch(html, /@media \(max-width: 760px\) \{[\s\S]*\.trip-tabs \{[^}]*margin-bottom: 10px/);
   assert.match(html, /#tripInfo \.trip-info-scroll \{[^}]*display: flex/);
   assert.match(html, /#tripInfo \.trip-info-scroll \{[^}]*overflow: hidden/);
@@ -700,7 +695,7 @@ test('people profiles live in an animated fit-content dashboard tab control', ()
   assert.match(html, /requestAnimationFrame\(\(\)=>syncTripTabIndicator\(active\)\)/);
   assert.match(html, /setTripTab\('overview'\)/);
   assert.match(html, /setTripTab\('people'\)/);
-  assert.match(html, /@media \(max-width: 760px\) \{[\s\S]*\.trip-tabs \{[^}]*position: absolute[^}]*width: fit-content/);
+  assert.match(html, /@media \(max-width: 760px\) \{[\s\S]*\.trip-tabs \{[^}]*position: fixed[^}]*width: fit-content/);
   assert.match(html, /@media \(max-width: 760px\) \{[\s\S]*#tripInfo \.dashboard-card \{[^}]*height: calc\(100svh - 20px\)[^}]*max-height: calc\(100svh - 20px\)/);
   assert.match(html, /@media \(max-width: 760px\) \{[\s\S]*\.trip-tabs \.board-tab-indicator \{[^}]*display: none/);
   assert.match(html, /@media \(max-width: 760px\) \{[\s\S]*\.trip-tabs \.board-tab.active \{[^}]*background: rgba\(255,255,255,\.80\)[^}]*color: var\(--ink\)/);
