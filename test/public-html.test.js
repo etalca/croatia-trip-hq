@@ -547,9 +547,11 @@ test('custom calendar events render with title, time range, attendees, descripti
   assert.match(html, /data-custom-event-calendar/);
 });
 
-test('custom event form scrolls on short viewports and summarizes invitees naturally', () => {
+test('custom event form scrolls on short viewports and preserves field focus outlines', () => {
   assert.match(html, /#eventPlanner \.dashboard-card \{[^}]*overflow: hidden;/s);
   assert.match(html, /#eventPlanner \.dinner-form \{[^}]*overflow-y: auto;[^}]*min-height: 0;/s);
+  assert.match(html, /#eventPlanner \.dinner-form \{[^}]*padding: 4px 8px 12px;[^}]*margin: -4px 0 0;/s);
+  assert.match(html, /#eventPlanner input:focus, #eventPlanner select:focus, #eventPlanner textarea:focus \{[^}]*outline: 2px solid rgba\(255,255,255,\.78\);[^}]*outline-offset: 2px;/s);
   assert.match(html, /<p class="event-invitee-summary" id="eventInviteeSummary">Just me<\/p>/);
   assert.match(html, /function selectedInviteeNames\(\)/);
   assert.match(html, /function formatInviteeSummary\(names\)/);
