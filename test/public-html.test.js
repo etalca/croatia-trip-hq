@@ -573,3 +573,20 @@ test('itinerary includes curated planning prompts without changing claimed-dinne
   assert.match(html, /dinners\.forEach\(slot=>eventsByDate\[slot\.date\]\?\.push\(\{title:'Dinner'/);
   assert.doesNotMatch(html, /Dinner placeholder/);
 });
+
+test('staging review mode enters the trip dashboard without magic-link signup', () => {
+  assert.match(html, /const REVIEW_NAME_KEY='reviewName'/);
+  assert.match(html, /const DEFAULT_STAGING_REVIEW_NAME='Tanner'/);
+  assert.match(html, /function isStagingReviewHost\(hostname=window\.location\.hostname\)/);
+  assert.match(html, /function stagingReviewName\(\)/);
+  assert.match(html, /hostname\.includes\('vercel\.app'\)/);
+  assert.match(html, /hostname\.includes\('staging\.croatia\.tannerbegin\.com'\)/);
+  assert.match(html, /params\.get\(REVIEW_NAME_KEY\) \|\| DEFAULT_STAGING_REVIEW_NAME/);
+  assert.match(html, /crew\.find\(name=>name\.toLowerCase\(\)===requested\.toLowerCase\(\)\)/);
+  assert.doesNotMatch(html, /canonicalCrewName/);
+  assert.match(html, /currentGuest=\{ name:reviewName, review:true \}/);
+  assert.match(html, /fields\.name\.value=reviewName; claimNameSelect\.value=reviewName/);
+  assert.match(html, /localStorage\.setItem\(NAME_KEY,reviewName\)/);
+  assert.match(html, /if\(params\.has\(REVIEW_NAME_KEY\)\) history\.replaceState\(null,'',window\.location\.pathname\)/);
+  assert.match(html, /Reviewing as \$\{reviewName\}/);
+});

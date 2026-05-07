@@ -556,6 +556,8 @@
   let currentGuest=null;
   const PENDING_CLAIM_KEY='korculaPendingClaimName';
   const CALENDAR_KEY='korculaCalendarAdded';
+  const REVIEW_NAME_KEY='reviewName';
+  const DEFAULT_STAGING_REVIEW_NAME='Tanner';
   const PREP_CHECKLIST_KEY='korculaPrepChecklist';
   const TRIP_PREFERENCES_KEY='korculaTripPreferences';
   const prepItems=[{key:'passport',label:'Passport checked'},{key:'swimsuit',label:'Swimsuit packed'},{key:'sunscreen',label:'Sunscreen / hat ready'},{key:'adapter',label:'Power adapter packed'},{key:'transport',label:'Ferry / transport plan reviewed'}];
@@ -574,6 +576,9 @@
   if(rememberedName()) fields.name.value=rememberedName();
   function savedFlights(){ return cachedFlights || readLocalFlights(); }
   function authHeaders(){ return authToken ? { authorization:`Bearer ${authToken}` } : {}; }
+  function isStagingReviewHost(hostname=window.location.hostname){ return hostname==='localhost' || hostname==='127.0.0.1' || hostname.includes('vercel.app') || hostname.includes('staging.croatia.tannerbegin.com'); }
+  function stagingReviewName(){ const hostname=window.location.hostname; const requested=params.get(REVIEW_NAME_KEY) || DEFAULT_STAGING_REVIEW_NAME; const matched=crew.find(name=>name.toLowerCase()===requested.toLowerCase()) || ''; return isStagingReviewHost(hostname) ? matched : ''; }
+  function applyStagingReviewEntry(){ const reviewName=stagingReviewName(); if(!reviewName) return false; currentGuest={ name:reviewName, review:true }; fields.name.value=reviewName; claimNameSelect.value=reviewName; localStorage.setItem(NAME_KEY,reviewName); if(params.has(REVIEW_NAME_KEY)) history.replaceState(null,'',window.location.pathname); showToast(`Reviewing as ${reviewName}`); return true; }
   function friendlyTitle(){ heroTitle.textContent = currentGuest?.name ? `${currentGuest.name}, your week on Korčula awaits.` : 'Your week on Korčula begins here.'; }
   function setClaimMessage(text){ claimMessage.textContent=text; claimMessage.hidden = !text; }
   function flightBoard(){ return cachedBoard || readLocalBoard(); }
@@ -712,6 +717,7 @@
     currentGuest=payload.guest; fields.name.value=currentGuest.name; claimNameSelect.value=currentGuest.name; localStorage.setItem(NAME_KEY,currentGuest.name); localStorage.removeItem(PENDING_CLAIM_KEY); friendlyTitle(); setPrimaryCta(); return currentGuest;
   }
   async function refreshAuthState(){
+    if(applyStagingReviewEntry()){ setPrimaryCta(); await loadRemoteState(currentGuest.name); return; }
     rememberAuthToken(tokenFromAuthRedirect() || localStorage.getItem('korculaAuthToken') || '');
     const claimFromUrl=new URLSearchParams(window.location.search).get('claim') || '';
     const pendingName=claimFromUrl || localStorage.getItem(PENDING_CLAIM_KEY) || '';
