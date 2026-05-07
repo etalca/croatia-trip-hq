@@ -541,6 +541,32 @@ test('custom calendar events render with title, time range, attendees, descripti
   assert.match(html, /data-custom-event-calendar/);
 });
 
+test('custom event form scrolls on short viewports and summarizes invitees naturally', () => {
+  assert.match(html, /#eventPlanner \.dashboard-card \{[^}]*overflow: hidden;/s);
+  assert.match(html, /#eventPlanner \.dinner-form \{[^}]*overflow-y: auto;[^}]*min-height: 0;/s);
+  assert.match(html, /<p class="event-invitee-summary" id="eventInviteeSummary">Just me<\/p>/);
+  assert.match(html, /function selectedInviteeNames\(\)/);
+  assert.match(html, /function formatInviteeSummary\(names\)/);
+  assert.match(html, /if\(!names\.length\) return 'Just me'/);
+  assert.match(html, /return formatNameList\(\['me',\.\.\.names\]\)/);
+  assert.match(html, /function syncEventInviteeSummary\(\)/);
+  assert.match(html, /eventInvitees\.addEventListener\('change',syncEventInviteeSummary\)/);
+  assert.doesNotMatch(html, /No attendees yet/);
+});
+
+test('overlapping day-view events are grouped into side-by-side pressure columns', () => {
+  assert.match(html, /function eventsOverlap\(a,b\)/);
+  assert.match(html, /function layoutDayViewEvents\(events\)/);
+  assert.match(html, /overlapGroup/);
+  assert.match(html, /overlapColumn/);
+  assert.match(html, /overlapColumns/);
+  assert.match(html, /function eventBlockStyle\(event\)/);
+  assert.ok(html.includes('left:calc(10px + ${event.overlapColumn||0}*((100% - 18px)/${event.overlapColumns||1}))'));
+  assert.ok(html.includes('width:calc((100% - 18px)/${event.overlapColumns||1} - 6px)'));
+  assert.match(html, /const laidOutEvents=layoutDayViewEvents\(activeDayViewEvents\)/);
+  assert.match(html, /laidOutEvents\.map\(\(event,index\)=>renderExpandedDayEvent\(event, full\)/);
+});
+
 test('magic-link sign-up gate is compact and centered on mobile', () => {
   assert.match(html, /gate\.classList\.toggle\('auth-mode', !currentGuest\)/);
   assert.match(html, /@media \(max-width: 760px\) \{[\s\S]*\.gate\.auth-mode \{ place-items: center; \}[\s\S]*\.gate\.auth-mode \.panel \{ width: min\(100%, 380px\); max-height: none; min-height: 0; align-self: center; \}/);
