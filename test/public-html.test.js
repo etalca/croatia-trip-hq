@@ -578,6 +578,12 @@ test('itinerary activity RSVPs show attendee names, declined state, and editable
   assert.match(html, /function activityAttendeeSummary\(activityId\)/);
   assert.match(html, /data-activity-signup="\$\{escapeHtml\(activityId\)\}"/);
   assert.match(html, /data-activity-decline="\$\{escapeHtml\(activityId\)\}"/);
+  assert.match(html, /function renderActivityActions\(activityId\)\{ const state=activityRsvpState\(activityId\);/);
+  assert.match(html, /data-activity-signup="\$\{escapeHtml\(activityId\)\}" aria-pressed="\$\{state==='signed'\?'true':'false'\}"/);
+  assert.match(html, /data-activity-decline="\$\{escapeHtml\(activityId\)\}" aria-pressed="\$\{state==='declined'\?'true':'false'\}"/);
+  assert.match(html, /activity-signup is-primary \$\{state==='signed'\?'is-selected':''\}/);
+  assert.match(html, /activity-signup is-muted \$\{state==='declined'\?'is-selected':''\}/);
+  assert.match(html, /\.activity-signup\.is-selected/);
   assert.match(html, /activity-card-actions/);
   assert.match(html, /activity-attendees/);
   assert.match(html, /function renderCompactCalendarEvent\(event, full\)/);
@@ -586,6 +592,8 @@ test('itinerary activity RSVPs show attendee names, declined state, and editable
   assert.match(html, /function renderActivityStateIcon\(activityId\)/);
   assert.match(html, /activityRsvpState\(activityId\)==='signed'\?'<span class="activity-state-icon is-signed" aria-label="Signed up">✓<\/span>':/);
   assert.match(html, /activityRsvpState\(activityId\)==='declined'\?'<span class="activity-state-icon is-declined" aria-label="Declined">×<\/span>':''/);
+  assert.doesNotMatch(html, /\.activity-state-icon \{[^}]*border-radius/);
+  assert.doesNotMatch(html, /\.activity-state-icon\.is-declined \{[^}]*border:/);
   assert.match(html, /function renderExpandedDayEvent\(event, full\)\{ return `[\s\S]*data-day-event="\$\{escapeHtml\(event\.id\|\|'\'\)\}"[\s\S]*renderActivityStateIcon\(event\.id\)[\s\S]*<\/article>`; \}/);
   assert.match(html, /function renderDayEventDetail\(event, full\)/);
   assert.match(html, /id="dayEventDetail"/);
@@ -636,6 +644,10 @@ test('people profiles live in an animated fit-content dashboard tab control', ()
   assert.match(html, /\.board-tabs \{[^}]*width: fit-content/);
   assert.match(html, /\.board-tab-indicator/);
   assert.match(html, /transition: transform \.24s ease, width \.24s ease/);
+  assert.match(html, /@media \(max-width: 760px\) \{[\s\S]*\.trip-info-scroll \{[^}]*position: relative/);
+  assert.match(html, /@media \(max-width: 760px\) \{[\s\S]*\.trip-tabs \{[^}]*position: absolute[^}]*bottom: max\(8px, env\(safe-area-inset-bottom\)\)[^}]*left: 50%[^}]*transform: translateX\(-50%\)[^}]*z-index: 4/);
+  assert.match(html, /@media \(max-width: 760px\) \{[\s\S]*\.trip-tab-panel \{[^}]*padding-bottom: 64px/);
+  assert.doesNotMatch(html, /@media \(max-width: 760px\) \{[\s\S]*\.trip-tabs \{[^}]*margin-bottom: 10px/);
   assert.match(html, /#tripInfo \.trip-info-scroll \{[^}]*display: flex/);
   assert.match(html, /#tripInfo \.trip-info-scroll \{[^}]*overflow: hidden/);
   assert.match(html, /\.trip-tab-viewport \{[^}]*flex: 1 1 auto[^}]*overflow: hidden/);
@@ -654,7 +666,7 @@ test('people profiles live in an animated fit-content dashboard tab control', ()
   assert.match(html, /requestAnimationFrame\(\(\)=>syncTripTabIndicator\(active\)\)/);
   assert.match(html, /setTripTab\('overview'\)/);
   assert.match(html, /setTripTab\('people'\)/);
-  assert.match(html, /@media \(max-width: 760px\) \{[\s\S]*\.trip-tabs \{[^}]*align-self: flex-start[^}]*width: fit-content/);
+  assert.match(html, /@media \(max-width: 760px\) \{[\s\S]*\.trip-tabs \{[^}]*position: absolute[^}]*width: fit-content/);
   assert.match(html, /@media \(max-width: 760px\) \{[\s\S]*#tripInfo \.dashboard-card \{[^}]*height: calc\(100svh - 20px\)[^}]*max-height: calc\(100svh - 20px\)/);
   assert.match(html, /@media \(max-width: 760px\) \{[\s\S]*\.trip-tabs \.board-tab-indicator \{[^}]*display: none/);
   assert.match(html, /@media \(max-width: 760px\) \{[\s\S]*\.trip-tabs \.board-tab.active \{[^}]*background: rgba\(255,255,255,\.80\)[^}]*color: var\(--ink\)/);
