@@ -596,7 +596,7 @@ test('shared custom event links import the event and open signup or decline acti
   assert.match(html, /openDayEventDetail\(index\)/);
   assert.match(html, /function setCustomEventDecline\(eventId\)/);
   assert.match(html, /data-custom-event-decline/);
-  assert.match(html, /\$\{declined\?'Declined':'Decline'\}/);
+  assert.match(html, /\$\{declined&&variant==='detail'\?'Declined':'Decline'\}/);
   assert.match(html, /openLinkedCalendarEvent\(sharedEventId\)/);
 });
 
@@ -718,18 +718,18 @@ test('itinerary activity RSVPs show attendee names, declined state, and editable
   assert.match(html, /function activityAttendeeSummary\(activityId\)/);
   assert.match(html, /data-activity-signup="\$\{escapeHtml\(activityId\)\}"/);
   assert.match(html, /data-activity-decline="\$\{escapeHtml\(activityId\)\}"/);
-  assert.match(html, /function renderActivityActions\(activityId\)\{ const state=activityRsvpState\(activityId\);/);
+  assert.match(html, /function renderActivityActions\(activityId, variant='detail'\)\{ const state=activityRsvpState\(activityId\);/);
   assert.match(html, /data-activity-signup="\$\{escapeHtml\(activityId\)\}" aria-pressed="\$\{state==='signed'\?'true':'false'\}"/);
   assert.match(html, /data-activity-decline="\$\{escapeHtml\(activityId\)\}" aria-pressed="\$\{state==='declined'\?'true':'false'\}"/);
   assert.match(html, /activity-signup is-primary \$\{state==='signed'\?'is-selected':''\} \$\{state==='declined'\?'is-unselected':''\}/);
   assert.match(html, /activity-signup is-muted \$\{state==='declined'\?'is-selected':''\} \$\{state==='signed'\?'is-unselected':''\}/);
   assert.match(html, /\.activity-signup\.is-unselected \{[^}]*opacity: \.2/);
-  assert.match(html, /\$\{state==='signed'\?'Signed up':'Sign up'\}/);
-  assert.match(html, /\$\{state==='declined'\?'Declined':'Decline'\}/);
+  assert.match(html, /const signupLabel=variant==='day-hover'\?'Sign up':\(state==='signed'\?'Signed up':'Sign up'\)/);
+  assert.match(html, /const declineLabel=variant==='day-hover'\?'Decline':\(state==='declined'\?'Declined':'Decline'\)/);
   assert.match(html, /\.activity-signup\.is-selected/);
   assert.match(html, /activity-card-actions/);
   assert.match(html, /data-activity-delete="\$\{escapeHtml\(activityId\)\}"/);
-  assert.match(html, /\$\{state==='declined'\?`<button class="activity-delete-link" type="button" data-activity-delete="\$\{escapeHtml\(activityId\)\}">Delete event<\/button>`:''\}/);
+  assert.match(html, /const deleteLink=variant==='detail'&&state==='declined'\?`<button class="activity-delete-link" type="button" data-activity-delete="\$\{escapeHtml\(activityId\)\}">Delete event<\/button>`:''/);
   assert.match(html, /\.activity-delete-link \{[^}]*background: none[^}]*border: 0[^}]*color: #ff6b6b[^}]*text-decoration: underline[^}]*text-decoration-color: #ff6b6b/);
   assert.doesNotMatch(html, /activity-delete-link[^}]*border-radius/);
   assert.match(html, /activity-attendees/);
@@ -742,7 +742,7 @@ test('itinerary activity RSVPs show attendee names, declined state, and editable
   assert.match(html, /activityRsvpState\(activityId\)==='declined'\?'<span class="activity-state-icon is-declined" aria-label="Declined">×<\/span>':''/);
   assert.doesNotMatch(html, /\.activity-state-icon \{[^}]*border-radius/);
   assert.doesNotMatch(html, /\.activity-state-icon\.is-declined \{[^}]*border:/);
-  assert.match(html, /function renderExpandedDayEvent\(event, full\)\{ if\(event\.custom\)[\s\S]*return `[\s\S]*data-day-event="\$\{escapeHtml\(event\.id\|\|'\'\)\}"[\s\S]*renderActivityStateIcon\(event\.id\)[\s\S]*<\/article>`; \}/);
+  assert.match(html, /function renderExpandedDayEvent\(event, full\)\{ const hoverActions=renderDayViewEventActions\(event\); if\(event\.custom\)[\s\S]*return `[\s\S]*data-day-event="\$\{escapeHtml\(event\.id\|\|'\'\)\}"[\s\S]*renderActivityStateIcon\(event\.id\)[\s\S]*\$\{hoverActions\}<\/article>`; \}/);
   assert.match(html, /function renderDayEventDetail\(event, full\)/);
   assert.match(html, /id="dayEventDetail"/);
   assert.match(html, /id="dayEventDetailActions"/);
@@ -778,13 +778,34 @@ test('itinerary activity RSVPs show attendee names, declined state, and editable
   assert.match(html, /dayEventDetailActions\.querySelectorAll\('\[data-activity-signup\]'\)\.forEach/);
   assert.match(html, /dayEventDetailActions\.querySelectorAll\('\[data-activity-decline\]'\)\.forEach/);
   assert.match(html, /dayEventDetailActions\.querySelectorAll\('\[data-activity-delete\]'\)\.forEach/);
-  assert.doesNotMatch(html, /dayViewTimeline\.querySelectorAll\('\[data-activity-signup\]'\)\.forEach/);
-  assert.doesNotMatch(html, /dayViewTimeline\.querySelectorAll\('\[data-activity-decline\]'\)\.forEach/);
+  assert.match(html, /dayViewTimeline\.querySelectorAll\('\[data-activity-signup\]'\)\.forEach/);
+  assert.match(html, /dayViewTimeline\.querySelectorAll\('\[data-activity-decline\]'\)\.forEach/);
   assert.doesNotMatch(html, /calendarItems\.querySelectorAll\('\[data-activity-signup\]'\)\.forEach/);
   assert.doesNotMatch(html, /calendarItems\.querySelectorAll\('\[data-activity-decline\]'\)\.forEach/);
   assert.match(html, /dinners\.forEach\(slot=>eventsByDate\[slot\.date\]\?\.push\(\{title:'Dinner'/);
   assert.doesNotMatch(html, /Dinner placeholder/);
 });
+
+test('desktop day-view RSVP actions appear on hover beside eligible events', () => {
+  assert.match(html, /function renderDayViewEventActions\(event\)/);
+  assert.match(html, /event\.custom\?renderCustomEventActions\(event\.id,'day-hover'\):\(event\.id\?renderActivityActions\(event\.id,'day-hover'\):''\)/);
+  assert.match(html, /class="day-view-hover-actions"/);
+  assert.match(html, /\.day-view-hover-actions \{[^}]*position: absolute;[^}]*top: 8px;[^}]*right: 8px;[^}]*opacity: 0;[^}]*pointer-events: none;/s);
+  assert.match(html, /\.day-view-event:hover > \.day-view-hover-actions, \.day-view-event:focus-within > \.day-view-hover-actions \{[^}]*opacity: 1 !important;[^}]*pointer-events: auto;/s);
+  assert.match(html, /@media \(max-width: 760px\) \{[\s\S]*\.day-view-hover-actions \{ display: none; \}/);
+  assert.match(html, /renderActivityActions\(activityId, variant='detail'\)/);
+  assert.match(html, /variant==='day-hover'\?'Sign up'/);
+  assert.match(html, /renderCustomEventActions\(eventId, variant='detail'\)/);
+  assert.match(html, /variant==='day-hover'\?\(event\?\.inviteMode==='open'\?'Sign up':'Accept'\)/);
+  assert.match(html, /const signup=\(!isCreator && \(event\?\.inviteMode==='open'\|\|event\?\.inviteMode==='invite-only'\)\)/);
+  assert.match(html, /dayViewTimeline\.querySelectorAll\('\[data-custom-event-signup\]'\)\.forEach/);
+  assert.match(html, /dayViewTimeline\.querySelectorAll\('\[data-custom-event-decline\]'\)\.forEach/);
+  assert.match(html, /function customEventStateClass\(eventId\)/);
+  assert.match(html, /customEventDeclines\(\)\[eventId\]/);
+  assert.match(html, /is-custom \$\{customEventStateClass\(event\.id\)\}/);
+  assert.match(html, /\.day-view-event\.is-activity\.is-declined strong, \.day-view-event\.is-custom\.is-declined strong \{[^}]*opacity: \.2;[^}]*text-decoration: line-through/s);
+});
+
 
 test('people profiles live in an animated fit-content dashboard tab control', () => {
   const tripInfoBlock = html.slice(html.indexOf('id="tripInfo"'), html.indexOf('id="dinnerPicker"'));
