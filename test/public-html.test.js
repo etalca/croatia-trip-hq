@@ -464,7 +464,7 @@ test('mobile todo chips stay bounded and horizontally scrollable without pushing
   assert.match(html, /@media \(max-width: 760px\) \{[\s\S]*#tripInfo \.dashboard-card header \{[^}]*position: relative;[^}]*display: block;[^}]*padding-right: 56px;[^}]*overflow: visible;/);
   assert.match(html, /@media \(max-width: 760px\) \{[\s\S]*#tripInfo \.dashboard-card header > div \{[^}]*overflow: visible;[^}]*width: 100%;[^}]*max-width: 100%;/);
   assert.match(html, /@media \(max-width: 760px\) \{[\s\S]*#tripInfo \.dashboard-card header \.close \{[^}]*position: absolute;[^}]*top: 0;[^}]*right: 0;/);
-  assert.match(html, /@media \(max-width: 760px\) \{[\s\S]*#tripInfo \.dashboard-status \{[^}]*width: calc\(100% \+ 56px\);[^}]*max-width: calc\(100% \+ 56px\);/);
+  assert.match(html, /@media \(max-width: 760px\) \{[\s\S]*#tripInfo \.dashboard-status \{[^}]*width: calc\(100% \+ 73px\);[^}]*max-width: calc\(100% \+ 73px\);/);
   assert.match(html, /@media \(max-width: 760px\) \{[\s\S]*\.dashboard-status \{[^}]*flex-wrap: nowrap;[^}]*overflow-x: auto;[^}]*overflow-y: hidden;[^}]*max-height: 30px;[^}]*white-space: nowrap;[^}]*touch-action: pan-x;/);
   assert.match(html, /@media \(max-width: 760px\) \{[\s\S]*\.dashboard-status \.todo-chip \{ flex: 0 0 auto; \}/);
   assert.doesNotMatch(html, /dashboardStatus\.classList\.toggle\('show-done'/);
