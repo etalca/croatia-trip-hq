@@ -461,7 +461,8 @@ test('mobile dashboard keeps todo chips sticky while trip cards and itinerary sc
 test('mobile todo chips stay bounded and horizontally scrollable without pushing the title wide', () => {
   assert.match(html, /\.dashboard-card header > div \{ min-width: 0; flex: 1 1 auto; overflow: hidden; \}/);
   assert.match(html, /\.dashboard-name \{[^}]*overflow-wrap: anywhere/);
-  assert.match(html, /@media \(max-width: 760px\) \{[\s\S]*\.dashboard-status \{[^}]*width: 100%;[^}]*max-width: 100%;[^}]*flex-wrap: nowrap;[^}]*overflow-x: auto;[^}]*overflow-y: hidden;[^}]*max-height: 30px;[^}]*white-space: nowrap;[^}]*touch-action: pan-x;/);
+  assert.match(html, /@media \(max-width: 760px\) \{[\s\S]*#tripInfo \.dashboard-status \{[^}]*width: calc\(100% \+ 56px\);[^}]*max-width: calc\(100% \+ 56px\);/);
+  assert.match(html, /@media \(max-width: 760px\) \{[\s\S]*\.dashboard-status \{[^}]*flex-wrap: nowrap;[^}]*overflow-x: auto;[^}]*overflow-y: hidden;[^}]*max-height: 30px;[^}]*white-space: nowrap;[^}]*touch-action: pan-x;/);
   assert.match(html, /@media \(max-width: 760px\) \{[\s\S]*\.dashboard-status \.todo-chip \{ flex: 0 0 auto; \}/);
   assert.doesNotMatch(html, /dashboardStatus\.classList\.toggle\('show-done'/);
   assert.doesNotMatch(html, /\.dashboard-status:not\(\.show-done\) \.todo-chip\.done \{ display: none; \}/);
