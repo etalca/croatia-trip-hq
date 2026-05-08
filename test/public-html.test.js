@@ -674,10 +674,10 @@ test('custom event descriptions linkify pasted URLs safely in cards and detail',
   assert.doesNotMatch(html, /dayEventDetailNote\.textContent=event\.description \|\| event\.note \|\| ''/);
 });
 
-test('calendar event detail has a top-right share icon matching calendar expand icons', () => {
+test('calendar event detail has a top-right share icon doubled from calendar expand icons', () => {
   assert.match(html, /<button class="day-event-share calendar-expand-icon" id="dayEventShare" type="button" title="Share event" aria-label="Share event" hidden>[\s\S]*<svg[^>]*viewBox="0 0 24 24"[^>]*>[\s\S]*<\/svg><\/button><h3 id="dayEventDetailTitle">Event<\/h3>/);
-  assert.match(html, /\.day-event-share \{[^}]*top: 10px;[^}]*right: 10px;/s);
   assert.match(html, /\.calendar-expand-icon \{[^}]*width: 22px;[^}]*height: 22px;[^}]*padding: 3px;[^}]*opacity: \.2;/s);
+  assert.match(html, /\.day-event-share \{[^}]*top: 10px;[^}]*right: 10px;[^}]*width: 44px;[^}]*height: 44px;[^}]*padding: 6px;/s);
   assert.match(html, /dayEventShareButton=document\.getElementById\('dayEventShare'\)/);
   assert.match(html, /dayEventShareButton\.hidden=false/);
   assert.match(html, /dayEventShareButton\.onclick=\(\)=>shareDayEvent\(event\)/);
