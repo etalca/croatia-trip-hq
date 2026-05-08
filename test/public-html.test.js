@@ -246,9 +246,11 @@ test('dashboard embeds itinerary directly with floating header instead of a wrap
   assert.match(tripInfoBlock, /id="calendarItems"/);
   assert.doesNotMatch(html, /\.embedded-itinerary \{[^}]*border:/);
   assert.doesNotMatch(html, /\.embedded-itinerary \{[^}]*background:/);
-  assert.match(html, /\.itinerary-heading \{/);
-  assert.match(html, /\.itinerary-heading \.secondary-action \{[^}]*height: 25\.5px;[^}]*min-height: 0;[^}]*box-sizing: border-box;[^}]*display: inline-grid;[^}]*place-items: center;[^}]*font-size: 13px;[^}]*line-height: 1;/s);
-  assert.match(html, /\.embedded-itinerary \{ display: grid; gap: 8px; padding-top: 5px; \}/);
+  assert.match(html, /\.itinerary-heading \{ display: grid; gap: 2px; margin: 2px 2px 0; \}/);
+  assert.match(html, /\.itinerary-heading h3 \{[^}]*line-height: 1\.04;[^}]*font-weight: 400;/s);
+  assert.match(html, /\.itinerary-heading p \{[^}]*font-size: 12px;[^}]*line-height: 1\.35;/s);
+  assert.match(html, /\.itinerary-heading \.secondary-action \{[^}]*margin-top: 4px;[^}]*height: 25\.5px;[^}]*min-height: 0;[^}]*box-sizing: border-box;[^}]*display: inline-grid;[^}]*place-items: center;[^}]*font-size: 13px;[^}]*line-height: 1;/s);
+  assert.match(html, /\.embedded-itinerary \{ display: grid; gap: 8px; padding-top: 7px; \}/);
   assert.match(html, /\.calendar-week \{/);
   assert.match(html, /\.calendar-day \{/);
   assert.match(html, /function renderCalendarView\(\)/);
