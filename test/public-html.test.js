@@ -775,7 +775,8 @@ test('grocery state is shared through the groceries API with local fallback and 
   assert.match(html, /function saveGroceryStateQuiet\(\)/);
   assert.match(html, /function groceryComplete\(\)/);
   assert.match(html, /function addGroceryItemFromInput\(\)/);
-  assert.match(html, /function plusOneGroceryItem\(itemId\)/);
+  assert.match(html, /function toggleGroceryPlusOne\(itemId\)/);
+  assert.match(html, /function removeGroceryItem\(itemId\)/);
   assert.match(html, /function currentGroceryPerson\(\)/);
   assert.match(html, /function groceryRequesterNames\(item\)/);
   assert.match(html, /function groceryItemMatchesText\(item, text\)/);
@@ -787,10 +788,13 @@ test('grocery state is shared through the groceries API with local fallback and 
   assert.match(html, /if\(next==='Add grocery notes'\) return openPrepPlanner\(\)/);
   assert.match(html, /addGroceryItemButton\.addEventListener\('click',addGroceryItemFromInput\)/);
   assert.match(html, /data-grocery-plus-one="\$\{escapeHtml\(item\.id\)\}"/);
-  assert.match(html, /Plus one/);
+  assert.match(html, /aria-pressed="\$\{already\?'true':'false'\}"/);
+  assert.match(html, /class="grocery-plus-one \$\{already\?'is-added':''\}"/);
+  assert.match(html, /\$\{already\?'Remove \+1':'\+1'\}/);
+  assert.match(html, /\$\{isOwner\?`<button class="grocery-remove"/);
   assert.match(html, /requestedBy/);
-  assert.match(html, /plusOneGroceryItem\(plus\.dataset\.groceryPlusOne\)/);
-  assert.match(html, /saveGroceryStateQuiet\(\)/);
+  assert.match(html, /toggleGroceryPlusOne\(plus\.dataset\.groceryPlusOne\)/);
+  assert.match(html, /removeGroceryItem\(btn\.dataset\.groceryRemove\)/);
   assert.match(html, /groceryList\.addEventListener\('click'/);
   assert.match(html, /const GROCERY_SECTIONS=\[/);
   assert.match(html, /name:'Produce',[\s\S]*onion[\s\S]*apple[\s\S]*berries[\s\S]*spinach[\s\S]*zucchini[\s\S]*mushroom/s);
@@ -808,7 +812,10 @@ test('grocery state is shared through the groceries API with local fallback and 
   assert.match(html, /\.grocery-input-row \{[^}]*align-items: end;[^}]*\}/s);
   assert.match(html, /\.grocery-input-control \{ display: grid; gap: 5px; \}/);
   assert.match(html, /<div class="grocery-input-control"><label for="groceryItem">Add grocery item<\/label><input id="groceryItem"/);
-  assert.match(html, /\.grocery-add-action, \.dietary-save-action, \.grocery-plus-one \{[^}]*border: 1px solid white;[^}]*background: white;[^}]*color: var\(--ink\);[^}]*border-radius: var\(--field-radius\);[^}]*height: 34px;[^}]*min-height: 34px;[^}]*box-sizing: border-box;[^}]*padding: 0 14px;/s);
+  assert.match(html, /\.grocery-add-action, \.dietary-save-action \{[^}]*border: 1px solid white;[^}]*background: white;[^}]*color: var\(--ink\);[^}]*border-radius: var\(--field-radius\);[^}]*height: 34px;[^}]*min-height: 34px;[^}]*box-sizing: border-box;[^}]*padding: 0 14px;/s);
+  assert.match(html, /\.grocery-plus-one \{[^}]*opacity: \.2;[^}]*transition: opacity \.18s ease/s);
+  assert.match(html, /\.grocery-plus-one\.is-added \{ opacity: 1;/);
+  assert.doesNotMatch(html, /\.grocery-plus-one:disabled/);
   assert.match(html, /@media \(max-width: 760px\) \{[\s\S]*\.grocery-add-action, \.dietary-save-action \{ height: 44px; min-height: 44px; border-radius: 18px; padding: 0 16px; \}/s);
   assert.match(html, /prepStatusChip\.addEventListener\('click',openPrepPlanner\)/);
   assert.match(html, /myPrepCard\.addEventListener\('click',openPrepPlanner\)/);
