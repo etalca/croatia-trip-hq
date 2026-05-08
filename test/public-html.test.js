@@ -672,6 +672,17 @@ test('custom event descriptions linkify pasted URLs safely in cards and detail',
   assert.doesNotMatch(html, /dayEventDetailNote\.textContent=event\.description \|\| event\.note \|\| ''/);
 });
 
+test('calendar event detail has a top-right share icon matching calendar expand icons', () => {
+  assert.match(html, /<button class="day-event-share calendar-expand-icon" id="dayEventShare" type="button" title="Share event" aria-label="Share event" hidden>[\s\S]*<svg[^>]*viewBox="0 0 24 24"[^>]*>[\s\S]*<\/svg><\/button><h3 id="dayEventDetailTitle">Event<\/h3>/);
+  assert.match(html, /\.day-event-share \{[^}]*top: 10px;[^}]*right: 10px;/s);
+  assert.match(html, /\.calendar-expand-icon \{[^}]*width: 22px;[^}]*height: 22px;[^}]*padding: 3px;[^}]*opacity: \.2;/s);
+  assert.match(html, /dayEventShareButton=document\.getElementById\('dayEventShare'\)/);
+  assert.match(html, /dayEventShareButton\.hidden=false/);
+  assert.match(html, /dayEventShareButton\.onclick=\(\)=>shareDayEvent\(event\)/);
+  assert.match(html, /async function shareDayEvent\(event\)/);
+  assert.match(html, /event\.custom\?customEventShareUrl\(event\):window\.location\.origin\+window\.location\.pathname/);
+});
+
 test('shared custom event links import the event and open signup or decline actions', () => {
   assert.match(html, /function decodeSharedEvent\(value\)/);
   assert.match(html, /function importSharedCalendarEventFromUrl\(\)/);
@@ -899,7 +910,7 @@ test('itinerary activity RSVPs show attendee names, declined state, and editable
   assert.match(html, /id="dayEventDetailActions"/);
   assert.match(html, /id="dayViewNav"/);
   assert.match(html, /function setDayViewNavHidden\(hidden\)\{ dayViewNav\.hidden=hidden; \}/);
-  assert.match(html, /function closeDayEventDetail\(\)\{ activeDayEventIndex=-1; dayEventDetail\.hidden=true; setDayViewNavHidden\(false\); \}/);
+  assert.match(html, /function closeDayEventDetail\(\)\{ activeDayEventIndex=-1; dayEventShareButton\.hidden=true; dayEventShareButton\.onclick=null; dayEventDetail\.hidden=true; setDayViewNavHidden\(false\); \}/);
   assert.match(html, /function openDayEventDetail\(index\)\{ const event=activeDayViewEvents\[index\]; if\(event\)\{ activeDayEventIndex=index; setDayViewNavHidden\(true\); renderDayEventDetail\(event, activeDayViewFull\); \} \}/);
   const detailMarkup = html.slice(html.indexOf('id="dayEventDetail"'), html.indexOf('id="prepPlanner"'));
   assert.doesNotMatch(detailMarkup, /id="closeDayEventDetailButton"/);
