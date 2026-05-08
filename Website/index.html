@@ -743,6 +743,9 @@
   let cachedBoard={};
   let cachedDinner={slots:[]};
   let cachedGroceries=readLocalGroceries();
+  const AUTH_TOKEN_KEY='korculaAuthToken';
+  const AUTH_REFRESH_TOKEN_KEY='korculaAuthRefreshToken';
+  const AUTH_EXPIRES_AT_KEY='korculaAuthExpiresAt';
   let authToken='';
   let currentGuest=null;
   let editingCustomEventId='';
@@ -1017,16 +1020,32 @@
   function openDashboard(){ hideHomeContent(); if(!currentGuest || !savedFlights()){ openDialog('tripInfo'); return; } closeDialog(); closeTripInfoModal(); closeDinnerPickerModal(false); closeDinnerPlansModal(false); closeCalendarViewModal(false); closePrepPlannerModal(false); closeEventPlannerModal(false); closeDayViewModal(false); renderDashboard(); dashboard.hidden=false; dashboard.classList.add('open'); requestAnimationFrame(()=>syncFlightTabIndicator(boardMode==='departures'?departuresTab:arrivalsTab)); }
   function closeDash(){ dashboard.classList.remove('open'); setTimeout(()=>{ if(!dashboard.classList.contains('open')) dashboard.hidden=true; syncHomeVisibility(); },240); }
   openGate.addEventListener('click', () => currentGuest ? openTripInfo() : openDialog()); closeGate.addEventListener('click', closeGateAction); gate.addEventListener('click', e=>{ if(e.target===gate) closeDialog(); }); if(closeTripInfo) closeTripInfo.addEventListener('click', closeTripInfoModal); tripInfo.addEventListener('click', e=>{ if(e.target===tripInfo) closeTripInfoModal(); }); openFlights?.addEventListener('click', openDashboard); openDinnerPlansButton?.addEventListener('click',openDinnerPlans); openCalendarViewButton?.addEventListener('click',openCalendarView); flightStatusChip.addEventListener('click',()=>{ if(savedFlights()) openDashboard(); else openDialog('tripInfo'); }); dinnerStatusChip.addEventListener('click',openDinnerPlans); myDinnerCard.addEventListener('click',openDinnerPlans); myFlightCard.addEventListener('click',()=>{ if(savedFlights()) openDashboard(); else openDialog('tripInfo'); }); calendarStatusChip.addEventListener('click',addTripToCalendar); prepStatusChip.addEventListener('click',openPrepPlanner); myPrepCard.addEventListener('click',openPrepPlanner); openEventPlannerButton.addEventListener('click',()=>openEventPlanner()); closeEventPlannerButton.addEventListener('click',()=>closeEventPlanner()); eventPlanner.addEventListener('click', e=>{ if(e.target===eventPlanner) closeEventPlanner(); }); eventInviteMode.addEventListener('change',syncEventInviteMode); eventStartTime.addEventListener('change',defaultEventEndTime); eventInviteeControl.addEventListener('click',()=>toggleEventInviteeOptions()); eventInvitees.addEventListener('change',syncEventInviteeSummary); deleteCustomEventButton.addEventListener('click',deleteCustomEvent); clearEventFormButton.addEventListener('click',clearCustomEventForm); eventForm.addEventListener('submit',saveCustomEvent); overviewTab.addEventListener('click',()=>setTripTab('overview')); peopleTab.addEventListener('click',()=>setTripTab('people')); closeProfileDetailButton.addEventListener('click',closeProfileDetail); profileDetail.addEventListener('click', e=>{ if(e.target===profileDetail) closeProfileDetail(); }); dinnerForm.addEventListener('submit', async e=>{ e.preventDefault(); if(!dinnerFormReady()) return; try{ const wasClearing=dinnerClearRequested; await saveDinnerPlan(); closeDinnerPicker(); showToast(wasClearing ? 'Dinner night cleared' : 'Dinner night saved'); } catch(err){ console.error(err); showToast(err.message || 'Could not save dinner night'); } }); closeDinnerPickerButton.addEventListener('click',()=>closeDinnerPicker()); dinnerPicker.addEventListener('click', e=>{ if(e.target===dinnerPicker) closeDinnerPicker(); }); closeDinnerPlansButton.addEventListener('click',()=>closeDinnerPlans()); dinnerPlans.addEventListener('click', e=>{ if(e.target===dinnerPlans) closeDinnerPlans(); }); closeCalendarViewButton.addEventListener('click',()=>closeCalendarView()); closePrepPlannerButton.addEventListener('click',()=>closePrepPlanner()); prepPlanner.addEventListener('click', e=>{ if(e.target===prepPlanner) closePrepPlanner(); }); addGroceryItemButton.addEventListener('click',addGroceryItemFromInput);  groceryItem.addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); addGroceryItemFromInput(); } }); groceryList.addEventListener('click',e=>{ const plus=e.target.closest('[data-grocery-plus-one]'); if(plus){ toggleGroceryPlusOne(plus.dataset.groceryPlusOne); return; } const btn=e.target.closest('[data-grocery-remove]'); if(!btn) return; removeGroceryItem(btn.dataset.groceryRemove); }); prepForm.addEventListener('submit', async e=>{ e.preventDefault(); try{ await saveTripPrep(); closePrepPlanner(); } catch(err){ console.error(err); showToast(err.message || 'Could not save groceries'); } }); calendarView.addEventListener('click', e=>{ if(e.target===calendarView) closeCalendarView(); }); closeDayViewButton.addEventListener('click',closeDayView); closeDayEventDetailScrim.addEventListener('click',closeDayEventDetail); previousDayViewButton.addEventListener('click',()=>moveDayView(-1)); nextDayViewButton.addEventListener('click',()=>moveDayView(1)); dayViewAddEventButton.addEventListener('click',()=>openEventPlanner(activeDayViewDate,'','dayView')); dayView.addEventListener('click', e=>{ if(e.target===dayView) closeDayView(); }); closeDashboard.addEventListener('click',()=>{ closeDash(); openTripInfo(); }); dashboard.addEventListener('click', e=>{ if(e.target===dashboard) closeDash(); }); arrivalsTab.addEventListener('click',()=>setBoardMode('arrivals')); departuresTab.addEventListener('click',()=>setBoardMode('departures')); copyFlightsFrom.addEventListener('change',()=>copyFlightDetailsFrom(copyFlightsFrom.value)); fields.flightStatus.addEventListener('change',syncFlightDetailsVisibility); clearDinnerFormButton.addEventListener('click',clearDinnerFormSelections); fields.name.addEventListener('change',()=>{ const selected=fields.name.value; if(selected) localStorage.setItem(NAME_KEY, selected); const local=flightBoard()[selected]; if(local) fillForm(local); loadRemoteState(selected); });
-  function tokenFromAuthRedirect(){
+  function authSessionFromRedirect(){
     const hash=new URLSearchParams((window.location.hash || '').replace(/^#/, ''));
     const query=new URLSearchParams(window.location.search);
-    return hash.get('access_token') || query.get('access_token') || '';
+    const accessToken=hash.get('access_token') || query.get('access_token') || '';
+    const refreshToken=hash.get('refresh_token') || query.get('refresh_token') || '';
+    const expiresAt=hash.get('expires_at') || query.get('expires_at') || '';
+    const expiresIn=hash.get('expires_in') || query.get('expires_in') || '';
+    return accessToken ? { accessToken, refreshToken, expiresAt: expiresAt || (expiresIn ? String(Math.floor(Date.now()/1000)+Number(expiresIn)) : '') } : null;
   }
-  function rememberAuthToken(token){
-    if(!token) return;
-    authToken=token;
-    localStorage.setItem('korculaAuthToken', token);
+  function rememberAuthSession(session){
+    if(!session?.accessToken) return false;
+    authToken=session.accessToken;
+    localStorage.setItem(AUTH_TOKEN_KEY, session.accessToken);
+    if(session.refreshToken) localStorage.setItem(AUTH_REFRESH_TOKEN_KEY, session.refreshToken);
+    if(session.expiresAt) localStorage.setItem(AUTH_EXPIRES_AT_KEY, String(session.expiresAt));
     if(window.location.hash) history.replaceState(null,'',window.location.pathname + window.location.search);
+    return true;
+  }
+  function forgetAuthSession(){ authToken=''; localStorage.removeItem(AUTH_TOKEN_KEY); localStorage.removeItem(AUTH_REFRESH_TOKEN_KEY); localStorage.removeItem(AUTH_EXPIRES_AT_KEY); }
+  async function refreshStoredAuthSession(){
+    const refreshToken=localStorage.getItem(AUTH_REFRESH_TOKEN_KEY) || '';
+    if(!refreshToken){ authToken=localStorage.getItem(AUTH_TOKEN_KEY) || ''; return Boolean(authToken); }
+    const res=await fetch('/api/auth/refresh', { method:'POST', headers:{'content-type':'application/json'}, body:JSON.stringify({ refreshToken }) });
+    const payload=await res.json().catch(()=>({}));
+    if(!res.ok || !payload.session?.accessToken){ forgetAuthSession(); return false; }
+    return rememberAuthSession(payload.session);
   }
   async function claimProfile(name){
     const res=await fetch('/api/auth/claim', { method:'POST', headers:{'content-type':'application/json', ...authHeaders()}, body:JSON.stringify({ name }) });
@@ -1037,7 +1056,8 @@
   async function refreshAuthState(){
     const sharedEventId=importSharedCalendarEventFromUrl();
     if(applyStagingReviewEntry()){ setPrimaryCta(); await loadRemoteState(currentGuest.name); if(sharedEventId) openLinkedCalendarEvent(sharedEventId); return; }
-    rememberAuthToken(tokenFromAuthRedirect() || localStorage.getItem('korculaAuthToken') || '');
+    if(!rememberAuthSession(authSessionFromRedirect())) authToken=localStorage.getItem(AUTH_TOKEN_KEY) || '';
+    await refreshStoredAuthSession();
     const claimFromUrl=new URLSearchParams(window.location.search).get('claim') || '';
     const pendingName=claimFromUrl || localStorage.getItem(PENDING_CLAIM_KEY) || '';
     if(authToken && pendingName){
