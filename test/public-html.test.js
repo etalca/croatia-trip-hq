@@ -377,10 +377,11 @@ test('mobile overlays are centered in the viewport instead of stretched and clip
   assert.match(html, /@media \(max-width: 760px\) \{[\s\S]*#tripInfo \.dashboard-card \{ height: min\(680px, calc\(100svh - 44px\)\);[^}]*align-self: center; \}/s);
 });
 
-test('dashboard add event stays compact while day-view add event matches chevron nav height', () => {
+test('dashboard add event uses the same filled pill styling as the event form save button while day-view add event matches chevrons', () => {
   assert.match(html, /\.back \{[^}]*height: 25\.5px;[^}]*font-size: 13px;[^}]*line-height: 1;[^}]*padding: 0 10px;[^}]*display: grid;[^}]*place-items: center;/s);
   assert.match(html, /\.todo-chip \{[^}]*height: 25\.5px;[^}]*box-sizing: border-box;[^}]*padding: 0 9px;[^}]*font-size: 13px;[^}]*line-height: 1;/s);
-  assert.match(html, /\.itinerary-heading \.secondary-action \{[^}]*height: 25\.5px;[^}]*min-height: 0;[^}]*box-sizing: border-box;[^}]*border-radius: 999px;[^}]*padding: 0 12px;[^}]*display: inline-grid;[^}]*place-items: center;/s);
+  assert.match(html, /\.submit button \{[^}]*border: 1px solid white;[^}]*background: white;[^}]*color: var\(--ink\);[^}]*border-radius: 999px;[^}]*min-height: 25\.5px;[^}]*padding: 0 10px;/s);
+  assert.match(html, /\.itinerary-heading \.secondary-action \{[^}]*border: 1px solid white;[^}]*background: white;[^}]*color: var\(--ink\);[^}]*height: 25\.5px;[^}]*min-height: 0;[^}]*box-sizing: border-box;[^}]*border-radius: 999px;[^}]*padding: 0 12px;[^}]*display: inline-grid;[^}]*place-items: center;/s);
   assert.match(html, /\.day-view-add-event \{[^}]*bottom: 16px;[^}]*height: 44px;[^}]*min-height: 44px;[^}]*box-sizing: border-box;[^}]*padding: 0 18px;[^}]*display: inline-grid;[^}]*place-items: center;/s);
   assert.match(html, /\.day-view-nav-button \{[^}]*width: 44px;[^}]*height: 44px;[^}]*min-height: 44px;[^}]*padding: 0;[^}]*font-size: 24px;[^}]*display: inline-grid;[^}]*place-items: center;/s);
   assert.match(html, /\.day-view-chevron \{[^}]*display: block;[^}]*line-height: 1;[^}]*transform: translateY\(-\.06em\);/s);
@@ -719,7 +720,7 @@ test('clear then save clears dinner responsibility and makes dinner todo incompl
   assert.match(html, /const hasOutstandingTodos=!flights \|\| !myDinner \|\| localStorage\.getItem\(CALENDAR_KEY\)!=='true'/);
 });
 
-test('grocery card replaces trip prep with dietary preferences and a shared grocery list', () => {
+test('grocery card replaces trip prep with dietary preferences and a shared categorized grocery list', () => {
   const tripInfoBlock = html.slice(html.indexOf('id="tripInfo"'), html.indexOf('id="dinnerPicker"'));
   assert.match(tripInfoBlock, /id="prepStatusChip"/);
   assert.match(tripInfoBlock, /id="myPrepCard"/);
@@ -730,8 +731,10 @@ test('grocery card replaces trip prep with dietary preferences and a shared groc
   assert.match(html, /id="dietaryNotes"/);
   assert.match(html, /id="groceryItem"/);
   assert.match(html, /id="addGroceryItem"/);
+  assert.match(html, /class="grocery-add-action" id="addGroceryItem"/);
   assert.match(html, /id="groceryList"/);
   assert.match(html, /id="groceryEmpty"/);
+  assert.match(html, /id="exportGroceriesReminders"/);
   assert.match(html, /Save groceries/);
   assert.doesNotMatch(html, /id="prepChecklist"/);
   assert.doesNotMatch(html, /data-prep-item="passport"|Passport checked|Swimsuit packed|Power adapter packed|Sunscreen \/ hat ready|Ferry \/ transport plan reviewed/);
@@ -755,6 +758,15 @@ test('grocery state is shared through the groceries API with local fallback and 
   assert.match(html, /if\(next==='Add grocery notes'\) return openPrepPlanner\(\)/);
   assert.match(html, /addGroceryItemButton\.addEventListener\('click',addGroceryItemFromInput\)/);
   assert.match(html, /groceryList\.addEventListener\('click'/);
+  assert.match(html, /function grocerySectionFor\(text\)/);
+  assert.match(html, /function groupedGroceryItems\(items\)/);
+  assert.match(html, /grocery-section-heading/);
+  assert.match(html, /apple\|banana\|bananas\|berries/);
+  assert.match(html, /function exportGroceriesToReminders\(\)/);
+  assert.match(html, /reminders:\/\/x-callback-url\/add/);
+  assert.match(html, /exportGroceriesReminders\.addEventListener\('click',exportGroceriesToReminders\)/);
+  assert.match(html, /\.prep-form \{[^}]*padding: 4px 8px 12px;[^}]*margin: -4px -8px 0;/s);
+  assert.match(html, /\.grocery-add-action \{[^}]*border: 1px solid white;[^}]*background: white;[^}]*color: var\(--ink\);[^}]*border-radius: 999px;[^}]*height: 25\.5px;[^}]*min-height: 0;[^}]*padding: 0 12px;/s);
   assert.match(html, /prepStatusChip\.addEventListener\('click',openPrepPlanner\)/);
   assert.match(html, /myPrepCard\.addEventListener\('click',openPrepPlanner\)/);
   assert.match(html, /function dietaryLine\(person\)\{ const prefs=normalizeGroceries\(cachedGroceries\)\.preferences \|\| \{\}/);
