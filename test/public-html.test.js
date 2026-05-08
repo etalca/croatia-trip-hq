@@ -883,7 +883,7 @@ test('people profiles live in an animated fit-content dashboard tab control', ()
   assert.match(html, /\.board-tab-indicator/);
   assert.match(html, /transition: transform \.24s ease, width \.24s ease/);
   assert.match(html, /@media \(max-width: 760px\) \{[\s\S]*\.trip-info-scroll \{[^}]*position: relative/);
-  assert.match(html, /@media \(max-width: 760px\) \{[\s\S]*\.trip-tabs \{[^}]*position: fixed[^}]*bottom: max\(14px, calc\(env\(safe-area-inset-bottom\) \+ 14px\)\)[^}]*left: 50%[^}]*transform: translateX\(-50%\)[^}]*z-index: 30[^}]*pointer-events: auto/);
+  assert.match(html, /@media \(max-width: 760px\) \{[\s\S]*\.trip-tabs \{[^}]*position: fixed[^}]*bottom: max\(14px, calc\(env\(safe-area-inset-bottom\) \+ 14px\)\)[^}]*left: 50%[^}]*transform: translate\(-50%, 25px\)[^}]*z-index: 30[^}]*pointer-events: auto/);
   assert.match(html, /@media \(max-width: 760px\) \{[\s\S]*\.trip-tab-panel \{[^}]*padding-bottom: 104px/);
   assert.doesNotMatch(html, /@media \(max-width: 760px\) \{[\s\S]*\.trip-tabs \{[^}]*margin-bottom: 10px/);
   assert.match(html, /#tripInfo \.dashboard-card \{[^}]*height: min\(88svh, 760px\)/);
