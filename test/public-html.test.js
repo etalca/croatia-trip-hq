@@ -719,41 +719,42 @@ test('clear then save clears dinner responsibility and makes dinner todo incompl
   assert.match(html, /const hasOutstandingTodos=!flights \|\| !myDinner \|\| localStorage\.getItem\(CALENDAR_KEY\)!=='true'/);
 });
 
-test('trip prep planner adds a personal checklist and preference prompts to the dashboard', () => {
+test('grocery card replaces trip prep with dietary preferences and a shared grocery list', () => {
   const tripInfoBlock = html.slice(html.indexOf('id="tripInfo"'), html.indexOf('id="dinnerPicker"'));
   assert.match(tripInfoBlock, /id="prepStatusChip"/);
   assert.match(tripInfoBlock, /id="myPrepCard"/);
+  assert.match(tripInfoBlock, /Grocery list/);
+  assert.match(tripInfoBlock, /Dietary notes and shared groceries/);
   assert.match(html, /id="prepPlanner"/);
-  assert.match(html, /aria-labelledby="prepPlannerTitle"/);
-  assert.match(html, /id="prepChecklist"/);
-  assert.match(html, /data-prep-item="passport"/);
-  assert.match(html, /data-prep-item="swimsuit"/);
-  assert.match(html, /data-prep-item="adapter"/);
-  assert.match(html, /data-prep-item="sunscreen"/);
-  assert.match(html, /data-prep-item="transport"/);
+  assert.match(html, /id="prepPlannerTitle">Groceries<\/h2>/);
   assert.match(html, /id="dietaryNotes"/);
-  assert.match(html, /id="tripWish"/);
-  assert.match(html, /id="activityInterest"/);
-  assert.match(html, /Boat day/);
-  assert.match(html, /Quiet beach time/);
+  assert.match(html, /id="groceryItem"/);
+  assert.match(html, /id="addGroceryItem"/);
+  assert.match(html, /id="groceryList"/);
+  assert.match(html, /id="groceryEmpty"/);
+  assert.match(html, /Save groceries/);
+  assert.doesNotMatch(html, /id="prepChecklist"/);
+  assert.doesNotMatch(html, /data-prep-item="passport"|Passport checked|Swimsuit packed|Power adapter packed|Sunscreen \/ hat ready|Ferry \/ transport plan reviewed/);
+  assert.doesNotMatch(html, /id="tripWish"|id="activityInterest"|One thing you want from the trip|Activity you’re most interested in/);
 });
 
-test('trip prep state is saved locally and participates in todos and homepage CTA', () => {
-  assert.match(html, /const PREP_CHECKLIST_KEY='korculaPrepChecklist'/);
-  assert.match(html, /const TRIP_PREFERENCES_KEY='korculaTripPreferences'/);
-  assert.match(html, /const prepItems=\[/);
-  assert.match(html, /function prepStorageSuffix\(\)/);
-  assert.match(html, /function prepStorageKey\(base\)/);
-  assert.match(html, /function readPrepChecklist\(\)/);
-  assert.match(html, /function savePrepChecklist\(items\)/);
-  assert.match(html, /function prepComplete\(\)/);
-  assert.match(html, /function readTripPreferences\(\)/);
-  assert.match(html, /function saveTripPreferences\(prefs\)/);
-  assert.match(html, /function renderPrepPlanner\(\)/);
-  assert.match(html, /function saveTripPrep\(\)/);
-  assert.match(html, /renderTodoChip\(prepStatusChip, prepComplete\(\), 'Trip prep done', 'Finish trip prep'\)/);
-  assert.match(html, /if\(!prepComplete\(\)\) return 'Finish trip prep'/);
-  assert.match(html, /if\(next==='Finish trip prep'\) return openPrepPlanner\(\)/);
+test('grocery state is shared through the groceries API with local fallback and participates in dashboard CTAs', () => {
+  assert.match(html, /const GROCERY_STATE_KEY='korculaGroceryState'/);
+  assert.match(html, /let cachedGroceries=readLocalGroceries\(\)/);
+  assert.match(html, /function readLocalGroceries\(\)/);
+  assert.match(html, /function cacheGroceries\(state\)/);
+  assert.match(html, /async function loadGroceryState\(\)/);
+  assert.match(html, /async function saveGroceryState\(\)/);
+  assert.match(html, /function groceryComplete\(\)/);
+  assert.match(html, /function addGroceryItemFromInput\(\)/);
+  assert.match(html, /function renderGroceryList\(\)/);
+  assert.match(html, /fetch\('\/api\/groceries'/);
+  assert.match(html, /fetch\('\/api\/groceries', \{ method:'POST'/);
+  assert.match(html, /renderTodoChip\(prepStatusChip, groceryComplete\(\), 'Groceries noted', 'Add grocery notes'\)/);
+  assert.match(html, /if\(!groceryComplete\(\)\) return 'Add grocery notes'/);
+  assert.match(html, /if\(next==='Add grocery notes'\) return openPrepPlanner\(\)/);
+  assert.match(html, /addGroceryItemButton\.addEventListener\('click',addGroceryItemFromInput\)/);
+  assert.match(html, /groceryList\.addEventListener\('click'/);
   assert.match(html, /prepStatusChip\.addEventListener\('click',openPrepPlanner\)/);
   assert.match(html, /myPrepCard\.addEventListener\('click',openPrepPlanner\)/);
 });
