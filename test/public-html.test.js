@@ -674,10 +674,11 @@ test('custom event descriptions linkify pasted URLs safely in cards and detail',
   assert.doesNotMatch(html, /dayEventDetailNote\.textContent=event\.description \|\| event\.note \|\| ''/);
 });
 
-test('calendar event detail has a top-right share icon doubled from calendar expand icons', () => {
+test('calendar event detail has a top-right share icon reduced 25 percent from doubled size', () => {
   assert.match(html, /<button class="day-event-share calendar-expand-icon" id="dayEventShare" type="button" title="Share event" aria-label="Share event" hidden>[\s\S]*<svg[^>]*viewBox="0 0 24 24"[^>]*>[\s\S]*<\/svg><\/button><h3 id="dayEventDetailTitle">Event<\/h3>/);
   assert.match(html, /\.calendar-expand-icon \{[^}]*width: 22px;[^}]*height: 22px;[^}]*padding: 3px;[^}]*opacity: \.2;/s);
-  assert.match(html, /\.day-event-share \{[^}]*top: 10px;[^}]*right: 10px;[^}]*width: 44px;[^}]*height: 44px;[^}]*padding: 6px;/s);
+  assert.match(html, /\.day-event-share \{[^}]*top: 10px;[^}]*right: 10px;[^}]*width: 33px;[^}]*height: 33px;[^}]*padding: 4\.5px;/s);
+  assert.doesNotMatch(html, /\.day-event-share \{[^}]*width: 44px;[^}]*height: 44px;[^}]*padding: 6px;/s);
   assert.match(html, /dayEventShareButton=document\.getElementById\('dayEventShare'\)/);
   assert.match(html, /dayEventShareButton\.hidden=false/);
   assert.match(html, /dayEventShareButton\.onclick=\(\)=>shareDayEvent\(event\)/);
@@ -817,8 +818,10 @@ test('grocery state is shared through the groceries API with local fallback and 
   assert.match(html, /\.dietary-preference-card\.is-saved #dietaryNotes \{[^}]*height: 44px;[^}]*min-height: 44px;[^}]*padding: 0 78px 0 10px;[^}]*line-height: 44px;[^}]*resize: none;/s);
   assert.match(html, /\.dietary-preference-card\.is-saved \.dietary-confirmation-row \{[^}]*height: 0;[^}]*min-height: 0;[^}]*margin-top: 0;/s);
   assert.doesNotMatch(html, /\.dietary-saved-message/);
-  assert.match(html, /\.dietary-edit-action \{[^}]*position: absolute;[^}]*right: 10px;[^}]*top: 44px;[^}]*transform: translateY\(-50%\);[^}]*opacity: \.2;[^}]*pointer-events: auto;/s);
-  assert.match(html, /\.dietary-edit-action:hover, \.dietary-edit-action:focus-visible \{[^}]*opacity: 1;/s);
+  assert.match(html, /\.dietary-edit-action \{[^}]*position: absolute;[^}]*right: 10px;[^}]*top: calc\(13px \+ 6px \+ 25px\);[^}]*transform: translateY\(-50%\);[^}]*border: 1px solid white;[^}]*color: white;[^}]*opacity: \.2;[^}]*pointer-events: auto;/s);
+  assert.doesNotMatch(html, /\.dietary-edit-action \{[^}]*border: 1px solid rgba\(255,255,255,\.24\)/s);
+  assert.doesNotMatch(html, /\.dietary-edit-action \{[^}]*color: rgba\(255,255,255,\.86\)/s);
+  assert.match(html, /\.dietary-edit-action:hover, \.dietary-edit-action:focus-visible \{[^}]*opacity: 1;[^}]*border-color: white;/s);
   assert.doesNotMatch(html, /\.dietary-preference-card\.is-saved:hover \.dietary-edit-action[^{]*\{[^}]*opacity: 1/s);
   assert.match(html, /fetch\('\/api\/groceries'/);
   assert.match(html, /fetch\('\/api\/groceries', \{ method:'POST'/);
