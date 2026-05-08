@@ -774,7 +774,7 @@ test('grocery state is shared through the groceries API with local fallback and 
   assert.doesNotMatch(html, /exportGroceriesReminders\.addEventListener/);
   assert.match(html, /\.prep-form \{[^}]*padding: 4px 8px 12px;[^}]*margin: -4px -8px 0;/s);
   assert.match(html, /\.grocery-input-row \{[^}]*align-items: end;[^}]*\}/s);
-  assert.match(html, /\.grocery-input-control \{ display: grid; gap: 10px; \}/);
+  assert.match(html, /\.grocery-input-control \{ display: grid; gap: 5px; \}/);
   assert.match(html, /<div class="grocery-input-control"><label for="groceryItem">Add grocery item<\/label><input id="groceryItem"/);
   assert.match(html, /\.grocery-add-action \{[^}]*border: 1px solid white;[^}]*background: white;[^}]*color: var\(--ink\);[^}]*border-radius: var\(--field-radius\);[^}]*height: 34px;[^}]*min-height: 34px;[^}]*box-sizing: border-box;[^}]*padding: 0 14px;/s);
   assert.match(html, /@media \(max-width: 760px\) \{[\s\S]*\.grocery-add-action \{ height: 44px; min-height: 44px; border-radius: 18px; padding: 0 16px; \}/s);
