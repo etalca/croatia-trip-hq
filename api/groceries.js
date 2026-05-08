@@ -4,7 +4,8 @@ const { Redis } = require('@upstash/redis');
 const { canonicalCrewName, sendJson, getSupabase } = require('../lib/trip-store');
 const { getAuthUserFromRequest, resolveGuestForAuthUser } = require('../lib/trip-auth');
 
-const LOCAL_GROCERIES_PATH = process.env.GROCERIES_DATA_PATH || path.join(process.cwd(), 'Server', 'groceries-data.json');
+const DEFAULT_LOCAL_GROCERIES_PATH = process.env.VERCEL ? path.join('/tmp', 'croatia-trip-hq-groceries.json') : path.join(process.cwd(), 'Server', 'groceries-data.json');
+const LOCAL_GROCERIES_PATH = process.env.GROCERIES_DATA_PATH || DEFAULT_LOCAL_GROCERIES_PATH;
 const REDIS_KEY = process.env.GROCERIES_DATA_KEY || 'croatia-trip-hq:groceries';
 let redisClient;
 
@@ -28,12 +29,20 @@ function normalizeGroceries(value) {
     const text = String(note || '').trim().slice(0, 220);
     if (person && text) cleanPreferences[person] = text;
   }
-  const items = Array.isArray(value?.items) ? value.items.map(item => ({
-    id: String(item.id || `grocery-${Date.now()}`).slice(0, 80),
-    text: String(item.text || '').trim().slice(0, 80),
-    addedBy: canonicalCrewName(item.addedBy || '') || '',
-    createdAt: String(item.createdAt || new Date().toISOString()).slice(0, 40),
-  })).filter(item => item.text).slice(0, 80) : [];
+  const items = Array.isArray(value?.items) ? value.items.map(item => {
+    const addedBy = canonicalCrewName(item.addedBy || '') || '';
+    const requestedBy = Array.from(new Set((Array.isArray(item.requestedBy) ? item.requestedBy : [])
+      .map(name => canonicalCrewName(name || ''))
+      .filter(Boolean)));
+    if (addedBy && !requestedBy.length) requestedBy.push(addedBy);
+    return {
+      id: String(item.id || `grocery-${Date.now()}`).slice(0, 80),
+      text: String(item.text || '').trim().slice(0, 80),
+      addedBy,
+      requestedBy,
+      createdAt: String(item.createdAt || new Date().toISOString()).slice(0, 40),
+    };
+  }).filter(item => item.text).slice(0, 80) : [];
   return { preferences: cleanPreferences, items };
 }
 async function readGroceries() {

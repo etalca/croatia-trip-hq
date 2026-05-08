@@ -751,6 +751,7 @@ test('grocery card replaces trip prep with dietary preferences and a shared cate
   assert.match(html, /id="prepPlanner"/);
   assert.match(html, /id="prepPlannerTitle">Groceries<\/h2>/);
   assert.match(html, /id="dietaryNotes"/);
+  assert.match(html, /<\/textarea><button class="dietary-save-action" type="submit">Save<\/button><\/div>/);
   assert.match(html, /id="groceryItem"/);
   assert.match(html, /id="addGroceryItem"/);
   assert.match(html, /class="grocery-add-action" id="addGroceryItem"/);
@@ -758,7 +759,7 @@ test('grocery card replaces trip prep with dietary preferences and a shared cate
   assert.match(html, /id="groceryEmpty"/);
   assert.doesNotMatch(html, /id="exportGroceriesReminders"/);
   assert.doesNotMatch(html, /Export to Reminders/);
-  assert.match(html, /Save groceries/);
+  assert.doesNotMatch(html, /Save groceries/);
   assert.doesNotMatch(html, /id="prepChecklist"/);
   assert.doesNotMatch(html, /data-prep-item="passport"|Passport checked|Swimsuit packed|Power adapter packed|Sunscreen \/ hat ready|Ferry \/ transport plan reviewed/);
   assert.doesNotMatch(html, /id="tripWish"|id="activityInterest"|One thing you want from the trip|Activity you’re most interested in/);
@@ -770,9 +771,14 @@ test('grocery state is shared through the groceries API with local fallback and 
   assert.match(html, /function readLocalGroceries\(\)/);
   assert.match(html, /function cacheGroceries\(state\)/);
   assert.match(html, /async function loadGroceryState\(\)/);
-  assert.match(html, /async function saveGroceryState\(\)/);
+  assert.match(html, /async function saveGroceryState\(\{ quiet=false \}=\{\}\)/);
+  assert.match(html, /function saveGroceryStateQuiet\(\)/);
   assert.match(html, /function groceryComplete\(\)/);
   assert.match(html, /function addGroceryItemFromInput\(\)/);
+  assert.match(html, /function plusOneGroceryItem\(itemId\)/);
+  assert.match(html, /function currentGroceryPerson\(\)/);
+  assert.match(html, /function groceryRequesterNames\(item\)/);
+  assert.match(html, /function groceryItemMatchesText\(item, text\)/);
   assert.match(html, /function renderGroceryList\(\)/);
   assert.match(html, /fetch\('\/api\/groceries'/);
   assert.match(html, /fetch\('\/api\/groceries', \{ method:'POST'/);
@@ -780,6 +786,11 @@ test('grocery state is shared through the groceries API with local fallback and 
   assert.match(html, /if\(!groceryComplete\(\)\) return 'Add grocery notes'/);
   assert.match(html, /if\(next==='Add grocery notes'\) return openPrepPlanner\(\)/);
   assert.match(html, /addGroceryItemButton\.addEventListener\('click',addGroceryItemFromInput\)/);
+  assert.match(html, /data-grocery-plus-one="\$\{escapeHtml\(item\.id\)\}"/);
+  assert.match(html, /Plus one/);
+  assert.match(html, /requestedBy/);
+  assert.match(html, /plusOneGroceryItem\(plus\.dataset\.groceryPlusOne\)/);
+  assert.match(html, /saveGroceryStateQuiet\(\)/);
   assert.match(html, /groceryList\.addEventListener\('click'/);
   assert.match(html, /const GROCERY_SECTIONS=\[/);
   assert.match(html, /name:'Produce',[\s\S]*onion[\s\S]*apple[\s\S]*berries[\s\S]*spinach[\s\S]*zucchini[\s\S]*mushroom/s);
@@ -797,8 +808,8 @@ test('grocery state is shared through the groceries API with local fallback and 
   assert.match(html, /\.grocery-input-row \{[^}]*align-items: end;[^}]*\}/s);
   assert.match(html, /\.grocery-input-control \{ display: grid; gap: 5px; \}/);
   assert.match(html, /<div class="grocery-input-control"><label for="groceryItem">Add grocery item<\/label><input id="groceryItem"/);
-  assert.match(html, /\.grocery-add-action \{[^}]*border: 1px solid white;[^}]*background: white;[^}]*color: var\(--ink\);[^}]*border-radius: var\(--field-radius\);[^}]*height: 34px;[^}]*min-height: 34px;[^}]*box-sizing: border-box;[^}]*padding: 0 14px;/s);
-  assert.match(html, /@media \(max-width: 760px\) \{[\s\S]*\.grocery-add-action \{ height: 44px; min-height: 44px; border-radius: 18px; padding: 0 16px; \}/s);
+  assert.match(html, /\.grocery-add-action, \.dietary-save-action, \.grocery-plus-one \{[^}]*border: 1px solid white;[^}]*background: white;[^}]*color: var\(--ink\);[^}]*border-radius: var\(--field-radius\);[^}]*height: 34px;[^}]*min-height: 34px;[^}]*box-sizing: border-box;[^}]*padding: 0 14px;/s);
+  assert.match(html, /@media \(max-width: 760px\) \{[\s\S]*\.grocery-add-action, \.dietary-save-action \{ height: 44px; min-height: 44px; border-radius: 18px; padding: 0 16px; \}/s);
   assert.match(html, /prepStatusChip\.addEventListener\('click',openPrepPlanner\)/);
   assert.match(html, /myPrepCard\.addEventListener\('click',openPrepPlanner\)/);
   assert.match(html, /function dietaryLine\(person\)\{ const prefs=normalizeGroceries\(cachedGroceries\)\.preferences \|\| \{\}/);
