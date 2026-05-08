@@ -568,8 +568,13 @@ test('custom calendar event form captures title, time range, invite mode, invite
   assert.match(html, /<label for="eventInviteMode">Invite type<\/label><select id="eventInviteMode" required>/);
   assert.match(html, /<option value="open">Open invite<\/option>/);
   assert.match(html, /<option value="invite-only">Invite only<\/option>/);
-  assert.match(html, /id="eventInvitees" multiple/);
-  assert.match(html, /id="eventInviteeSummary">No invitees<\/p>/);
+  assert.match(html, /id="eventInvitees" multiple hidden/);
+  assert.match(html, /button type="button" class="event-invitee-control" id="eventInviteeControl"/);
+  assert.match(html, /<span id="eventInviteeSummary">No invitees<\/span>/);
+  assert.match(html, /id="eventInviteeOptions"/);
+  assert.match(html, /\.event-invitee-control \{[^}]*min-height: 44px;[^}]*height: auto;/s);
+  assert.match(html, /\.event-invitee-control \{[^}]*white-space: normal;/s);
+  assert.doesNotMatch(html, /\.event-invitees-field select \{ min-height: 104px;/);
   assert.match(html, /function populateEventInvitees\(\)/);
   assert.match(html, /function formatInviteeSummary\(names\)\{ if\(!names\.length\) return 'No invitees'; return formatNameList\(names\); \}/);
   assert.doesNotMatch(html, /return formatNameList\(\['me',\.\.\.names\]\)/);
@@ -601,7 +606,9 @@ test('custom event form scrolls on short viewports and preserves field focus out
   assert.match(html, /#eventPlanner \.dinner-form \{[^}]*overflow-y: auto;[^}]*min-height: 0;/s);
   assert.match(html, /#eventPlanner \.dinner-form \{[^}]*padding: 4px 8px 12px;[^}]*margin: -4px 0 0;/s);
   assert.match(html, /#eventPlanner input:focus, #eventPlanner select:focus, #eventPlanner textarea:focus \{[^}]*outline: 2px solid rgba\(255,255,255,\.78\);[^}]*outline-offset: 2px;/s);
-  assert.match(html, /<p class="event-invitee-summary" id="eventInviteeSummary">No invitees<\/p>/);
+  assert.match(html, /<button type="button" class="event-invitee-control" id="eventInviteeControl" aria-expanded="false" aria-controls="eventInviteeOptions"><span id="eventInviteeSummary">No invitees<\/span><\/button>/);
+  assert.match(html, /id="eventInvitees" multiple hidden/);
+  assert.match(html, /class="event-invitee-options" id="eventInviteeOptions" hidden/);
   assert.match(html, /function selectedInviteeNames\(\)/);
   assert.match(html, /function formatInviteeSummary\(names\)/);
   assert.match(html, /if\(!names\.length\) return 'No invitees'/);
