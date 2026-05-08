@@ -271,6 +271,7 @@
   .dietary-preference-card { position: relative; transition: background .18s ease, border-color .18s ease; }
   .dietary-preference-card.is-saved { border-color: transparent; background: transparent; }
   .dietary-preference-card.is-saved #dietaryNotes { height: 44px; min-height: 44px; padding: 0 78px 0 10px; line-height: 44px; resize: none; overflow: hidden; }
+  .dietary-preference-card.is-saved .dietary-confirmation-row { height: 0; min-height: 0; margin-top: 0; }
   .dietary-confirmation-row { display: flex; align-items: center; gap: 8px; margin-top: 8px; min-height: 34px; }
   .grocery-add-action, .dietary-save-action { border: 1px solid white; background: white; color: var(--ink); border-radius: var(--field-radius); height: 34px; min-height: 34px; box-sizing: border-box; padding: 0 14px; display: inline-grid; place-items: center; font-size: 13px; line-height: 1; cursor: pointer; }
   .dietary-edit-action { position: absolute; right: 10px; top: 44px; transform: translateY(-50%); height: 25.5px; min-height: 25.5px; width: auto; border-radius: 999px; display: grid; place-items: center; border: 1px solid rgba(255,255,255,.24); background: rgba(255,255,255,.14); color: rgba(255,255,255,.86); cursor: pointer; padding: 0 10px; font-size: 13px; line-height: 1; opacity: .2; pointer-events: auto; transition: opacity .18s ease, background .18s ease, border-color .18s ease; }
@@ -329,10 +330,10 @@
   .dinner-night:hover .dinner-action, .dinner-night:focus-within .dinner-action { opacity: 1; pointer-events: auto; }
   .dinner-action:hover, .dinner-action:focus-visible { background: rgba(255,255,255,.26); border-color: rgba(255,255,255,.42); }
   .dinner-card { display: grid; gap: 10px; align-content: start; }
-  .itinerary-heading { display: grid; gap: 2px; margin: 2px 2px 0; }
+  .itinerary-heading { display: grid; gap: 0; margin: 0 2px 0; }
   .itinerary-heading h3 { margin: 0; font-size: 18px; line-height: 1.04; font-weight: 400; color: white; }
   .itinerary-heading p { margin: 0; color: rgba(255,255,255,.64); font-size: 12px; line-height: 1.35; }
-  .itinerary-heading .secondary-action { justify-self: start; margin-top: 4px; border: 1px solid white; background: white; color: var(--ink); height: 25.5px; min-height: 0; box-sizing: border-box; border-radius: 999px; padding: 0 12px; display: inline-grid; place-items: center; font-size: 13px; line-height: 1; cursor: pointer; }
+  .itinerary-heading .secondary-action { justify-self: start; margin-top: 2px; border: 1px solid white; background: white; color: var(--ink); height: 25.5px; min-height: 0; box-sizing: border-box; border-radius: 999px; padding: 0 12px; display: inline-grid; place-items: center; font-size: 13px; line-height: 1; cursor: pointer; }
   .itinerary-heading .secondary-action:hover { cursor: pointer; }
   .event-invitees-field[hidden] { display: none; }
   .event-invitees-field { position: relative; }
@@ -348,7 +349,7 @@
   .calendar-event.is-custom, .day-view-event.is-custom { border-color: rgba(255,255,255,.30); background: rgba(255,255,255,.16); }
   .custom-event-mode { color: rgba(255,255,255,.54) !important; }
   .calendar-event-actions { display: flex; flex-wrap: wrap; gap: 6px; padding-top: 4px; }
-  .embedded-itinerary { display: grid; gap: 8px; padding-top: 7px; }
+  .embedded-itinerary { display: grid; gap: 8px; padding-top: 0; }
   .calendar-list { overflow-y: auto; min-height: 0; }
   .calendar-week { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
   .calendar-day { position: relative; min-height: 132px; display: grid; align-content: start; gap: 8px; border: 1px solid rgba(255,255,255,.18); border-radius: 16px; background: rgba(255,255,255,.10); padding: 10px; overflow: hidden; }

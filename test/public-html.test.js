@@ -246,11 +246,11 @@ test('dashboard embeds itinerary directly with floating header instead of a wrap
   assert.match(tripInfoBlock, /id="calendarItems"/);
   assert.doesNotMatch(html, /\.embedded-itinerary \{[^}]*border:/);
   assert.doesNotMatch(html, /\.embedded-itinerary \{[^}]*background:/);
-  assert.match(html, /\.itinerary-heading \{ display: grid; gap: 2px; margin: 2px 2px 0; \}/);
+  assert.match(html, /\.itinerary-heading \{ display: grid; gap: 0; margin: 0 2px 0; \}/);
   assert.match(html, /\.itinerary-heading h3 \{[^}]*line-height: 1\.04;[^}]*font-weight: 400;/s);
   assert.match(html, /\.itinerary-heading p \{[^}]*font-size: 12px;[^}]*line-height: 1\.35;/s);
-  assert.match(html, /\.itinerary-heading \.secondary-action \{[^}]*margin-top: 4px;[^}]*height: 25\.5px;[^}]*min-height: 0;[^}]*box-sizing: border-box;[^}]*display: inline-grid;[^}]*place-items: center;[^}]*font-size: 13px;[^}]*line-height: 1;/s);
-  assert.match(html, /\.embedded-itinerary \{ display: grid; gap: 8px; padding-top: 7px; \}/);
+  assert.match(html, /\.itinerary-heading \.secondary-action \{[^}]*margin-top: 2px;[^}]*height: 25\.5px;[^}]*min-height: 0;[^}]*box-sizing: border-box;[^}]*display: inline-grid;[^}]*place-items: center;[^}]*font-size: 13px;[^}]*line-height: 1;/s);
+  assert.match(html, /\.embedded-itinerary \{ display: grid; gap: 8px; padding-top: 0; \}/);
   assert.match(html, /\.calendar-week \{/);
   assert.match(html, /\.calendar-day \{/);
   assert.match(html, /function renderCalendarView\(\)/);
@@ -815,6 +815,7 @@ test('grocery state is shared through the groceries API with local fallback and 
   assert.match(html, /\.dietary-preference-card\.is-saved \{[^}]*border-color: transparent;[^}]*background: transparent;/s);
   assert.doesNotMatch(html, /\.dietary-preference-card\.is-saved \{[^}]*background: rgba\(255,255,255,\.08\)/s);
   assert.match(html, /\.dietary-preference-card\.is-saved #dietaryNotes \{[^}]*height: 44px;[^}]*min-height: 44px;[^}]*padding: 0 78px 0 10px;[^}]*line-height: 44px;[^}]*resize: none;/s);
+  assert.match(html, /\.dietary-preference-card\.is-saved \.dietary-confirmation-row \{[^}]*height: 0;[^}]*min-height: 0;[^}]*margin-top: 0;/s);
   assert.doesNotMatch(html, /\.dietary-saved-message/);
   assert.match(html, /\.dietary-edit-action \{[^}]*position: absolute;[^}]*right: 10px;[^}]*top: 44px;[^}]*transform: translateY\(-50%\);[^}]*opacity: \.2;[^}]*pointer-events: auto;/s);
   assert.match(html, /\.dietary-edit-action:hover, \.dietary-edit-action:focus-visible \{[^}]*opacity: 1;/s);
