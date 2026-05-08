@@ -380,7 +380,7 @@ test('mobile overlays are centered in the viewport instead of stretched and clip
 test('dashboard add event stays compact while day-view add event matches chevron nav height', () => {
   assert.match(html, /\.back \{[^}]*height: 25\.5px;[^}]*font-size: 13px;[^}]*line-height: 1;[^}]*padding: 0 10px;[^}]*display: grid;[^}]*place-items: center;/s);
   assert.match(html, /\.todo-chip \{[^}]*height: 25\.5px;[^}]*box-sizing: border-box;[^}]*padding: 0 9px;[^}]*font-size: 13px;[^}]*line-height: 1;/s);
-  assert.match(html, /\.itinerary-heading \.secondary-action \{[^}]*height: 25\.5px;[^}]*min-height: 0;[^}]*box-sizing: border-box;[^}]*padding: 0 10px;[^}]*display: inline-grid;[^}]*place-items: center;/s);
+  assert.match(html, /\.itinerary-heading \.secondary-action \{[^}]*height: 25\.5px;[^}]*min-height: 0;[^}]*box-sizing: border-box;[^}]*border-radius: 999px;[^}]*padding: 0 12px;[^}]*display: inline-grid;[^}]*place-items: center;/s);
   assert.match(html, /\.day-view-add-event \{[^}]*bottom: 16px;[^}]*height: 44px;[^}]*min-height: 44px;[^}]*box-sizing: border-box;[^}]*padding: 0 18px;[^}]*display: inline-grid;[^}]*place-items: center;/s);
   assert.match(html, /\.day-view-nav-button \{[^}]*width: 44px;[^}]*height: 44px;[^}]*min-height: 44px;[^}]*padding: 0;[^}]*font-size: 24px;[^}]*display: inline-grid;[^}]*place-items: center;/s);
   assert.match(html, /\.day-view-chevron \{[^}]*display: block;[^}]*line-height: 1;[^}]*transform: translateY\(-\.06em\);/s);
@@ -862,7 +862,8 @@ test('desktop day-view RSVP actions appear on hover beside eligible events', () 
   assert.match(html, /function customEventStateClass\(eventId\)/);
   assert.match(html, /customEventDeclines\(\)\[eventId\]/);
   assert.match(html, /is-custom \$\{customEventStateClass\(event\.id\)\}/);
-  assert.match(html, /\.day-view-event\.is-activity\.is-declined strong, \.day-view-event\.is-custom\.is-declined strong \{[^}]*opacity: \.2;[^}]*text-decoration: line-through/s);
+  assert.match(html, /\.day-view-event\.is-activity\.is-declined > :is\(strong, span, small\), \.day-view-event\.is-custom\.is-declined > :is\(strong, span, small\) \{[^}]*opacity: \.2;/s);
+  assert.match(html, /\.day-view-event\.is-activity\.is-declined strong, \.day-view-event\.is-custom\.is-declined strong \{[^}]*text-decoration: line-through/s);
 });
 
 
