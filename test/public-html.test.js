@@ -757,6 +757,8 @@ test('grocery state is shared through the groceries API with local fallback and 
   assert.match(html, /groceryList\.addEventListener\('click'/);
   assert.match(html, /prepStatusChip\.addEventListener\('click',openPrepPlanner\)/);
   assert.match(html, /myPrepCard\.addEventListener\('click',openPrepPlanner\)/);
+  assert.match(html, /function dietaryLine\(person\)\{ const prefs=normalizeGroceries\(cachedGroceries\)\.preferences \|\| \{\}/);
+  assert.doesNotMatch(html, /readTripPreferences/);
 });
 
 test('itinerary activity RSVPs show attendee names, declined state, and editable choices', () => {
