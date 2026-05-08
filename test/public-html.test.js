@@ -559,8 +559,11 @@ test('custom calendar event form captures title, time range, invite mode, invite
   assert.match(html, /id="eventPlanner"/);
   assert.match(html, /id="eventForm"/);
   assert.match(html, /<label for="eventTitle">Title<\/label><input id="eventTitle"/);
-  assert.match(html, /<label for="eventStartTime">Start time<\/label><input id="eventStartTime" type="time" required>/);
-  assert.match(html, /<label for="eventEndTime">End time<\/label><input id="eventEndTime" type="time" required>/);
+  assert.match(html, /<label for="eventStartTime">Start time<\/label><input id="eventStartTime" type="time" step="300" required>/);
+  assert.match(html, /<label for="eventEndTime">End time<\/label><input id="eventEndTime" type="time" step="300" required>/);
+  assert.match(html, /function addMinutesToTime\(value, minutes\)/);
+  assert.match(html, /function defaultEventEndTime\(\)\{[^}]*eventEndTime\.value=addMinutesToTime\(eventStartTime\.value,60\)/);
+  assert.match(html, /eventStartTime\.addEventListener\('change',defaultEventEndTime\)/);
   assert.match(html, /<label for="eventDescription">Description<\/label><textarea id="eventDescription"/);
   assert.match(html, /<label for="eventInviteMode">Invite type<\/label><select id="eventInviteMode" required>/);
   assert.match(html, /<option value="open">Open invite<\/option>/);
