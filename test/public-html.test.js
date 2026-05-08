@@ -241,7 +241,7 @@ test('dashboard embeds itinerary directly with floating header instead of a wrap
   assert.doesNotMatch(html, /\.embedded-itinerary \{[^}]*border:/);
   assert.doesNotMatch(html, /\.embedded-itinerary \{[^}]*background:/);
   assert.match(html, /\.itinerary-heading \{/);
-  assert.match(html, /\.itinerary-heading \.secondary-action \{[^}]*height: 25\.5px;[^}]*min-height: 0;/s);
+  assert.match(html, /\.itinerary-heading \.secondary-action \{[^}]*height: 25\.5px;[^}]*min-height: 0;[^}]*box-sizing: border-box;[^}]*display: inline-grid;[^}]*place-items: center;[^}]*font-size: 13px;[^}]*line-height: 1;/s);
   assert.match(html, /\.embedded-itinerary \{ display: grid; gap: 8px; padding-top: 5px; \}/);
   assert.match(html, /\.calendar-week \{/);
   assert.match(html, /\.calendar-day \{/);
@@ -271,7 +271,7 @@ test('dashboard itinerary cards use subtle expand icons to open an iCal-style da
   assert.match(html, /<div class="day-view-nav" id="dayViewNav" aria-label="Change day"><button class="back" id="previousDayView" type="button">Previous day<\/button><button class="back" id="nextDayView" type="button">Next day<\/button><\/div>/);
   assert.match(html, /dayViewAddEventButton=document\.getElementById\('dayViewAddEvent'\)/);
   assert.match(html, /dayViewAddEventButton\.addEventListener\('click',\(\)=>openEventPlanner\(activeDayViewDate\)\)/);
-  assert.match(html, /\.day-view-add-event \{[^}]*position: absolute;[^}]*left: 20px;[^}]*bottom: 20px;[^}]*height: 25\.5px;[^}]*min-height: 0;/s);
+  assert.match(html, /\.day-view-add-event \{[^}]*position: absolute;[^}]*left: 20px;[^}]*bottom: 20px;[^}]*height: 25\.5px;[^}]*min-height: 0;[^}]*box-sizing: border-box;[^}]*display: inline-grid;[^}]*place-items: center;[^}]*font-size: 13px;[^}]*line-height: 1;/s);
   assert.match(html, /\.day-event-detail:not\(\[hidden\]\) ~ \.day-view-add-event \{ display: none; \}/);
   assert.match(html, /function openDayView\(date\)/);
   assert.match(html, /let activeDayViewDate=''/);
@@ -347,12 +347,28 @@ test('trip dashboard clickable cards show expand affordances and scroll below st
   assert.match(tripInfoBlock, /id="myFlightCard"[\s\S]*?<img class="dashboard-card-expand" src="assets\/Expand icon\.svg" alt="" aria-hidden="true">/);
   assert.match(tripInfoBlock, /<section class="calendar-list embedded-itinerary" id="calendarItems" aria-label="Trip itinerary"><\/section>[\s\S]*?<\/section>/);
   assert.match(html, /#tripInfo \.dashboard-card header \{ flex: 0 0 auto; \}/);
+  assert.match(html, /#tripInfo \.dashboard-card \{ height: min\(88svh, 760px\); \}/);
+  assert.doesNotMatch(html, /#tripInfo \.dashboard-card \{[^}]*padding-bottom: 64px;/s);
   assert.match(html, /#tripInfo \.trip-info-scroll \{ flex: 1 1 auto; overflow: hidden; min-height: 0; display: flex; flex-direction: column; gap: 10px; scrollbar-width: none; -ms-overflow-style: none; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; \}/);
   assert.match(html, /#tripInfo \.calendar-list \{ overflow: visible; min-height: auto; \}/);
   assert.match(html, /#tripInfo \.trip-info-scroll::-webkit-scrollbar \{ width: 0; height: 0; display: none; \}/);
   assert.match(html, /\.personal-card \{[^}]*position: relative;[^}]*padding: 14px 42px 14px 14px;/s);
   assert.match(html, /\.calendar-expand-icon \{[^}]*width: 22px;[^}]*height: 22px;[^}]*padding: 3px;[^}]*opacity: \.2;/s);
   assert.match(html, /\.dashboard-card-expand \{[^}]*position: absolute;[^}]*top: 10px;[^}]*right: 10px;[^}]*width: 22px;[^}]*height: 22px;[^}]*padding: 3px;[^}]*box-sizing: border-box;[^}]*opacity: \.2;/s);
+});
+
+test('dashboard overview people toggle floats over content instead of reserving a blank bottom bar', () => {
+  assert.match(html, /\.trip-tabs \{[^}]*position: absolute;[^}]*bottom: 20px;[^}]*left: 50%;[^}]*transform: translateX\(-50%\);[^}]*z-index: 6;[^}]*backdrop-filter: blur\(16px\);/s);
+  assert.match(html, /\.trip-tab-viewport \{[^}]*flex: 1 1 auto;[^}]*overflow: hidden;[^}]*min-height: 0;/s);
+  assert.doesNotMatch(html, /#tripInfo \.dashboard-card \{[^}]*padding-bottom: 64px;/s);
+  assert.doesNotMatch(html, /\.trip-tabs \{[^}]*position: static/s);
+});
+
+test('add event buttons match compact todo and day navigation chip sizing', () => {
+  assert.match(html, /\.back \{[^}]*height: 25\.5px;[^}]*font-size: 13px;[^}]*line-height: 1;[^}]*padding: 0 10px;[^}]*display: grid;[^}]*place-items: center;/s);
+  assert.match(html, /\.todo-chip \{[^}]*height: 25\.5px;[^}]*box-sizing: border-box;[^}]*padding: 0 9px;[^}]*font-size: 13px;[^}]*line-height: 1;/s);
+  assert.match(html, /\.itinerary-heading \.secondary-action \{[^}]*height: 25\.5px;[^}]*min-height: 0;[^}]*box-sizing: border-box;[^}]*padding: 0 10px;[^}]*display: inline-grid;[^}]*place-items: center;/s);
+  assert.match(html, /\.day-view-add-event \{[^}]*height: 25\.5px;[^}]*min-height: 0;[^}]*box-sizing: border-box;[^}]*padding: 0 10px;[^}]*display: inline-grid;[^}]*place-items: center;/s);
 });
 
 test('claimed dinner card puts the prompt above, date as title, and co-lead below', () => {
@@ -461,6 +477,8 @@ test('mobile dashboard keeps todo chips sticky while trip cards and itinerary sc
   assert.match(tripInfoBlock, /<div class="trip-info-scroll">[\s\S]*?<div class="dashboard-hero">/);
   assert.match(tripInfoBlock, /<section class="calendar-list embedded-itinerary" id="calendarItems" aria-label="Trip itinerary"><\/section>[\s\S]*?<\/section>/);
   assert.match(html, /#tripInfo \.dashboard-card header \{ flex: 0 0 auto; \}/);
+  assert.match(html, /#tripInfo \.dashboard-card \{ height: min\(88svh, 760px\); \}/);
+  assert.doesNotMatch(html, /#tripInfo \.dashboard-card \{[^}]*padding-bottom: 64px;/s);
   assert.match(html, /#tripInfo \.trip-info-scroll \{ flex: 1 1 auto; overflow: hidden; min-height: 0; display: flex; flex-direction: column; gap: 10px; scrollbar-width: none; -ms-overflow-style: none; -webkit-overflow-scrolling: touch; overscroll-behavior: contain; \}/);
   assert.match(html, /#tripInfo \.calendar-list \{ overflow: visible; min-height: auto; \}/);
   assert.match(html, /#tripInfo \.trip-info-scroll::-webkit-scrollbar \{ width: 0; height: 0; display: none; \}/);
@@ -845,7 +863,7 @@ test('people profiles live in an animated fit-content dashboard tab control', ()
   assert.doesNotMatch(tripInfoBlock, /id="myPeopleCard"/);
   assert.match(html, /\.board-tabs \{[^}]*width: fit-content/);
   assert.match(html, /\.trip-tabs \{[^}]*position: absolute;[^}]*bottom: 20px;[^}]*left: 50%;[^}]*transform: translateX\(-50%\);[^}]*z-index: 6;[^}]*margin: 0;/s);
-  assert.match(html, /#tripInfo \.dashboard-card \{[^}]*padding-bottom: 64px/s);
+  assert.doesNotMatch(html, /#tripInfo \.dashboard-card \{[^}]*padding-bottom: 64px/s);
   assert.match(html, /\.board-tab-indicator/);
   assert.match(html, /transition: transform \.24s ease, width \.24s ease/);
   assert.match(html, /@media \(max-width: 760px\) \{[\s\S]*\.trip-info-scroll \{[^}]*position: relative/);
