@@ -619,7 +619,7 @@
       <div class="field"><label for="eventStartTime">Start time</label><input id="eventStartTime" type="time" step="300" required></div>
       <div class="field"><label for="eventEndTime">End time</label><input id="eventEndTime" type="time" step="300" required></div>
       <div class="field"><label for="eventInviteMode">Invite type</label><select id="eventInviteMode" required><option value="open">Open invite</option><option value="invite-only">Invite only</option></select></div>
-      <div class="field event-invitees-field" id="eventInviteesField" hidden><label for="eventInvitees">Invitees</label><select id="eventInvitees" multiple></select><p class="event-invitee-summary" id="eventInviteeSummary">Just me</p></div>
+      <div class="field event-invitees-field" id="eventInviteesField" hidden><label for="eventInvitees">Invitees</label><select id="eventInvitees" multiple></select><p class="event-invitee-summary" id="eventInviteeSummary">No invitees</p></div>
       <div class="field full"><label for="eventDescription">Description</label><textarea id="eventDescription" maxlength="220" placeholder="Where to meet, what to bring, or why it sounds fun…"></textarea></div>
       <div class="submit"><small>Open invites appear for everyone to join. Invite-only events show for you and invited guests.</small><span class="button-row"><button class="secondary-action destructive-text" type="button" id="deleteCustomEvent" hidden>Delete</button><button class="secondary-action" type="button" id="clearEventForm">Clear</button><button type="submit">Save event</button></span></div>
     </form>
@@ -920,7 +920,7 @@
   function customEventMeta(event){ return `${formatEventTimeRange(event.startTime,event.endTime)} · ${event.inviteMode==='open'?'open invite':'invite only'}`; }
   function populateEventInvitees(){ eventDate.innerHTML=''; tripItineraryDays().forEach(date=>{ const n=niceDinnerDate(date); const option=document.createElement('option'); option.value=date; option.textContent=`${n.weekday}, ${n.day}`; eventDate.appendChild(option); }); eventInvitees.innerHTML=''; crewAlphabetical.filter(person=>person !== currentActivityName()).forEach(person=>{ const option=document.createElement('option'); option.value=person; option.textContent=person; eventInvitees.appendChild(option); }); }
   function selectedInviteeNames(){ return Array.from(eventInvitees.selectedOptions).map(option=>option.value); }
-  function formatInviteeSummary(names){ if(!names.length) return 'Just me'; return formatNameList(['me',...names]); }
+  function formatInviteeSummary(names){ if(!names.length) return 'No invitees'; return formatNameList(names); }
   function syncEventInviteeSummary(){ eventInviteeSummary.textContent=formatInviteeSummary(selectedInviteeNames()); }
   function syncEventInviteMode(){ const inviteOnly=eventInviteMode.value==='invite-only'; eventInviteesField.hidden=!inviteOnly; eventInvitees.disabled=!inviteOnly; syncEventInviteeSummary(); }
   function addMinutesToTime(value, minutes){ if(!value) return ''; const total=(timeToMinutes(value)+minutes+1440)%1440; return `${String(Math.floor(total/60)).padStart(2,'0')}:${String(total%60).padStart(2,'0')}`; }

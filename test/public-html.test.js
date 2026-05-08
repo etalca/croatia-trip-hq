@@ -569,7 +569,10 @@ test('custom calendar event form captures title, time range, invite mode, invite
   assert.match(html, /<option value="open">Open invite<\/option>/);
   assert.match(html, /<option value="invite-only">Invite only<\/option>/);
   assert.match(html, /id="eventInvitees" multiple/);
+  assert.match(html, /id="eventInviteeSummary">No invitees<\/p>/);
   assert.match(html, /function populateEventInvitees\(\)/);
+  assert.match(html, /function formatInviteeSummary\(names\)\{ if\(!names\.length\) return 'No invitees'; return formatNameList\(names\); \}/);
+  assert.doesNotMatch(html, /return formatNameList\(\['me',\.\.\.names\]\)/);
   assert.match(html, /function syncEventInviteMode\(\)/);
   assert.match(html, /eventInviteMode\.addEventListener\('change',syncEventInviteMode\)/);
   assert.match(html, /eventForm\.addEventListener\('submit',saveCustomEvent\)/);
@@ -598,11 +601,12 @@ test('custom event form scrolls on short viewports and preserves field focus out
   assert.match(html, /#eventPlanner \.dinner-form \{[^}]*overflow-y: auto;[^}]*min-height: 0;/s);
   assert.match(html, /#eventPlanner \.dinner-form \{[^}]*padding: 4px 8px 12px;[^}]*margin: -4px 0 0;/s);
   assert.match(html, /#eventPlanner input:focus, #eventPlanner select:focus, #eventPlanner textarea:focus \{[^}]*outline: 2px solid rgba\(255,255,255,\.78\);[^}]*outline-offset: 2px;/s);
-  assert.match(html, /<p class="event-invitee-summary" id="eventInviteeSummary">Just me<\/p>/);
+  assert.match(html, /<p class="event-invitee-summary" id="eventInviteeSummary">No invitees<\/p>/);
   assert.match(html, /function selectedInviteeNames\(\)/);
   assert.match(html, /function formatInviteeSummary\(names\)/);
-  assert.match(html, /if\(!names\.length\) return 'Just me'/);
-  assert.match(html, /return formatNameList\(\['me',\.\.\.names\]\)/);
+  assert.match(html, /if\(!names\.length\) return 'No invitees'/);
+  assert.match(html, /return formatNameList\(names\)/);
+  assert.doesNotMatch(html, /return formatNameList\(\['me',\.\.\.names\]\)/);
   assert.match(html, /function syncEventInviteeSummary\(\)/);
   assert.match(html, /eventInvitees\.addEventListener\('change',syncEventInviteeSummary\)/);
   assert.doesNotMatch(html, /No attendees yet/);
