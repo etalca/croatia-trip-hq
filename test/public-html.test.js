@@ -934,10 +934,13 @@ test('people profiles live in an animated fit-content dashboard tab control', ()
   assert.match(html, /No dietary preferences added yet\./);
   assert.match(html, /id="profileSummaryLine" class="profile-arrival-line">Shared trip details\.<\/p>/);
   assert.doesNotMatch(html, /<article class="profile-detail-item"><strong>Arrival<\/strong>/);
-  assert.match(html, /class="profile-detail-row"[\s\S]*class="profile-detail-icon" aria-hidden="true">☎<\/span>[\s\S]*id="profilePhone">No phone added yet\.<\/span>/);
-  assert.match(html, /class="profile-detail-row"[\s\S]*class="profile-detail-icon" aria-hidden="true">🛏️<\/span>[\s\S]*id="profileRoom"/);
-  assert.match(html, /class="profile-detail-row"[\s\S]*class="profile-detail-icon" aria-hidden="true">🧑‍🍳<\/span>[\s\S]*id="profileDinner"/);
-  assert.match(html, /class="profile-detail-row"[\s\S]*class="profile-detail-icon" aria-hidden="true">🍽️<\/span>[\s\S]*id="profileDietary">No dietary preferences added yet\.<\/span>/);
+  assert.match(html, /class="profile-detail-row"[\s\S]*<svg class="profile-detail-icon" data-symbol="phone" aria-hidden="true"[\s\S]*<span id="profilePhone">No phone added yet\.<\/span>/);
+  assert.match(html, /class="profile-detail-row"[\s\S]*<svg class="profile-detail-icon" data-symbol="bed" aria-hidden="true"[\s\S]*<span id="profileRoom">Room TBD<\/span>/);
+  assert.match(html, /class="profile-detail-row"[\s\S]*<svg class="profile-detail-icon" data-symbol="chef" aria-hidden="true"[\s\S]*<span id="profileDinner">No dinner claimed yet\.<\/span>/);
+  assert.match(html, /class="profile-detail-row"[\s\S]*<svg class="profile-detail-icon" data-symbol="utensils" aria-hidden="true"[\s\S]*<span id="profileDietary">No dietary preferences added yet\.<\/span>/);
+  assert.doesNotMatch(html, /☎|🛏|🧑‍🍳|🍽/);
+  assert.doesNotMatch(html, /<strong>Phone<\/strong>|<strong>Room<\/strong>|<strong>Dinner<\/strong>|<strong>Dietary preferences<\/strong>/);
+  assert.match(html, /\.profile-detail-icon \{[^}]*stroke: currentColor[^}]*fill: none/s);
   assert.doesNotMatch(html, /\.profile-detail-item \{[^}]*border:/);
   assert.doesNotMatch(html, /id="profileDeparture"/);
   assert.doesNotMatch(html, /id="profileNotes"/);
