@@ -835,9 +835,10 @@ test('itinerary activity RSVPs show attendee names, declined state, and editable
   assert.match(html, /const ACTIVITY_SIGNUPS_KEY='korculaActivitySignups'/);
   assert.match(html, /const ACTIVITY_DECLINES_KEY='korculaActivityDeclines'/);
   assert.match(html, /const ACTIVITY_DELETED_KEY='korculaActivityDeleted'/);
-  assert.match(html, /const activityEvents=\[\{id:'grocery-run'/);
-  assert.match(html, /id:'boat-day'/);
-  assert.match(html, /id:'beach-afternoon'/);
+  assert.match(html, /const activityEvents=\[\]/);
+  assert.doesNotMatch(html, /id:'grocery-run'|Grocery run|stock the villa/);
+  assert.doesNotMatch(html, /id:'boat-day'|Boat day candidate|boat rental or tour/);
+  assert.doesNotMatch(html, /id:'beach-afternoon'|Beach afternoon|open swim block/);
   assert.match(html, /function activitySignups\(\)/);
   assert.match(html, /function activityDeclines\(\)/);
   assert.match(html, /function activityDeleted\(\)/);

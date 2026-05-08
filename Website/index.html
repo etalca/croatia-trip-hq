@@ -898,7 +898,7 @@
   function closeProfileDetail(){ closeProfileDetailModal(true); }
   function closeProfileDetailModal(reopenPeople=true){ profileDetail.classList.remove('open'); if(reopenPeople && currentGuest){ reopenAfterBack(()=>{ if(!profileDetail.classList.contains('open')) profileDetail.hidden=true; openTripInfo(); setTripTab('people'); }); return; } setTimeout(()=>{ if(!profileDetail.classList.contains('open')) profileDetail.hidden=true; syncHomeVisibility(); },240); }
 
-  const activityEvents=[{id:'grocery-run',date:'2026-06-28',title:'Grocery run',meta:'11:00 a.m. · stock the villa',hour:'11:00 a.m.',duration:90,note:'Good shared errand for the first full day.'},{id:'boat-day',date:'2026-06-30',title:'Boat day candidate',meta:'10:00 a.m. · group opt-in',hour:'10:00 a.m.',duration:300,note:'Sign up if a boat rental or tour sounds fun.'},{id:'beach-afternoon',date:'2026-07-02',title:'Beach afternoon',meta:'2:00 p.m. · open swim block',hour:'2:00 p.m.',duration:180,note:'Low-key open block for swimming, reading, and doing nothing.'}];
+  const activityEvents=[];
   const DINNER_TIME='7–9 p.m.';
   const DINNER_HOUR='7:00 p.m.';
   const DAY_VIEW_PX_PER_MINUTE=1;
