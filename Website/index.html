@@ -650,7 +650,7 @@
     <header><div><h2 id="profileName">Guest profile</h2><p id="profileSummaryLine" class="profile-arrival-line">Shared trip details.</p></div><button class="back" id="closeProfileDetail" aria-label="Back to people">Back</button></header>
     <section class="profile-detail-list" aria-label="Guest trip information">
       <div class="profile-detail-row"><svg class="profile-detail-icon" data-symbol="phone" aria-hidden="true" viewBox="0 0 24 24"><path d="M7.2 4.8l2.1 4.1-1.6 1.4c.9 1.9 2.3 3.4 4.1 4.2l1.5-1.6 4.1 2.1-.8 3.2c-.2.7-.8 1.1-1.5 1.1C9.4 19.3 4.7 14.6 4.7 8.9c0-.7.5-1.3 1.1-1.5l1.4-.4z"/></svg><span id="profilePhone">No phone added yet.</span></div>
-      <div class="profile-detail-row"><svg class="profile-detail-icon" data-symbol="bed" aria-hidden="true" viewBox="0 0 24 24"><path d="M4 18V8.5M4 14h16M20 18v-5.2c0-1-.8-1.8-1.8-1.8H11v3M7 11h3.2c.5 0 .8.4.8.8V14H4v-1.8C4 11.5 4.5 11 5.2 11H7z"/></svg><span id="profileRoom">Room TBD</span></div>
+      <div class="profile-detail-row"><svg class="profile-detail-icon" data-symbol="bed" aria-hidden="true" viewBox="0 0 24 24"><path d="M4 18V8.5M4 14h16M20 18v-5.2c0-1-.8-1.8-1.8-1.8H11v3M7 11h3.2c.5 0 .8.4.8.8V14H4v-1.8C4 11.5 4.5 11 5.2 11H7z"/></svg><span id="profileRoom">Coming soon</span></div>
       <div class="profile-detail-row"><svg class="profile-detail-icon" data-symbol="chef" aria-hidden="true" viewBox="0 0 24 24"><path d="M7 10.4C5.5 10 4.5 8.9 4.5 7.5 4.5 5.8 5.9 4.4 7.6 4.4c.6 0 1.2.2 1.7.5A3.6 3.6 0 0112 3.8c1.1 0 2.1.4 2.7 1.1.5-.3 1.1-.5 1.7-.5 1.7 0 3.1 1.4 3.1 3.1 0 1.4-1 2.6-2.5 2.9M7 10.4h10M7.4 10.4l.8 8h7.6l.8-8M9 14h6"/></svg><span id="profileDinner">No dinner claimed yet.</span></div>
       <div class="profile-detail-row"><svg class="profile-detail-icon" data-symbol="utensils" aria-hidden="true" viewBox="0 0 24 24"><path d="M7 4v6M4.8 4v6M9.2 4v6M4.8 10h4.4M7 10v10M16.5 4c1.8 1.6 2.7 3.4 2.7 5.5 0 2.2-.9 3.6-2.7 4.2V20"/></svg><span id="profileDietary">No dietary preferences added yet.</span></div>
     </section>
@@ -673,22 +673,8 @@
 <script>
 (() => {
   const crew=['Tanner','David','Jacob G.','Jacob M.','Mikaela','Candace','Kaelin','Mark','Amanda','Ellie','Erika','Andie','Zach','Kait','Nick'];
-  const roomAssignments={
-    'Tanner':{floor:'1st floor', apartment:'1st floor apartment', bed:'Queen bed', room:'Queen room', roommates:['David']},
-    'David':{floor:'1st floor', apartment:'1st floor apartment', bed:'Queen bed', room:'Queen room', roommates:['Tanner']},
-    'Zach':{floor:'3rd floor', apartment:'3rd floor apartment', bed:'Queen bed', room:'Queen room', roommates:['Andie']},
-    'Andie':{floor:'3rd floor', apartment:'3rd floor apartment', bed:'Queen bed', room:'Queen room', roommates:['Zach']},
-    'Candace':{floor:'3rd floor', apartment:'3rd floor apartment', bed:'Twin bed', room:'2-twin room', roommates:['Erika']},
-    'Erika':{floor:'3rd floor', apartment:'3rd floor apartment', bed:'Twin bed', room:'2-twin room', roommates:['Candace']},
-    'Amanda':{floor:'2nd floor', apartment:'2nd floor apartment', bed:'Twin bed', room:'2-twin room', roommates:['Kait']},
-    'Kait':{floor:'2nd floor', apartment:'2nd floor apartment', bed:'Twin bed', room:'2-twin room', roommates:['Amanda']},
-    'Mark':{floor:'2nd floor', apartment:'2nd floor apartment', bed:'Queen bed', room:'Queen room', roommates:['Kaelin']},
-    'Kaelin':{floor:'2nd floor', apartment:'2nd floor apartment', bed:'Queen bed', room:'Queen room', roommates:['Mark']},
-    'Jacob G.':{floor:'2nd floor', apartment:'2nd floor apartment', bed:'Queen bed', room:'Queen room', roommates:['Jacob M.']},
-    'Jacob M.':{floor:'2nd floor', apartment:'2nd floor apartment', bed:'Queen bed', room:'Queen room', roommates:['Jacob G.']},
-    'Mikaela':{floor:'2nd floor', apartment:'2nd floor apartment', bed:'Twin bed', room:'2-twin room', roommates:['Ellie']},
-    'Ellie':{floor:'2nd floor', apartment:'2nd floor apartment', bed:'Twin bed', room:'2-twin room', roommates:['Mikaela']}
-  };
+  const ROOM_COMING_SOON='Coming soon';
+  const roomAssignments={};
   const phoneNumbers={
     'Mikaela':{display:'(816) 590-0536', href:'+18165900536'},
     'Candace':{display:'(808) 336-1171', href:'+18083361171'},
@@ -897,8 +883,8 @@
   function orderedPeople(board){ return crew.map((person,index)=>({person,index,d:board[person]})).sort((a,b)=>{ const av=timeValue(a.d,'arrivals'), bv=timeValue(b.d,'arrivals'); if(av!==bv) return av-bv; return a.index-b.index; }); }
   function renderDashboard(){ const board=flightBoard(); const latest=savedFlights(); if(latest?.name && !board[latest.name]) board[latest.name]=latest; arrivalsBoard.innerHTML=orderedPeople(board).map(({person,d},i)=>{ const has=!!d; const isDepart=boardMode==='departures'; const dateTime=has ? [isDepart?d.departureDate:d.arrivalDate, isDepart?d.departureTime:d.arrivalTime].filter(Boolean).join(' · ') : 'Not added yet'; const airport=has ? (isDepart?d.departureAirport:d.arrivalAirport) || '' : ''; const flight=has ? (isDepart?d.departureFlight:d.arrivalFlight) || d.flightStatus || 'Flight details saved' : 'Waiting'; const countdownLabel=has ? `${isDepart?'Departs':'Arrives'} in ${countdownFor(d,boardMode)}` : 'Awaiting flights'; const noteText=has && d.flightNotes ? d.flightNotes : 'No flight notes yet.'; const notes=escapeHtml(noteText); const canEdit=person===currentGuest?.name; const editButton=canEdit ? `<button class="arrival-edit" type="button" data-edit-flight="${escapeHtml(person)}">Edit</button>` : ''; return `<div class="arrival-row ${has?'':'is-empty'}"><div class="arrival-name">${escapeHtml(person)}</div><div class="arrival-meta"><span class="arrival-time">${escapeHtml(dateTime)}</span><span class="arrival-airport">${escapeHtml(airport)}</span></div><div class="arrival-flight">${escapeHtml(flight)}</div><div class="arrival-countdown">${escapeHtml(countdownLabel)}</div><div class="arrival-actions">${editButton}<button class="notes-toggle" data-note="note-${boardMode}-${i}" title="Show notes" aria-label="Show notes for ${escapeHtml(person)}">${noteIcon()}</button></div><div class="arrival-notes" id="note-${boardMode}-${i}" hidden>${notes}</div></div>`; }).join(''); arrivalsBoard.querySelectorAll('.notes-toggle').forEach(btn=>btn.addEventListener('click',()=>{ const note=document.getElementById(btn.dataset.note); note.hidden=!note.hidden; })); arrivalsBoard.querySelectorAll('.arrival-edit').forEach(btn=>btn.addEventListener('click',()=>openDialog('dashboard'))); }
   function roomAssignment(person){ return roomAssignments[person] || null; }
-  function roomLine(person){ const room=roomAssignment(person); if(!room) return 'Room TBD'; const roommateText=room.roommates.length ? ` with ${formatNameList(room.roommates)}` : ''; if(room.room==='2-twin room') return `${room.apartment} · ${room.bed} in a ${room.room}${roommateText}`; return `${room.apartment} · ${room.bed}${roommateText}`; }
-  function roomSummary(person){ const room=roomAssignment(person); if(!room) return 'Room TBD'; return room.room==='2-twin room' ? `${room.floor} · ${room.bed} in ${room.room}` : `${room.floor} · ${room.bed}`; }
+  function roomLine(person){ return ROOM_COMING_SOON; }
+  function roomSummary(person){ return ROOM_COMING_SOON; }
   function phoneLine(person){ const phone=phoneNumbers[person]; if(!phone) return 'No phone added yet.'; return `<a href="tel:${phone.href}">${escapeHtml(phone.display)}</a>`; }
   function arrivalCountdownLine(person, board){ const flights=board[person] || {}; if(!flights.arrivalDate) return 'Arrival TBD'; return `Arrives in ${countdownFor(flights,'arrivals')}`; }
   function profileSummary(person, board, dinner){ const arrival=arrivalCountdownLine(person, board); if(arrival!=='Arrival TBD') return arrival; const slot=(dinner.slots || []).find(slot=>(slot.leads || []).includes(person)); if(slot) return `Dinner ${longDinnerDate(slot.date)}`; return roomSummary(person); }
