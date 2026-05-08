@@ -272,7 +272,8 @@ test('dashboard itinerary cards use subtle expand icons to open an iCal-style da
   assert.doesNotMatch(html, />Previous day<\/button>/);
   assert.doesNotMatch(html, />Next day<\/button>/);
   assert.match(html, /dayViewAddEventButton=document\.getElementById\('dayViewAddEvent'\)/);
-  assert.match(html, /dayViewAddEventButton\.addEventListener\('click',\(\)=>openEventPlanner\(activeDayViewDate\)\)/);
+  assert.match(html, /dayViewAddEventButton\.addEventListener\('click',\(\)=>openEventPlanner\(activeDayViewDate,'','dayView'\)\)/);
+  assert.match(html, /function returnToLastScreen\(\)\{ if\(returnTarget==='dayView'\) openDayView\(activeDayViewDate\);/);
   assert.match(html, /\.day-view-add-event \{[^}]*position: absolute;[^}]*left: 20px;[^}]*bottom: 20px;[^}]*height: 44px;[^}]*min-height: 44px;[^}]*box-sizing: border-box;[^}]*display: inline-grid;[^}]*place-items: center;[^}]*font-size: 14px;[^}]*line-height: 1;/s);
   assert.match(html, /\.day-view-nav-button \{[^}]*width: 44px;[^}]*height: 44px;[^}]*min-height: 44px;[^}]*padding: 0;[^}]*font-size: 24px;[^}]*display: inline-grid;[^}]*place-items: center;/s);
   assert.match(html, /\.day-view-chevron \{[^}]*display: block;[^}]*line-height: 1;[^}]*transform: translateY\(-\.06em\);/s);
@@ -619,7 +620,7 @@ test('custom event detail lets creators edit and delete instead of showing joine
   assert.doesNotMatch(html, />Delete event<\/button>/);
   assert.match(html, /\.destructive-text \{[^}]*color: rgba\(255,107,107,\.72\) !important;[^}]*opacity: \.72;/s);
   assert.match(html, /\.destructive-text:hover, \.destructive-text:focus-visible \{[^}]*color: #ff8f8f;[^}]*opacity: 1;/s);
-  assert.match(html, /function openEventPlanner\(date='', eventId=''\)/);
+  assert.match(html, /function openEventPlanner\(date='', eventId='', backTarget=activeDayViewDate\?'dayView':'tripInfo'\)\{ setReturnTarget\(backTarget\);/);
   assert.match(html, /let editingCustomEventId=''/);
   assert.match(html, /function fillCustomEventForm\(event\)/);
   assert.match(html, /function deleteCustomEvent\(\)/);
@@ -694,6 +695,7 @@ test('modal back buttons return to the last screen instead of always the dashboa
   assert.match(html, /function returnToLastScreen\(\)/);
   assert.match(html, /function openDinnerPickerForDate\(date, backTarget='tripInfo'\)/);
   assert.match(html, /closeDinnerPickerModal\(true\)/);
+  assert.match(html, /if\(returnTarget==='dayView'\) openDayView\(activeDayViewDate\);/);
   assert.match(html, /if\(returnTarget==='dinnerPlans'\) openDinnerPlans\(\);/);
   assert.match(html, /if\(returnTarget==='calendarView'\) openCalendarView\(\);/);
   assert.match(html, /if\(returnTarget==='dashboard'\) openDashboard\(\);/);
