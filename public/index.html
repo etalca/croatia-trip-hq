@@ -354,7 +354,8 @@
   .day-view-scroll::-webkit-scrollbar { display: none; }
   .day-view-timeline { position: relative; min-height: 1020px; display: grid; grid-template-columns: 54px minmax(0, 1fr); }
   .day-view-nav { display: flex; justify-content: flex-end; gap: 8px; padding-top: 12px; }
-  .day-view-nav-button { width: 44px; height: 44px; min-height: 44px; padding: 0; font-size: 24px; line-height: 1; }
+  .day-view-nav-button { width: 44px; height: 44px; min-height: 44px; padding: 0; font-size: 24px; line-height: 1; display: inline-grid; place-items: center; }
+  .day-view-chevron { display: block; line-height: 1; transform: translateY(-.06em); }
   .day-view-add-event { position: absolute; left: 20px; bottom: 20px; z-index: 2; height: 44px; min-height: 44px; box-sizing: border-box; border: 1px solid rgba(255,255,255,.26); border-radius: 999px; background: rgba(255,255,255,.86); color: var(--ink); padding: 0 18px; display: inline-grid; place-items: center; font-size: 14px; line-height: 1; cursor: pointer; box-shadow: 0 10px 30px rgba(0,0,0,.16); }
   .day-view-add-event:hover, .day-view-add-event:focus-visible { background: white; transform: translateY(-1px); }
   .day-event-detail:not([hidden]) ~ .day-view-add-event { display: none; }
@@ -409,10 +410,10 @@
     .actions { width: min(100%, 330px); gap: 9px; }
     .pill { min-height: 44px; height: 44px; padding: 0 16px; }
     .pill:hover { transform: none; }
-    .gate, .dashboard { place-items: stretch; }
+    .gate, .dashboard { place-items: center; }
     .gate.auth-mode { place-items: center; }
     .gate.auth-mode .panel { width: min(100%, 380px); max-height: none; min-height: 0; align-self: center; }
-    .panel, .dashboard-card { width: 100%; max-height: calc(100svh - 20px); border-radius: 20px; padding: 16px; }
+    .panel, .dashboard-card { width: min(100%, calc(100svw - 20px)); max-height: calc(100svh - 44px); border-radius: 20px; padding: 16px; }
     .panel header, .dashboard-card header { gap: 12px; margin-bottom: 14px; align-items: flex-start; }
     .panel h2, .dashboard-card h2 { font-size: 26px; line-height: 1.08; }
     .panel p, .dashboard-card p { font-size: 13px; line-height: 1.32; }
@@ -430,9 +431,9 @@
     textarea { min-height: 92px; padding: 11px 12px; }
     .submit { display: grid; gap: 10px; margin-top: 4px; }
     .submit button { width: 100%; padding: 0 16px; }
-    .dashboard-card { min-height: min(680px, calc(100svh - 20px)); }
+    .dashboard-card { min-height: 0; }
     #tripInfo { place-items: center; }
-    #tripInfo .dashboard-card { height: calc(100svh - 20px); min-height: 0; max-height: calc(100svh - 20px); align-self: center; }
+    #tripInfo .dashboard-card { height: min(680px, calc(100svh - 44px)); min-height: 0; max-height: calc(100svh - 44px); align-self: center; }
     #tripInfo .dashboard-card header { position: relative; display: block; padding-right: 56px; overflow: visible; }
     #tripInfo .dashboard-card header > div { overflow: visible; width: 100%; max-width: 100%; }
     #tripInfo .dashboard-card header .close { position: absolute; top: 0; right: 0; }
@@ -588,7 +589,7 @@
 <div class="dashboard" id="dayView" role="dialog" aria-modal="true" aria-labelledby="dayViewTitle" hidden>
   <section class="dashboard-card day-view-card">
     <header><div><h2 id="dayViewTitle">Day view</h2><p id="dayViewSubtitle">Hour by hour.</p></div><button class="back" id="closeDayView" aria-label="Back to trip dashboard">Back</button></header>
-    <div class="day-view-scroll"><section class="day-view-timeline" id="dayViewTimeline" aria-label="Full day itinerary"></section></div><div class="day-event-detail" id="dayEventDetail" hidden><button class="day-event-detail-scrim" id="closeDayEventDetail" type="button" aria-label="Close event details"></button><article class="day-event-detail-card"><h3 id="dayEventDetailTitle">Event</h3><p id="dayEventDetailMeta"></p><p id="dayEventDetailAttendees"></p><p class="day-event-detail-note" id="dayEventDetailNote"></p><div class="activity-card-actions day-event-detail-actions" id="dayEventDetailActions"></div></article></div><button class="day-view-add-event" id="dayViewAddEvent" type="button">Add event</button><div class="day-view-nav" id="dayViewNav" aria-label="Change day"><button class="back day-view-nav-button" id="previousDayView" type="button" aria-label="Previous day">‹</button><button class="back day-view-nav-button" id="nextDayView" type="button" aria-label="Next day">›</button></div>
+    <div class="day-view-scroll"><section class="day-view-timeline" id="dayViewTimeline" aria-label="Full day itinerary"></section></div><div class="day-event-detail" id="dayEventDetail" hidden><button class="day-event-detail-scrim" id="closeDayEventDetail" type="button" aria-label="Close event details"></button><article class="day-event-detail-card"><h3 id="dayEventDetailTitle">Event</h3><p id="dayEventDetailMeta"></p><p id="dayEventDetailAttendees"></p><p class="day-event-detail-note" id="dayEventDetailNote"></p><div class="activity-card-actions day-event-detail-actions" id="dayEventDetailActions"></div></article></div><button class="day-view-add-event" id="dayViewAddEvent" type="button">Add event</button><div class="day-view-nav" id="dayViewNav" aria-label="Change day"><button class="back day-view-nav-button" id="previousDayView" type="button" aria-label="Previous day"><span class="day-view-chevron" aria-hidden="true">‹</span></button><button class="back day-view-nav-button" id="nextDayView" type="button" aria-label="Next day"><span class="day-view-chevron" aria-hidden="true">›</span></button></div>
   </section>
 </div>
 <div class="dashboard" id="eventPlanner" role="dialog" aria-modal="true" aria-labelledby="eventPlannerTitle" hidden>
