@@ -268,10 +268,13 @@ test('dashboard itinerary cards use subtle expand icons to open an iCal-style da
   assert.match(html, /id="previousDayView"/);
   assert.match(html, /id="nextDayView"/);
   assert.match(html, /<button class="day-view-add-event" id="dayViewAddEvent" type="button">Add event<\/button>/);
-  assert.match(html, /<div class="day-view-nav" id="dayViewNav" aria-label="Change day"><button class="back" id="previousDayView" type="button">Previous day<\/button><button class="back" id="nextDayView" type="button">Next day<\/button><\/div>/);
+  assert.match(html, /<div class="day-view-nav" id="dayViewNav" aria-label="Change day"><button class="back day-view-nav-button" id="previousDayView" type="button" aria-label="Previous day">‹<\/button><button class="back day-view-nav-button" id="nextDayView" type="button" aria-label="Next day">›<\/button><\/div>/);
+  assert.doesNotMatch(html, />Previous day<\/button>/);
+  assert.doesNotMatch(html, />Next day<\/button>/);
   assert.match(html, /dayViewAddEventButton=document\.getElementById\('dayViewAddEvent'\)/);
   assert.match(html, /dayViewAddEventButton\.addEventListener\('click',\(\)=>openEventPlanner\(activeDayViewDate\)\)/);
-  assert.match(html, /\.day-view-add-event \{[^}]*position: absolute;[^}]*left: 20px;[^}]*bottom: 20px;[^}]*height: 25\.5px;[^}]*min-height: 0;[^}]*box-sizing: border-box;[^}]*display: inline-grid;[^}]*place-items: center;[^}]*font-size: 13px;[^}]*line-height: 1;/s);
+  assert.match(html, /\.day-view-add-event \{[^}]*position: absolute;[^}]*left: 20px;[^}]*bottom: 20px;[^}]*height: 44px;[^}]*min-height: 44px;[^}]*box-sizing: border-box;[^}]*display: inline-grid;[^}]*place-items: center;[^}]*font-size: 14px;[^}]*line-height: 1;/s);
+  assert.match(html, /\.day-view-nav-button \{[^}]*width: 44px;[^}]*height: 44px;[^}]*min-height: 44px;[^}]*padding: 0;[^}]*font-size: 24px;/s);
   assert.match(html, /\.day-event-detail:not\(\[hidden\]\) ~ \.day-view-add-event \{ display: none; \}/);
   assert.match(html, /function openDayView\(date\)/);
   assert.match(html, /let activeDayViewDate=''/);
@@ -364,11 +367,12 @@ test('dashboard overview people toggle floats over content instead of reserving 
   assert.doesNotMatch(html, /\.trip-tabs \{[^}]*position: static/s);
 });
 
-test('add event buttons match compact todo and day navigation chip sizing', () => {
+test('dashboard add event stays compact while day-view add event matches chevron nav height', () => {
   assert.match(html, /\.back \{[^}]*height: 25\.5px;[^}]*font-size: 13px;[^}]*line-height: 1;[^}]*padding: 0 10px;[^}]*display: grid;[^}]*place-items: center;/s);
   assert.match(html, /\.todo-chip \{[^}]*height: 25\.5px;[^}]*box-sizing: border-box;[^}]*padding: 0 9px;[^}]*font-size: 13px;[^}]*line-height: 1;/s);
   assert.match(html, /\.itinerary-heading \.secondary-action \{[^}]*height: 25\.5px;[^}]*min-height: 0;[^}]*box-sizing: border-box;[^}]*padding: 0 10px;[^}]*display: inline-grid;[^}]*place-items: center;/s);
-  assert.match(html, /\.day-view-add-event \{[^}]*height: 25\.5px;[^}]*min-height: 0;[^}]*box-sizing: border-box;[^}]*padding: 0 10px;[^}]*display: inline-grid;[^}]*place-items: center;/s);
+  assert.match(html, /\.day-view-add-event \{[^}]*height: 44px;[^}]*min-height: 44px;[^}]*box-sizing: border-box;[^}]*padding: 0 18px;[^}]*display: inline-grid;[^}]*place-items: center;/s);
+  assert.match(html, /\.day-view-nav-button \{[^}]*width: 44px;[^}]*height: 44px;[^}]*min-height: 44px;[^}]*padding: 0;[^}]*font-size: 24px;/s);
 });
 
 test('claimed dinner card puts the prompt above, date as title, and co-lead below', () => {
