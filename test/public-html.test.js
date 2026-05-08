@@ -381,7 +381,8 @@ test('dashboard add event uses the same filled pill styling as the event form sa
   assert.match(html, /\.back \{[^}]*height: 25\.5px;[^}]*font-size: 13px;[^}]*line-height: 1;[^}]*padding: 0 10px;[^}]*display: grid;[^}]*place-items: center;/s);
   assert.match(html, /\.todo-chip \{[^}]*height: 25\.5px;[^}]*box-sizing: border-box;[^}]*padding: 0 9px;[^}]*font-size: 13px;[^}]*line-height: 1;/s);
   assert.match(html, /\.submit button \{[^}]*border: 1px solid white;[^}]*background: white;[^}]*color: var\(--ink\);[^}]*border-radius: 999px;[^}]*min-height: 25\.5px;[^}]*padding: 0 10px;/s);
-  assert.match(html, /\.itinerary-heading \.secondary-action \{[^}]*border: 1px solid white;[^}]*background: white;[^}]*color: var\(--ink\);[^}]*height: 25\.5px;[^}]*min-height: 0;[^}]*box-sizing: border-box;[^}]*border-radius: 999px;[^}]*padding: 0 12px;[^}]*display: inline-grid;[^}]*place-items: center;/s);
+  assert.match(html, /\.itinerary-heading \.secondary-action \{[^}]*border: 1px solid white;[^}]*background: white;[^}]*color: var\(--ink\);[^}]*height: 25\.5px;[^}]*min-height: 0;[^}]*box-sizing: border-box;[^}]*border-radius: 999px;[^}]*padding: 0 12px;[^}]*display: inline-grid;[^}]*place-items: center;[^}]*cursor: pointer;/s);
+  assert.match(html, /\.itinerary-heading \.secondary-action:hover \{ cursor: pointer; \}/);
   assert.match(html, /\.day-view-add-event \{[^}]*bottom: 16px;[^}]*height: 44px;[^}]*min-height: 44px;[^}]*box-sizing: border-box;[^}]*padding: 0 18px;[^}]*display: inline-grid;[^}]*place-items: center;/s);
   assert.match(html, /\.day-view-nav-button \{[^}]*width: 44px;[^}]*height: 44px;[^}]*min-height: 44px;[^}]*padding: 0;[^}]*font-size: 24px;[^}]*display: inline-grid;[^}]*place-items: center;/s);
   assert.match(html, /\.day-view-chevron \{[^}]*display: block;[^}]*line-height: 1;[^}]*transform: translateY\(-\.06em\);/s);
@@ -773,6 +774,8 @@ test('grocery state is shared through the groceries API with local fallback and 
   assert.doesNotMatch(html, /exportGroceriesReminders\.addEventListener/);
   assert.match(html, /\.prep-form \{[^}]*padding: 4px 8px 12px;[^}]*margin: -4px -8px 0;/s);
   assert.match(html, /\.grocery-input-row \{[^}]*align-items: end;[^}]*\}/s);
+  assert.match(html, /\.grocery-input-control \{ display: grid; gap: 10px; \}/);
+  assert.match(html, /<div class="grocery-input-control"><label for="groceryItem">Add grocery item<\/label><input id="groceryItem"/);
   assert.match(html, /\.grocery-add-action \{[^}]*border: 1px solid white;[^}]*background: white;[^}]*color: var\(--ink\);[^}]*border-radius: var\(--field-radius\);[^}]*height: 34px;[^}]*min-height: 34px;[^}]*box-sizing: border-box;[^}]*padding: 0 14px;/s);
   assert.match(html, /@media \(max-width: 760px\) \{[\s\S]*\.grocery-add-action \{ height: 44px; min-height: 44px; border-radius: 18px; padding: 0 16px; \}/s);
   assert.match(html, /prepStatusChip\.addEventListener\('click',openPrepPlanner\)/);
