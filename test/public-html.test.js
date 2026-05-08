@@ -417,11 +417,18 @@ test('main dashboard is a hub with only dinner, flight, and embedded itinerary c
 });
 
 test('flight board edit button stays visible beside the info icon without changing row content', () => {
-  assert.match(html, /\.arrival-row \{[^}]*position: relative;[^}]*grid-template-columns: minmax\(86px, 1fr\) minmax\(190px, 1\.45fr\) minmax\(86px, \.8fr\) minmax\(104px, \.72fr\);/s);
+  assert.match(html, /<div class="board-tabs" role="tablist" aria-label="Flight board">\s*<span class="board-tab-indicator" id="flightTabIndicator" aria-hidden="true"><\/span>/);
+  assert.match(html, /flightTabIndicator=document\.getElementById\('flightTabIndicator'\)/);
+  assert.match(html, /function syncFlightTabIndicator\(active=arrivalsTab\)/);
+  assert.match(html, /function setBoardMode\(mode\)\{[^}]*syncFlightTabIndicator\(mode==='departures'\?departuresTab:arrivalsTab\)/);
+  assert.match(html, /function openDashboard\(\)\{[\s\S]*requestAnimationFrame\(\(\)=>syncFlightTabIndicator\(boardMode==='departures'\?departuresTab:arrivalsTab\)\)/);
+  assert.match(html, /\.arrival-row \{[^}]*position: relative;[^}]*grid-template-columns: minmax\(86px, 1fr\) minmax\(190px, 1\.45fr\) minmax\(86px, \.8fr\) minmax\(104px, \.72fr\)/s);
   assert.match(html, /\.arrival-actions \{[^}]*position: absolute;[^}]*top: 8px;[^}]*right: 8px;[^}]*display: inline-flex;/s);
   assert.match(html, /\.arrival-edit \{[^}]*height: 25\.5px;[^}]*width: auto;[^}]*border-radius: 999px;[^}]*background: rgba\(255,255,255,\.14\);[^}]*padding: 0 10px;[^}]*font-size: 13px;[^}]*opacity: 1;[^}]*pointer-events: auto;/s);
   assert.match(html, /\.notes-toggle \{ width: 25\.5px; height: 25\.5px;/);
   assert.match(html, /@media \(max-width: 760px\) \{[\s\S]*\.arrival-edit \{ height: 25\.5px; min-height: 0; width: auto; padding: 0 10px; \}[\s\S]*\.arrival-actions \.notes-toggle \{ width: 25\.5px; height: 25\.5px; min-height: 0; flex: 0 0 25\.5px; \}/);
+  assert.match(html, /@media \(max-width: 760px\) \{[\s\S]*\.board-tab-indicator \{[^}]*display: none/);
+  assert.doesNotMatch(html, /\.trip-tabs \.board-tab-indicator \{ display: none; \}/);
   assert.doesNotMatch(html, /\.arrival-edit, \.notes-toggle \{ height: 44px; \}/);
   assert.match(html, /<div class="arrival-actions">\$\{editButton\}<button class="notes-toggle"/);
 });
@@ -899,6 +906,10 @@ test('people profiles live in an animated fit-content dashboard tab control', ()
   assert.match(tripInfoBlock, /id="tripTabIndicator"/);
   assert.match(tripInfoBlock, /id="overviewTab"/);
   assert.match(tripInfoBlock, /id="peopleTab"/);
+  assert.match(html, /\.board-tab\.active \{[^}]*background: rgba\(255,255,255,\.80\);[^}]*color: var\(--ink\);/);
+  assert.match(html, /function syncBoardTabIndicator\(indicator, active\)/);
+  assert.match(html, /requestAnimationFrame\(\(\)=>syncTripTabIndicator\(overviewTab\)\)/);
+  assert.match(html, /function openTripInfo\(\)\{[\s\S]*requestAnimationFrame\(\(\)=>syncTripTabIndicator\(overviewTab\)\)/);
   assert.match(tripInfoBlock, /id="tripTabViewport"/);
   assert.match(tripInfoBlock, /id="overviewPanel"/);
   assert.match(tripInfoBlock, /id="peoplePanel"[^>]*hidden/);
@@ -908,7 +919,7 @@ test('people profiles live in an animated fit-content dashboard tab control', ()
   assert.match(html, /\.trip-tabs \{[^}]*position: absolute;[^}]*bottom: 20px;[^}]*left: 50%;[^}]*transform: translateX\(-50%\);[^}]*z-index: 6;[^}]*margin: 0;/s);
   assert.doesNotMatch(html, /#tripInfo \.dashboard-card \{[^}]*padding-bottom: 64px/s);
   assert.match(html, /\.board-tab-indicator/);
-  assert.match(html, /transition: transform \.24s ease, width \.24s ease/);
+  assert.match(html, /transition: left \.24s ease, width \.24s ease/);
   assert.match(html, /@media \(max-width: 760px\) \{[\s\S]*\.trip-info-scroll \{[^}]*position: relative/);
   assert.match(html, /@media \(max-width: 760px\) \{[\s\S]*\.trip-tabs \{[^}]*position: fixed[^}]*bottom: max\(14px, calc\(env\(safe-area-inset-bottom\) \+ 14px\)\)[^}]*left: 50%[^}]*transform: translateX\(-50%\)[^}]*z-index: 30[^}]*pointer-events: auto/);
   assert.doesNotMatch(html, /transform: translate\(-50%, 25px\)/);
@@ -935,9 +946,12 @@ test('people profiles live in an animated fit-content dashboard tab control', ()
   assert.match(html, /setTripTab\('people'\)/);
   assert.match(html, /@media \(max-width: 760px\) \{[\s\S]*\.trip-tabs \{[^}]*position: fixed[^}]*width: fit-content/);
   assert.match(html, /@media \(max-width: 760px\) \{[\s\S]*#tripInfo \.dashboard-card \{[^}]*height: min\(680px, calc\(100svh - 44px\)\)[^}]*max-height: calc\(100svh - 44px\)/);
-  assert.match(html, /@media \(max-width: 760px\) \{[\s\S]*\.trip-tabs \.board-tab-indicator \{[^}]*display: none/);
+  assert.match(html, /@media \(max-width: 760px\) \{[\s\S]*\.board-tab-indicator \{[^}]*display: none/);
   assert.match(html, /@media \(max-width: 760px\) \{[\s\S]*\.trip-tabs \.board-tab.active \{[^}]*background: rgba\(255,255,255,\.80\)[^}]*color: var\(--ink\)/);
-  assert.match(html, /tripTabIndicator\.style\.transform=`translateX\(\$\{active\.offsetLeft\}px\)`/);
+  assert.match(html, /\.board-tab-indicator \{[^}]*transition: left \.24s ease, width \.24s ease/);
+  assert.match(html, /indicator\.style\.width=`\$\{active\.offsetWidth\}px`/);
+  assert.match(html, /indicator\.style\.minWidth=`\$\{active\.offsetWidth\}px`/);
+  assert.match(html, /indicator\.style\.left=`\$\{active\.offsetLeft\}px`/);
   assert.match(html, /function setTripTab\(tab\)/);
   assert.match(html, /function profileSummary\(person, board, dinner\)/);
   assert.match(html, /const roomAssignments=\{/);
