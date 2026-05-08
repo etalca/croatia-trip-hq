@@ -787,10 +787,12 @@ test('grocery state is shared through the groceries API with local fallback and 
   assert.match(html, /if\(!groceryComplete\(\)\) return 'Add grocery notes'/);
   assert.match(html, /if\(next==='Add grocery notes'\) return openPrepPlanner\(\)/);
   assert.match(html, /addGroceryItemButton\.addEventListener\('click',addGroceryItemFromInput\)/);
+  assert.match(html, /\$\{!isOwner\?`<button class="grocery-plus-one \$\{already\?'is-added':''\}"/);
   assert.match(html, /data-grocery-plus-one="\$\{escapeHtml\(item\.id\)\}"/);
   assert.match(html, /aria-pressed="\$\{already\?'true':'false'\}"/);
   assert.match(html, /class="grocery-plus-one \$\{already\?'is-added':''\}"/);
-  assert.match(html, /\$\{already\?'Remove \+1':'\+1'\}/);
+  assert.match(html, /data-grocery-plus-one="\$\{escapeHtml\(item\.id\)\}">\+1<\/button>/);
+  assert.doesNotMatch(html, /Remove \+1/);
   assert.match(html, /\$\{isOwner\?`<button class="grocery-remove"/);
   assert.match(html, /requestedBy/);
   assert.match(html, /toggleGroceryPlusOne\(plus\.dataset\.groceryPlusOne\)/);
