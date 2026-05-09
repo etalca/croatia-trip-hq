@@ -818,7 +818,8 @@ test('grocery state is shared through the groceries API with local fallback and 
   assert.match(html, /\.dietary-preference-card\.is-saved #dietaryNotes \{[^}]*height: 44px;[^}]*min-height: 44px;[^}]*padding: 0 78px 0 10px;[^}]*line-height: 44px;[^}]*resize: none;/s);
   assert.match(html, /\.dietary-preference-card\.is-saved \.dietary-confirmation-row \{[^}]*height: 0;[^}]*min-height: 0;[^}]*margin-top: 0;/s);
   assert.doesNotMatch(html, /\.dietary-saved-message/);
-  assert.match(html, /\.dietary-edit-action \{[^}]*position: absolute;[^}]*right: 10px;[^}]*top: calc\(13px \+ 6px \+ 28px\);[^}]*transform: translateY\(-50%\);[^}]*z-index: 9999;[^}]*isolation: isolate;[^}]*border: 1px solid white;[^}]*color: white;[^}]*opacity: \.2;[^}]*pointer-events: auto;/s);
+  assert.match(html, /\.dietary-edit-action \{[^}]*position: absolute;[^}]*right: 10px;[^}]*top: calc\(13px \+ 6px \+ 28px\);[^}]*transform: translateY\(-50%\);[^}]*z-index: 9999;[^}]*isolation: isolate;[^}]*border: 1px solid white;[^}]*color: white;[^}]*opacity: 1;[^}]*pointer-events: auto;/s);
+  assert.doesNotMatch(html, /\.dietary-edit-action \{[^}]*opacity: \.2;/s);
   assert.doesNotMatch(html, /\.dietary-edit-action \{[^}]*top: calc\(13px \+ 6px \+ 25px\)/s);
   assert.doesNotMatch(html, /\.dietary-edit-action \{[^}]*border: 1px solid rgba\(255,255,255,\.24\)/s);
   assert.doesNotMatch(html, /\.dietary-edit-action \{[^}]*color: rgba\(255,255,255,\.86\)/s);
