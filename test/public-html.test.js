@@ -54,11 +54,12 @@ test('not booked flight status collapses optional flight details and saves statu
 });
 
 test('hero video is configured for Safari-friendly autoplay on load', () => {
-  assert.match(html, /<video id="waterVideo"[^>]*data-desktop-src="assets\/hero-water-3-browser\.mp4"[^>]*data-mobile-src="assets\/right\.mp4"[^>]*data-mobile-poster="assets\/right-poster\.jpg"[^>]*muted[^>]*playsinline[^>]*autoplay[^>]*>/);
-  assert.match(html, /<source media="\(max-width: 760px\)" src="assets\/right\.mp4" type="video\/mp4">/);
+  assert.match(html, /<video id="waterVideo"[^>]*data-desktop-src="assets\/hero-water-3-browser\.mp4"[^>]*data-mobile-src="assets\/right-autoplay\.mp4"[^>]*data-mobile-poster="assets\/right-autoplay-poster\.jpg"[^>]*muted[^>]*playsinline[^>]*autoplay[^>]*>/);
+  assert.match(html, /<source media="\(max-width: 760px\)" src="assets\/right-autoplay\.mp4" type="video\/mp4">/);
   assert.match(html, /<source src="assets\/hero-water-3-browser\.mp4" type="video\/mp4">/);
-  assert.ok(fs.existsSync('public/assets/right.mp4'));
-  assert.ok(fs.existsSync('public/assets/right-poster.jpg'));
+  const mobileHero = fs.readFileSync('public/assets/right-autoplay.mp4');
+  assert.ok(fs.existsSync('public/assets/right-autoplay-poster.jpg'));
+  assert.ok(mobileHero.indexOf(Buffer.from('moov')) < mobileHero.indexOf(Buffer.from('mdat')), 'mobile MP4 must be faststart for iOS autoplay');
   assert.match(html, /video\.defaultMuted=true; video\.muted=true; video\.playsInline=true; video\.autoplay=true;/);
   assert.match(html, /video\.setAttribute\('muted',''\)/);
   assert.match(html, /window\.addEventListener\('pageshow',nudgeVideo/);
