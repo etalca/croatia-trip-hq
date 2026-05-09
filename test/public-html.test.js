@@ -66,8 +66,9 @@ test('hero video is configured for Safari-friendly autoplay on load', () => {
   assert.match(html, /window\.addEventListener\('pageshow',nudgeVideo/);
   assert.match(html, /video\.play\(\)\.then\(markVideoReady\)\.catch/);
   assert.match(html, /function markVideoReady\(\)\{ if\(video\.readyState>=2\)\{ ready=true; video\.classList\.add\('video-ready'\); \} \}/);
-  assert.match(html, /function attachVideoSource\(\)\{\s*applyMediaSource\(\);\s*nudgeVideo\(\);\s*if\(video\.readyState < 1\) video\.load\(\);\s*markVideoReady\(\); nudgeVideo\(\);\s*\}/);
+  assert.match(html, /function attachVideoSource\(\)\{\s*applyMediaSource\(\);\s*nudgeVideo\(\);\s*markVideoReady\(\); nudgeVideo\(\);\s*\}/);
   assert.doesNotMatch(html, /video\.src = sourceUrl/);
+  assert.doesNotMatch(html, /video\.load\(\)/);
   assert.doesNotMatch(html, /video\.dataset\.src = sourceUrl/);
   assert.match(html, /video\.addEventListener\('loadeddata',\(\)=>\{ markVideoReady\(\); nudgeVideo\(\); \}\);/);
   assert.match(html, /video\.addEventListener\('playing',markVideoReady\);/);

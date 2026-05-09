@@ -1128,7 +1128,6 @@
   function attachVideoSource(){
     applyMediaSource();
     nudgeVideo();
-    if(video.readyState < 1) video.load();
     markVideoReady(); nudgeVideo();
   }
   mobileQuery.addEventListener?.('change',()=>{ applyMediaSource(); attachVideoSource(); });
