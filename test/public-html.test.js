@@ -54,7 +54,9 @@ test('not booked flight status collapses optional flight details and saves statu
 });
 
 test('hero video is configured for Safari-friendly autoplay on load', () => {
-  assert.match(html, /<video id="waterVideo"[^>]*src="assets\/hero-water-3-browser\.mp4"[^>]*data-desktop-src="assets\/hero-water-3-browser\.mp4"[^>]*data-mobile-src="assets\/right\.mp4"[^>]*data-mobile-poster="assets\/right-poster\.jpg"[^>]*muted[^>]*playsinline[^>]*autoplay/);
+  assert.match(html, /<video id="waterVideo"[^>]*data-desktop-src="assets\/hero-water-3-browser\.mp4"[^>]*data-mobile-src="assets\/right\.mp4"[^>]*data-mobile-poster="assets\/right-poster\.jpg"[^>]*muted[^>]*playsinline[^>]*autoplay[^>]*>/);
+  assert.match(html, /<source media="\(max-width: 760px\)" src="assets\/right\.mp4" type="video\/mp4">/);
+  assert.match(html, /<source src="assets\/hero-water-3-browser\.mp4" type="video\/mp4">/);
   assert.ok(fs.existsSync('public/assets/right.mp4'));
   assert.ok(fs.existsSync('public/assets/right-poster.jpg'));
   assert.match(html, /video\.defaultMuted=true; video\.muted=true; video\.playsInline=true; video\.autoplay=true;/);
@@ -62,8 +64,9 @@ test('hero video is configured for Safari-friendly autoplay on load', () => {
   assert.match(html, /window\.addEventListener\('pageshow',nudgeVideo/);
   assert.match(html, /video\.play\(\)\.then\(markVideoReady\)\.catch/);
   assert.match(html, /function markVideoReady\(\)\{ if\(video\.readyState>=2\)\{ ready=true; video\.classList\.add\('video-ready'\); \} \}/);
-  assert.match(html, /markVideoReady\(\); nudgeVideo\(\);/);
-  assert.match(html, /video\.play\(\)\.then\(markVideoReady\)\.catch/);
+  assert.match(html, /function attachVideoSource\(\)\{\s*applyMediaSource\(\);\s*nudgeVideo\(\);\s*if\(video\.readyState < 1\) video\.load\(\);\s*markVideoReady\(\); nudgeVideo\(\);\s*\}/);
+  assert.doesNotMatch(html, /video\.src = sourceUrl/);
+  assert.doesNotMatch(html, /video\.dataset\.src = sourceUrl/);
   assert.match(html, /video\.addEventListener\('loadeddata',\(\)=>\{ markVideoReady\(\); nudgeVideo\(\); \}\);/);
   assert.match(html, /video\.addEventListener\('playing',markVideoReady\);/);
   assert.match(html, /function frame\(now\)\{ markVideoReady\(\); const t=now\*\.001;/);

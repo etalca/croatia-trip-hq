@@ -514,7 +514,7 @@
 <body>
 <div id="stage">
   <img class="poster-img" src="assets/hero-water-3-poster.jpg" alt="" aria-hidden="true">
-  <video id="waterVideo" src="assets/hero-water-3-browser.mp4" data-src="assets/hero-water-3-browser.mp4" data-desktop-src="assets/hero-water-3-browser.mp4" data-mobile-src="assets/right.mp4" data-mobile-poster="assets/right-poster.jpg" poster="assets/hero-water-3-poster.jpg" muted playsinline autoplay loop preload="auto"></video>
+  <video id="waterVideo" data-src="assets/hero-water-3-browser.mp4" data-desktop-src="assets/hero-water-3-browser.mp4" data-mobile-src="assets/right.mp4" data-mobile-poster="assets/right-poster.jpg" poster="assets/hero-water-3-poster.jpg" muted playsinline autoplay loop preload="auto"><source media="(max-width: 760px)" src="assets/right.mp4" type="video/mp4"><source src="assets/hero-water-3-browser.mp4" type="video/mp4"></video>
   <canvas id="gl"></canvas>
 </div>
 <div class="shade"></div>
@@ -1127,8 +1127,6 @@
   function nudgeVideo(){ video.defaultMuted=true; video.muted=true; video.playsInline=true; video.autoplay=true; video.setAttribute('muted',''); video.setAttribute('playsinline',''); video.setAttribute('autoplay',''); markVideoReady(); video.play().then(markVideoReady).catch(()=>{}); }
   function attachVideoSource(){
     applyMediaSource();
-    const sourceUrl = desiredVideoSource();
-    if(video.getAttribute('src') !== sourceUrl){ ready=false; posterUploaded=false; video.classList.remove('video-ready'); canvas.classList.remove('webgl-ready'); video.src = sourceUrl; video.dataset.src = sourceUrl; video.load(); }
     nudgeVideo();
     if(video.readyState < 1) video.load();
     markVideoReady(); nudgeVideo();
