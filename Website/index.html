@@ -514,7 +514,7 @@
 <body>
 <div id="stage">
   <img class="poster-img" src="assets/hero-water-3-poster.jpg" alt="" aria-hidden="true">
-  <video id="waterVideo" data-src="assets/hero-water-3-browser.mp4" data-desktop-src="assets/hero-water-3-browser.mp4" data-mobile-src="assets/right-autoplay.mp4" data-mobile-poster="assets/right-autoplay-poster.jpg" poster="assets/hero-water-3-poster.jpg" muted playsinline autoplay loop preload="auto"><source media="(max-width: 760px)" src="assets/right-autoplay.mp4" type="video/mp4"><source src="assets/hero-water-3-browser.mp4" type="video/mp4"></video>
+  <video id="waterVideo" data-src="assets/hero-water-3-browser.mp4" data-desktop-src="assets/hero-water-3-browser.mp4" data-mobile-src="assets/right-autoplay.mp4" data-mobile-poster="assets/right-autoplay-poster.jpg" poster="assets/hero-water-3-poster.jpg" muted playsinline webkit-playsinline autoplay loop preload="auto"><source media="(max-width: 760px)" src="assets/right-autoplay.mp4" type="video/mp4"><source src="assets/hero-water-3-browser.mp4" type="video/mp4"></video>
   <canvas id="gl"></canvas>
 </div>
 <div class="shade"></div>
@@ -1124,7 +1124,7 @@
   function desiredVideoSource(){ return mobileQuery.matches ? (video.dataset.mobileSrc||desktopVideoSrc) : desktopVideoSrc; }
   function applyMediaSource(){ const posterSrc=mobileQuery.matches ? (video.dataset.mobilePoster||desktopPosterSrc) : desktopPosterSrc; if(posterImg.getAttribute('src')!==posterSrc) posterImg.src=posterSrc; poster.src=posterSrc; video.setAttribute('poster',posterSrc); }
   function markVideoReady(){ if(video.readyState>=2){ ready=true; video.classList.add('video-ready'); } }
-  function nudgeVideo(){ video.defaultMuted=true; video.muted=true; video.playsInline=true; video.autoplay=true; video.setAttribute('muted',''); video.setAttribute('playsinline',''); video.setAttribute('autoplay',''); markVideoReady(); video.play().then(markVideoReady).catch(()=>{}); }
+  function nudgeVideo(){ video.defaultMuted=true; video.muted=true; video.playsInline=true; video.autoplay=true; video.setAttribute('muted',''); video.setAttribute('playsinline',''); video.setAttribute('webkit-playsinline',''); video.setAttribute('autoplay',''); markVideoReady(); video.play().then(markVideoReady).catch(()=>{}); }
   function attachVideoSource(){
     applyMediaSource();
     nudgeVideo();
