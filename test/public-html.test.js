@@ -54,25 +54,27 @@ test('not booked flight status collapses optional flight details and saves statu
 });
 
 test('hero video is configured for Safari-friendly autoplay on load', () => {
-  assert.match(html, /<video id="waterVideo"[^>]*data-desktop-src="assets\/hero-water-3-browser\.mp4"[^>]*data-mobile-src="assets\/right-autoplay\.mp4"[^>]*data-mobile-poster="assets\/right-autoplay-poster\.jpg"[^>]*muted[^>]*playsinline[^>]*webkit-playsinline[^>]*autoplay[^>]*>/);
-  assert.match(html, /<source media="\(max-width: 760px\)" src="assets\/right-autoplay\.mp4" type="video\/mp4">/);
-  assert.match(html, /<source src="assets\/hero-water-3-browser\.mp4" type="video\/mp4">/);
+  assert.match(html, /<video id="waterVideo" class="hero-video desktop-hero-video"[^>]*src="assets\/hero-water-3-browser\.mp4"[^>]*muted[^>]*playsinline[^>]*webkit-playsinline[^>]*autoplay[^>]*>/);
+  assert.match(html, /<video id="waterVideoMobile" class="hero-video mobile-hero-video"[^>]*src="assets\/right-autoplay\.mp4"[^>]*poster="assets\/right-autoplay-poster\.jpg"[^>]*muted[^>]*playsinline[^>]*webkit-playsinline[^>]*autoplay[^>]*>/);
+  assert.match(html, /@media \(max-width: 760px\)[\s\S]*#waterVideo \{ display: none; \}[\s\S]*#waterVideoMobile \{[^}]*display: block;[^}]*\}/);
+  assert.doesNotMatch(html, /<source media="\(max-width: 760px\)"/);
   const mobileHero = fs.readFileSync('public/assets/right-autoplay.mp4');
   assert.ok(fs.existsSync('public/assets/right-autoplay-poster.jpg'));
   assert.ok(mobileHero.indexOf(Buffer.from('moov')) < mobileHero.indexOf(Buffer.from('mdat')), 'mobile MP4 must be faststart for iOS autoplay');
-  assert.match(html, /video\.defaultMuted=true; video\.muted=true; video\.playsInline=true; video\.autoplay=true;/);
-  assert.match(html, /video\.setAttribute\('muted',''\)/);
-  assert.match(html, /video\.setAttribute\('webkit-playsinline',''\)/);
+  assert.match(html, /const mobileQuery=window\.matchMedia\('\(max-width: 760px\)'\);\s*const desktopVideo = document\.getElementById\('waterVideo'\);\s*const mobileVideo = document\.getElementById\('waterVideoMobile'\);\s*const video = mobileQuery\.matches \? mobileVideo : desktopVideo;/);
+  assert.match(html, /\[desktopVideo,mobileVideo\]\.forEach\(prepareAutoplayVideo\)/);
+  assert.match(html, /function prepareAutoplayVideo\(el\)\{ el\.defaultMuted=true; el\.muted=true; el\.playsInline=true; el\.autoplay=true; el\.setAttribute\('muted',''\); el\.setAttribute\('playsinline',''\); el\.setAttribute\('webkit-playsinline',''\); el\.setAttribute\('autoplay',''\); \}/);
   assert.match(html, /window\.addEventListener\('pageshow',nudgeVideo/);
   assert.match(html, /video\.play\(\)\.then\(markVideoReady\)\.catch/);
   assert.match(html, /function markVideoReady\(\)\{ if\(video\.readyState>=2\)\{ ready=true; video\.classList\.add\('video-ready'\); \} \}/);
-  assert.match(html, /function attachVideoSource\(\)\{\s*applyMediaSource\(\);\s*nudgeVideo\(\);\s*markVideoReady\(\); nudgeVideo\(\);\s*\}/);
   assert.doesNotMatch(html, /video\.src = sourceUrl/);
   assert.doesNotMatch(html, /video\.load\(\)/);
   assert.doesNotMatch(html, /video\.dataset\.src = sourceUrl/);
   assert.match(html, /video\.addEventListener\('loadeddata',\(\)=>\{ markVideoReady\(\); nudgeVideo\(\); \}\);/);
   assert.match(html, /video\.addEventListener\('playing',markVideoReady\);/);
-  assert.match(html, /function frame\(now\)\{ markVideoReady\(\); const t=now\*\.001;/);
+  assert.match(html, /video\.addEventListener\('timeupdate',markVideoReady,\{once:true\}\);/);
+  assert.match(html, /document\.addEventListener\('visibilitychange',\(\)=>\{ if\(!document\.hidden\) nudgeVideo\(\); \}\);/);
+  assert.match(html, /\.hero-video\.video-ready \{ opacity: 1 !important; \}/);
 });
 
 test('safe-area insets are applied only to overlays and modal shells', () => {
@@ -96,17 +98,16 @@ test('mobile hero bleeds video under the iOS Home Screen bottom safe area', () =
   assert.doesNotMatch(html, /\b100lvh\b/);
   assert.match(html, /#stage \{ position: fixed; inset: 0; overflow: hidden; background: #04151d; \}/);
   assert.doesNotMatch(html, /@supports \(height: 100lvh\)/);
-  assert.match(html, /\.poster-img, #waterVideo, #gl \{ position: absolute; inset: 0; width: 100%; height: 100%; display: block; \}/);
+  assert.match(html, /\.poster-img, \.hero-video, #gl \{ position: absolute; inset: 0; width: 100%; height: 100%; display: block; \}/);
   assert.doesNotMatch(html, /min-width: 100%; min-height: 100%;/);
-  assert.match(html, /\.poster-img, #waterVideo \{[^}]*object-fit: cover;[^}]*object-position: center;/s);
-  assert.match(html, /#waterVideo \{[^}]*z-index: 1;[^}]*opacity: 1;/s);
-  assert.doesNotMatch(html, /#waterVideo \{[^}]*opacity: 0;/s);
-  assert.match(html, /#waterVideo\.video-ready \{ opacity: 1 !important; \}/);
+  assert.match(html, /\.poster-img, \.hero-video \{[^}]*object-fit: cover;[^}]*object-position: center;/s);
+  assert.match(html, /\.hero-video \{[^}]*z-index: 1;[^}]*opacity: 1;/s);
+  assert.doesNotMatch(html, /\.hero-video \{[^}]*opacity: 0;/s);
+  assert.match(html, /\.hero-video\.video-ready \{ opacity: 1 !important; \}/);
   assert.match(html, /#gl\.webgl-ready \{ opacity: 1 !important; \}/);
   assert.doesNotMatch(html, /#gl \{[^}]*transition:/s);
-  assert.match(html, /@media \(max-width: 760px\) \{\n    #waterVideo \{ position: fixed; top: 0; right: 0; bottom: calc\(-1 \* env\(safe-area-inset-bottom\)\); left: 0; height: calc\(100% \+ env\(safe-area-inset-bottom\)\); object-fit: cover; object-position: center; transform: none; transform-origin: center center; z-index: 3; \}\n    #gl \{ display: none; \}/);
-  assert.match(html, /function desiredVideoSource\(\)\{ return mobileQuery\.matches \? \(video\.dataset\.mobileSrc\|\|desktopVideoSrc\) : desktopVideoSrc; \}/);
-  assert.match(html, /function applyMediaSource\(\)\{ const posterSrc=mobileQuery\.matches \? \(video\.dataset\.mobilePoster\|\|desktopPosterSrc\) : desktopPosterSrc; if\(posterImg\.getAttribute\('src'\)!==posterSrc\) posterImg\.src=posterSrc; poster\.src=posterSrc; video\.setAttribute\('poster',posterSrc\); \}/);
+  assert.match(html, /@media \(max-width: 760px\) \{\n    #waterVideo \{ display: none; \}\n    #waterVideoMobile \{ display: block; position: fixed; top: 0; right: 0; bottom: calc\(-1 \* env\(safe-area-inset-bottom\)\); left: 0; height: calc\(100% \+ env\(safe-area-inset-bottom\)\); object-fit: cover; object-position: center; transform: none; transform-origin: center center; z-index: 3; \}\n    #gl \{ display: none; \}/);
+  assert.match(html, /function applyMediaSource\(\)\{ const posterSrc=mobileQuery\.matches \? 'assets\/right-autoplay-poster\.jpg' : desktopPosterSrc; if\(posterImg\.getAttribute\('src'\)!==posterSrc\) posterImg\.src=posterSrc; poster\.src=posterSrc; \}/);
   assert.doesNotMatch(html, /#stage \{[^}]*env\(safe-area-inset/s);
   assert.doesNotMatch(html, /#waterVideo \{[^}]*env\(safe-area-inset-top|#waterVideo \{[^}]*env\(safe-area-inset-left|#waterVideo \{[^}]*env\(safe-area-inset-right/s);
   assert.doesNotMatch(html, /#gl \{[^}]*env\(safe-area-inset/s);

@@ -29,11 +29,12 @@
   a { color: inherit; }
   [hidden] { display: none !important; }
   #stage { position: fixed; inset: 0; overflow: hidden; background: #04151d; }
-  .poster-img, #waterVideo, #gl { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
-  .poster-img, #waterVideo { object-fit: cover; object-position: center; }
+  .poster-img, .hero-video, #gl { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+  .poster-img, .hero-video { object-fit: cover; object-position: center; }
   .poster-img { z-index: 0; }
-  #waterVideo { z-index: 1; opacity: 1; }
-  #waterVideo.video-ready { opacity: 1 !important; }
+  .hero-video { z-index: 1; opacity: 1; }
+  .mobile-hero-video { display: none; }
+  .hero-video.video-ready { opacity: 1 !important; }
   #gl { z-index: 2; opacity: 0; }
   #gl.webgl-ready { opacity: 1 !important; }
   .shade { position: fixed; inset: 0; pointer-events: none; background:
@@ -431,7 +432,8 @@
   .fallback { position: fixed; inset: 0; display: grid; place-items: center; padding: 30px; color: rgba(255,255,255,.8); text-align: center; background: #061923; visibility: hidden; z-index: 30; }
   .fallback.show { visibility: visible; }
   @media (max-width: 760px) {
-    #waterVideo { position: fixed; top: 0; right: 0; bottom: calc(-1 * env(safe-area-inset-bottom)); left: 0; height: calc(100% + env(safe-area-inset-bottom)); object-fit: cover; object-position: center; transform: none; transform-origin: center center; z-index: 3; }
+    #waterVideo { display: none; }
+    #waterVideoMobile { display: block; position: fixed; top: 0; right: 0; bottom: calc(-1 * env(safe-area-inset-bottom)); left: 0; height: calc(100% + env(safe-area-inset-bottom)); object-fit: cover; object-position: center; transform: none; transform-origin: center center; z-index: 3; }
     #gl { display: none; }
     .day-view-hover-actions { display: none; }
     .countdown span { font-size: 12px; }
@@ -514,7 +516,8 @@
 <body>
 <div id="stage">
   <img class="poster-img" src="assets/hero-water-3-poster.jpg" alt="" aria-hidden="true">
-  <video id="waterVideo" data-src="assets/hero-water-3-browser.mp4" data-desktop-src="assets/hero-water-3-browser.mp4" data-mobile-src="assets/right-autoplay.mp4" data-mobile-poster="assets/right-autoplay-poster.jpg" poster="assets/hero-water-3-poster.jpg" muted playsinline webkit-playsinline autoplay loop preload="auto"><source media="(max-width: 760px)" src="assets/right-autoplay.mp4" type="video/mp4"><source src="assets/hero-water-3-browser.mp4" type="video/mp4"></video>
+  <video id="waterVideo" class="hero-video desktop-hero-video" src="assets/hero-water-3-browser.mp4" poster="assets/hero-water-3-poster.jpg" muted playsinline webkit-playsinline autoplay loop preload="auto"></video>
+  <video id="waterVideoMobile" class="hero-video mobile-hero-video" src="assets/right-autoplay.mp4" poster="assets/right-autoplay-poster.jpg" muted playsinline webkit-playsinline autoplay loop preload="auto"></video>
   <canvas id="gl"></canvas>
 </div>
 <div class="shade"></div>
@@ -1080,7 +1083,10 @@
   addPlanningCall.addEventListener('click', e=>{ e.preventDefault(); addPlanningCallToCalendar(); });
 
   const canvas = document.getElementById('gl');
-  const video = document.getElementById('waterVideo');
+  const mobileQuery=window.matchMedia('(max-width: 760px)');
+  const desktopVideo = document.getElementById('waterVideo');
+  const mobileVideo = document.getElementById('waterVideoMobile');
+  const video = mobileQuery.matches ? mobileVideo : desktopVideo;
   const posterImg = document.querySelector('.poster-img');
   const desktopPosterSrc = video.getAttribute('poster') || posterImg.getAttribute('src');
   const poster = new Image();
@@ -1112,19 +1118,18 @@
   const dCanvas=document.createElement('canvas'); dCanvas.width=256; dCanvas.height=256; const dctx=dCanvas.getContext('2d',{alpha:false}); dctx.fillStyle='black'; dctx.fillRect(0,0,256,256);
   let width=0,height=0,dpr=1; function heroViewportHeight(){ const stageRect=document.getElementById('stage')?.getBoundingClientRect(); return Math.ceil(stageRect?.height || window.visualViewport?.height || window.innerHeight); } function heroViewportWidth(){ const stageRect=document.getElementById('stage')?.getBoundingClientRect(); return Math.ceil(stageRect?.width || window.innerWidth); } function resize(){ dpr=Math.min(2,window.devicePixelRatio||1); width=Math.ceil(heroViewportWidth()*dpr); height=Math.ceil(heroViewportHeight()*dpr); canvas.width=width; canvas.height=height; gl.viewport(0,0,width,height); } window.addEventListener('resize',resize,{passive:true}); window.visualViewport?.addEventListener('resize',resize,{passive:true}); window.visualViewport?.addEventListener('scroll',resize,{passive:true});
   resize();
-  const mobileQuery=window.matchMedia('(max-width: 760px)');
-  function heroLayoutSnapshot(){ const video=document.getElementById('waterVideo'); const chain=[]; let el=video; while(el){ const cs=getComputedStyle(el); const r=el.getBoundingClientRect(); chain.push({tag:el.tagName.toLowerCase(), id:el.id||'', className:el.className||'', rectTop:r.top, rectBottom:r.bottom, rectWidth:r.width, rectHeight:r.height, computedHeight:cs.height, minHeight:cs.minHeight, maxHeight:cs.maxHeight, aspectRatio:cs.aspectRatio, paddingTop:cs.paddingTop, paddingBottom:cs.paddingBottom, objectFit:cs.objectFit, objectPosition:cs.objectPosition}); el=el.parentElement; } return {innerHeight:window.innerHeight, innerWidth:window.innerWidth, visualViewport:{height:window.visualViewport?.height,width:window.visualViewport?.width,offsetTop:window.visualViewport?.offsetTop,offsetLeft:window.visualViewport?.offsetLeft,scale:window.visualViewport?.scale}, video:{videoWidth:video?.videoWidth,videoHeight:video?.videoHeight,currentSrc:video?.currentSrc,readyState:video?.readyState}, chainFromVideoUp:chain}; }
+  function heroLayoutSnapshot(){ const video=mobileQuery.matches ? document.getElementById('waterVideoMobile') : document.getElementById('waterVideo'); const chain=[]; let el=video; while(el){ const cs=getComputedStyle(el); const r=el.getBoundingClientRect(); chain.push({tag:el.tagName.toLowerCase(), id:el.id||'', className:el.className||'', rectTop:r.top, rectBottom:r.bottom, rectWidth:r.width, rectHeight:r.height, computedHeight:cs.height, minHeight:cs.minHeight, maxHeight:cs.maxHeight, aspectRatio:cs.aspectRatio, paddingTop:cs.paddingTop, paddingBottom:cs.paddingBottom, objectFit:cs.objectFit, objectPosition:cs.objectPosition}); el=el.parentElement; } return {innerHeight:window.innerHeight, innerWidth:window.innerWidth, visualViewport:{height:window.visualViewport?.height,width:window.visualViewport?.width,offsetTop:window.visualViewport?.offsetTop,offsetLeft:window.visualViewport?.offsetLeft,scale:window.visualViewport?.scale}, video:{videoWidth:video?.videoWidth,videoHeight:video?.videoHeight,currentSrc:video?.currentSrc,readyState:video?.readyState}, chainFromVideoUp:chain}; }
   window.heroLayoutSnapshot=heroLayoutSnapshot; if(new URLSearchParams(location.search).has('heroDebug')) setInterval(()=>console.table(heroLayoutSnapshot().chainFromVideoUp),1000);
   const pointer={x:.5,y:.5,px:.5,py:.5,down:false,active:false,speed:0}; function setPointer(e){ if(mobileQuery.matches) return; const x=e.clientX/window.innerWidth, y=e.clientY/window.innerHeight; pointer.speed=Math.hypot(x-pointer.x,y-pointer.y); pointer.px=pointer.x; pointer.py=pointer.y; pointer.x=x; pointer.y=y; pointer.active=true; } window.addEventListener('pointermove',setPointer,{passive:true}); window.addEventListener('pointerdown',e=>{ if(mobileQuery.matches) return; pointer.down=true; setPointer(e);},{passive:true}); window.addEventListener('pointerup',()=>pointer.down=false,{passive:true});
   function addImpulse(){ if(mobileQuery.matches) return; const r=Number(controls.radius.value); const waterline=Number(controls.waterline.value); const strength=Math.min(1,.18+pointer.speed*34+(pointer.down?.18:0)); if(!pointer.active || pointer.y < waterline-.01 || strength < .04) return; const x=pointer.x*256; const y=(1-pointer.y)*256; const g=dctx.createRadialGradient(x,y,0,x,y,r); g.addColorStop(0,`rgba(255,255,255,${.50*strength})`); g.addColorStop(.32,`rgba(190,220,255,${.22*strength})`); g.addColorStop(1,'rgba(0,0,0,0)'); dctx.globalCompositeOperation='lighter'; dctx.fillStyle=g; dctx.beginPath(); dctx.arc(x,y,r,0,Math.PI*2); dctx.fill(); dctx.globalCompositeOperation='source-over'; }
   function fadeDisturbance(){ dctx.globalCompositeOperation='source-over'; dctx.fillStyle=`rgba(0,0,0,${1-Number(controls.fade.value)})`; dctx.fillRect(0,0,256,256); }
   let ready=false, posterReady=false, posterUploaded=false;
   poster.onload = () => { posterReady = true; };
-  const desktopVideoSrc = video.dataset.desktopSrc || video.dataset.src || video.getAttribute('src');
-  function desiredVideoSource(){ return mobileQuery.matches ? (video.dataset.mobileSrc||desktopVideoSrc) : desktopVideoSrc; }
-  function applyMediaSource(){ const posterSrc=mobileQuery.matches ? (video.dataset.mobilePoster||desktopPosterSrc) : desktopPosterSrc; if(posterImg.getAttribute('src')!==posterSrc) posterImg.src=posterSrc; poster.src=posterSrc; video.setAttribute('poster',posterSrc); }
+  function prepareAutoplayVideo(el){ el.defaultMuted=true; el.muted=true; el.playsInline=true; el.autoplay=true; el.setAttribute('muted',''); el.setAttribute('playsinline',''); el.setAttribute('webkit-playsinline',''); el.setAttribute('autoplay',''); }
+  [desktopVideo,mobileVideo].forEach(prepareAutoplayVideo);
+  function applyMediaSource(){ const posterSrc=mobileQuery.matches ? 'assets/right-autoplay-poster.jpg' : desktopPosterSrc; if(posterImg.getAttribute('src')!==posterSrc) posterImg.src=posterSrc; poster.src=posterSrc; }
   function markVideoReady(){ if(video.readyState>=2){ ready=true; video.classList.add('video-ready'); } }
-  function nudgeVideo(){ video.defaultMuted=true; video.muted=true; video.playsInline=true; video.autoplay=true; video.setAttribute('muted',''); video.setAttribute('playsinline',''); video.setAttribute('webkit-playsinline',''); video.setAttribute('autoplay',''); markVideoReady(); video.play().then(markVideoReady).catch(()=>{}); }
+  function nudgeVideo(){ prepareAutoplayVideo(video); markVideoReady(); video.play().then(markVideoReady).catch(()=>{}); }
   function attachVideoSource(){
     applyMediaSource();
     nudgeVideo();
