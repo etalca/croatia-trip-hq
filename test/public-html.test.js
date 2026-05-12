@@ -607,6 +607,8 @@ test('custom calendar events render with title, time range, attendees, descripti
   assert.match(html, /customEventAttendeeNames\(event\)/);
   assert.match(html, /formatEventTimeRange\(event\.startTime,event\.endTime\)/);
   assert.match(html, /description:eventDescription\.value\.trim\(\)/);
+  assert.match(html, /createdAt:existing\?\.createdAt \|\| now/);
+  assert.match(html, /updatedAt:now/);
   assert.match(html, /renderCustomEventActions\(event\.id\)/);
   assert.match(html, /data-custom-event-signup/);
   assert.match(html, /function downloadCustomEventToCalendar\(event\)/);
@@ -614,6 +616,46 @@ test('custom calendar events render with title, time range, attendees, descripti
   assert.match(html, /DTEND;TZID=Europe\/Zagreb:\$\{icsDateTime\(event\.date,event\.endTime\)\}/);
   assert.match(html, /DESCRIPTION:\$\{icsEscape\(event\.description \|\| ''\)\}/);
   assert.match(html, /data-custom-event-calendar/);
+});
+
+test('calendar day cards show per-user unseen custom event badges that clear when the day is opened', () => {
+  assert.match(html, /const CUSTOM_EVENT_SEEN_KEY='korculaCustomCalendarEventSeenByDay'/);
+  assert.match(html, /function currentEventSeenKey\(\)/);
+  assert.match(html, /return `\$\{CUSTOM_EVENT_SEEN_KEY\}:\$\{currentActivityName\(\) \|\| rememberedName\(\) \|\| 'anonymous'\}`/);
+  assert.match(html, /function readEventSeenByDay\(\)/);
+  assert.match(html, /function saveEventSeenByDay\(value\)/);
+  assert.match(html, /function markDayEventsSeen\(date\)/);
+  assert.match(html, /seen\[date\]=new Date\(\)\.toISOString\(\)/);
+  assert.match(html, /function unseenEventsForDate\(date, events\)/);
+  assert.match(html, /event\.custom && event\.updatedAt && event\.updatedAt>lastSeen/);
+  assert.match(html, /function unseenDayBadge\(date, events\)/);
+  assert.match(html, /const count=unseenEventsForDate\(date, events\)\.length/);
+  assert.match(html, /count===1 \? '<span class="calendar-unseen-badge is-dot" aria-label="1 unseen calendar update"><\/span>' : `<span class="calendar-unseen-badge" aria-label="\$\{count\} unseen calendar updates">\$\{count\}<\/span>`/);
+  assert.match(html, /\$\{unseenDayBadge\(date, dayEvents\)\}/);
+  assert.match(html, /function openDayView\(date\)\{[^}]*markDayEventsSeen\(date\)/s);
+  assert.match(html, /\.calendar-unseen-badge \{[^}]*background: linear-gradient\(135deg, #f28b6b, #b7412e\);/s);
+  assert.match(html, /\.calendar-unseen-badge\.is-dot \{[^}]*width: 10px;[^}]*height: 10px;[^}]*font-size: 0;/s);
+});
+
+test('unseen calendar badges only count custom events visible to the current invitee', () => {
+  assert.match(html, /visibleCustomEvents\(\)\.forEach\(event=>eventsByDate\[event\.date\]\?\.push\(event\)\)/);
+  assert.match(html, /function customEventVisibleTo\(event, name=currentActivityName\(\)\)/);
+  assert.match(html, /event\.inviteMode==='open' \|\| event\.creator===name \|\| \(event\.invitees \|\| \[\]\)\.includes\(name\)/);
+  assert.match(html, /unseenEventsForDate\(date, events\)\{ const lastSeen=readEventSeenByDay\(\)\[date\] \|\| ''; return \(events \|\| \[\]\)\.filter\(event=>event\.custom && event\.updatedAt && event\.updatedAt>lastSeen\); \}/);
+  assert.doesNotMatch(html, /customEvents\(\)\.filter\([^)]*updatedAt[^)]*lastSeen/);
+});
+
+test('staging-only unread demo can seed one-event and two-event days safely', () => {
+  assert.match(html, /function seedStagingUnreadDemo\(\)/);
+  assert.match(html, /if\(!isStagingReviewHost\(window\.location\.hostname\) \|\| !params\.has\('unreadDemo'\)\) return ''/);
+  assert.match(html, /title:'Unread demo: one update'/);
+  assert.match(html, /title:'Unread demo: first of two'/);
+  assert.match(html, /title:'Unread demo: second of two'/);
+  assert.match(html, /inviteMode:'invite-only'/);
+  assert.match(html, /invitees:\[currentActivityName\(\) \|\| 'Tanner','David'\]/);
+  assert.match(html, /saveCustomEvents\(\[\.\.\.demoEvents, \.\.\.customEvents\(\)\.filter\(event=>!demoEvents\.some\(demo=>demo\.id===event\.id\)\)\]\)/);
+  assert.match(html, /localStorage\.removeItem\(currentEventSeenKey\(\)\)/);
+  assert.match(html, /seedStagingUnreadDemo\(\)/);
 });
 
 test('custom event form scrolls on short viewports and preserves field focus outlines', () => {
@@ -697,7 +739,7 @@ test('shared custom event links import the event and open signup or decline acti
   assert.match(html, /function decodeSharedEvent\(value\)/);
   assert.match(html, /function importSharedCalendarEventFromUrl\(\)/);
   assert.match(html, /new URLSearchParams\(window\.location\.search\)\.get\('calendarEvent'\)/);
-  assert.match(html, /saveCustomEvents\(\[event, \.\.\.events\.filter\(item=>item\.id!==event\.id\)\]\)/);
+  assert.match(html, /saveCustomEvents\(\[\{ \.\.\.event, createdAt:event\.createdAt \|\| new Date\(\)\.toISOString\(\), updatedAt:event\.updatedAt \|\| new Date\(\)\.toISOString\(\) \}, \.\.\.events\.filter\(item=>item\.id!==event\.id\)\]\)/);
   assert.match(html, /function openLinkedCalendarEvent\(eventId\)/);
   assert.match(html, /openDayView\(event\.date\)/);
   assert.match(html, /openDayEventDetail\(index\)/);
