@@ -921,6 +921,7 @@ test('grocery state is shared through the groceries API with local fallback and 
   assert.match(html, /activeGroceryUnseenItemIds\.delete\(id\)/);
   assert.match(html, /function groceryItemUnseenDot\(id\)/);
   assert.match(html, /activeGroceryUnseenItemIds\.has\(id\) \? '<span class="grocery-unseen-dot" aria-label="New grocery update"><\/span>' : ''/);
+  assert.match(html, /function escapeAttr\(v\)\{ return escapeHtml\(v\); \}/);
   assert.match(html, /class="grocery-item" data-grocery-item-id="\$\{escapeHtml\(item\.id\)\}" onpointerdown="dismissUnseenGroceryItemDot\('\$\{escapeAttr\(item\.id\)\}'\)" onmouseenter="dismissUnseenGroceryItemDot\('\$\{escapeAttr\(item\.id\)\}'\)"/);
   assert.match(html, /\.grocery-unseen-dot \{[^}]*background: rgba\(41, 143, 184, \.25\);[^}]*box-shadow: 0 3px 8px rgba\(5,34,48,\.12\);/s);
   assert.match(html, /function seedStagingGroceryUnreadDemo\(\)/);

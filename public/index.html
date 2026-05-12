@@ -731,6 +731,7 @@
   function syncHomeVisibility(){ document.body.classList.toggle('modal-open', anyModalOpen()); }
   function hideHomeContent(){ document.body.classList.add('modal-open'); }
   function escapeHtml(v){ return String(v ?? '').replace(/[&<>'"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c])); }
+  function escapeAttr(v){ return escapeHtml(v); }
   function linkifyText(value){ const escaped=escapeHtml(value); return escaped.replace(/https?:\/\/[^\s<]+/g,url=>{ const safeHref=url.replaceAll('&amp;','&'); return `<a href="${safeHref}" target="_blank" rel="noopener noreferrer">${url}</a>`; }); }
   function normalizeAirportInput(el){ const raw=el.value.trim(); const code=(raw.match(/[A-Za-z]{3}/)?.[0] || '').toUpperCase(); if(code && airportCities[code] && !raw.includes('(')) el.value = `${airportCities[code]} (${code})`; }
   [fields.arrivalAirport, fields.departureAirport].forEach(el=>{ el.addEventListener('blur',()=>normalizeAirportInput(el)); el.addEventListener('change',()=>normalizeAirportInput(el)); });
