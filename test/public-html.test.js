@@ -630,13 +630,14 @@ test('calendar day cards show per-user unseen custom event badges that clear whe
   assert.match(html, /event\.custom && event\.updatedAt && event\.updatedAt>lastSeen/);
   assert.match(html, /function unseenDayBadge\(date, events\)/);
   assert.match(html, /const count=unseenEventsForDate\(date, events\)\.length/);
-  assert.match(html, /count===1 \? '<span class="calendar-unseen-badge is-dot" aria-label="1 unseen calendar update"><\/span>' : `<span class="calendar-unseen-badge" aria-label="\$\{count\} unseen calendar updates">\$\{count\}<\/span>`/);
+  assert.match(html, /return `<span class="calendar-unseen-badge" aria-label="\$\{count\} unseen calendar update\$\{count===1\?'':'s'\}">\$\{count\}<\/span>`/);
+  assert.doesNotMatch(html, /calendar-unseen-badge is-dot/);
   assert.match(html, /\$\{unseenDayBadge\(date, dayEvents\)\}/);
   assert.match(html, /function openDayView\(date\)\{[^}]*activeDayUnseenEventIds=new Set\(unseenEventsForDate\(date, events\)\.map\(event=>event\.id\)\)/s);
   assert.match(html, /function openDayView\(date\)\{[^}]*markDayEventsSeen\(date\)/s);
-  assert.match(html, /\.calendar-unseen-badge \{[^}]*background: rgba\(41, 143, 184, \.6\);[^}]*border: 1px solid rgba\(255,255,255,\.14\);[^}]*box-shadow: 0 4px 10px rgba\(5,34,48,\.18\);/s);
+  assert.match(html, /\.calendar-unseen-badge \{[^}]*background: rgba\(41, 143, 184, \.25\);[^}]*border: 1px solid rgba\(255,255,255,\.12\);[^}]*box-shadow: 0 3px 8px rgba\(5,34,48,\.12\);/s);
   assert.doesNotMatch(html, /background: linear-gradient\(135deg, #f28b6b, #b7412e\)/);
-  assert.match(html, /\.calendar-unseen-badge\.is-dot \{[^}]*width: 10px;[^}]*height: 10px;[^}]*font-size: 0;/s);
+  assert.doesNotMatch(html, /\.calendar-unseen-badge\.is-dot/);
 });
 
 test('unseen custom events keep a subtle dot on the event block after opening the day', () => {
@@ -644,8 +645,12 @@ test('unseen custom events keep a subtle dot on the event block after opening th
   assert.match(html, /function unseenEventBlockDot\(event\)/);
   assert.match(html, /activeDayUnseenEventIds\.has\(event\.id\)/);
   assert.match(html, /<span class="event-unseen-dot" aria-label="New update"><\/span>/);
-  assert.match(html, /\.event-unseen-dot \{[^}]*background: rgba\(41, 143, 184, \.6\);[^}]*box-shadow: 0 3px 8px rgba\(5,34,48,\.14\);/s);
+  assert.match(html, /\.event-unseen-dot \{[^}]*background: rgba\(41, 143, 184, \.25\);[^}]*box-shadow: 0 3px 8px rgba\(5,34,48,\.12\);/s);
   assert.match(html, /\$\{unseenEventBlockDot\(event\)\}<strong>\$\{escapeHtml\(event\.title\)\}<\/strong>/);
+  assert.match(html, /function clearEventUnseenDot\(eventId, element\)/);
+  assert.match(html, /activeDayUnseenEventIds\.delete\(eventId\)/);
+  assert.match(html, /btn\.addEventListener\('mouseenter',\(\)=>clearEventUnseenDot\(event\?\.id, btn\)\)/);
+  assert.match(html, /clearEventUnseenDot\(event\?\.id, btn\); openDayEventDetail\(index\)/);
 });
 
 test('unseen calendar badges only count custom events visible to the current invitee', () => {
