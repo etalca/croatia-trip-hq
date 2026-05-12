@@ -41,6 +41,7 @@ function normalizeGroceries(value) {
       addedBy,
       requestedBy,
       createdAt: String(item.createdAt || new Date().toISOString()).slice(0, 40),
+      updatedAt: String(item.updatedAt || item.createdAt || new Date().toISOString()).slice(0, 40),
     };
   }).filter(item => item.text).slice(0, 80) : [];
   return { preferences: cleanPreferences, items };
