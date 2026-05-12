@@ -924,6 +924,8 @@ test('grocery state is shared through the groceries API with local fallback and 
   assert.match(html, /function escapeAttr\(v\)\{ return escapeHtml\(v\); \}/);
   assert.match(html, /class="grocery-item" data-grocery-item-id="\$\{escapeHtml\(item\.id\)\}" onpointerdown="dismissUnseenGroceryItemDot\('\$\{escapeAttr\(item\.id\)\}'\)" onmouseenter="dismissUnseenGroceryItemDot\('\$\{escapeAttr\(item\.id\)\}'\)"/);
   assert.match(html, /\.grocery-unseen-dot \{[^}]*background: rgba\(41, 143, 184, \.25\);[^}]*box-shadow: 0 3px 8px rgba\(5,34,48,\.12\);/s);
+  assert.match(html, /groceryList\.addEventListener\('pointerdown',e=>\{ const item=e\.target\.closest\('\[data-grocery-item-id\]'\); if\(item\) dismissUnseenGroceryItemDot\(item\.dataset\.groceryItemId\); \}\)/);
+  assert.match(html, /groceryList\.addEventListener\('mouseover',e=>\{ const item=e\.target\.closest\('\[data-grocery-item-id\]'\); if\(item\) dismissUnseenGroceryItemDot\(item\.dataset\.groceryItemId\); \}\)/);
   assert.match(html, /function seedStagingGroceryUnreadDemo\(\)/);
   assert.match(html, /grocery-demo-coffee/);
   assert.match(html, /grocery-demo-sunscreen/);
