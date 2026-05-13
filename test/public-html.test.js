@@ -1166,7 +1166,8 @@ test('people profiles live in an animated fit-content dashboard tab control', ()
   assert.doesNotMatch(html, /☎|🛏|🧑‍🍳|🍽|🛒/);
   assert.doesNotMatch(html, /<strong>Phone<\/strong>|<strong>Room<\/strong>|<strong>Dinner<\/strong>|<strong>Dietary preferences<\/strong>|<strong>Groceries added<\/strong>/);
   assert.match(html, /\.profile-detail-icon \{[^}]*stroke: currentColor[^}]*fill: none/s);
-  assert.match(html, /\.profile-arrival-line \{ color: rgba\(255,255,255,\.76\); display: grid; grid-template-columns: 24px minmax\(0, 1fr\); gap: 10px; align-items: start; line-height: 1\.32; \}/);
+  assert.match(html, /\.profile-arrival-line \{ color: rgba\(255,255,255,\.76\); display: grid; grid-template-columns: 24px minmax\(0, 1fr\); gap: 10px; align-items: center; line-height: 1\.32; \}/);
+  assert.match(html, /\.profile-detail-row \{[^}]*align-items: center;/);
   assert.match(html, /\.person-card-details \.profile-arrival-line \{ margin: 0; \}/);
   assert.match(html, /\.profile-arrival-line \.profile-detail-icon \{ width: 22px; height: 22px; flex: 0 0 auto; \}/);
   assert.doesNotMatch(html, /\.profile-detail-item \{[^}]*border:/);
@@ -1180,8 +1181,10 @@ test('people profiles live in an animated fit-content dashboard tab control', ()
   assert.match(html, /function profileIcon\(symbol\)/);
   assert.match(html, /function profilePanelId\(person\)/);
   assert.match(html, /<article class="person-card">/);
+  assert.match(html, /const groupDrivers=\['Mark','Erika','Tanner'\]/);
   assert.match(html, /function hasPhone\(person\)\{ return Boolean\(phoneNumbers\[person\]\); \}/);
   assert.match(html, /function hasSavedFlights\(person, board\)\{ return Boolean\(board\[person\]\?\.arrivalDate\); \}/);
+  assert.match(html, /function isGroupDriver\(person\)\{ return groupDrivers\.includes\(person\); \}/);
   assert.match(html, /function hasRoomAssignment\(person\)\{ return Boolean\(roomAssignment\(person\)\); \}/);
   assert.match(html, /function dinnerSlotFor\(person, dinner\)\{ return \(dinner\.slots \|\| \[\]\)\.find\(slot=>\(slot\.leads \|\| \[\]\)\.includes\(person\)\) \|\| null; \}/);
   assert.match(html, /function hasDinnerAssignment\(person, dinner\)\{ return Boolean\(dinnerSlotFor\(person, dinner\)\); \}/);
@@ -1194,6 +1197,8 @@ test('people profiles live in an animated fit-content dashboard tab control', ()
   assert.match(html, /person-summary-icons/);
   assert.match(html, /person-summary-icon/);
   assert.match(html, /personSummaryIcon\('plane','Flight details added',hasSavedFlights\(person, board\)\)/);
+  assert.match(html, /\$\{isGroupDriver\(person\)\?personSummaryIcon\('car','Group driver',true\):''\}/);
+  assert.match(html, /car:'<path d="M5\.1 14\.6h13\.8/);
   assert.match(html, /plane:'<path d="M17\.8 19\.2 16 11l3\.5-3\.5c1-\.9[^"]*L13\.5 8\.5 5\.3 6\.7[^"]*3\.4 6\.6z"\/>/);
   assert.doesNotMatch(html, /plane:'<path d="M3\.8 12\.2l16\.4-6\.4-6\.4 16\.4-2\.5-7\.5-7\.5-2\.5zM11\.3 14\.7l3\.6-3\.6"\/>/);
   assert.match(html, /personSummaryIcon\('phone','Phone number added',hasPhone\(person\)\)/);
