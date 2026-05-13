@@ -1166,6 +1166,9 @@ test('people profiles live in an animated fit-content dashboard tab control', ()
   assert.doesNotMatch(html, /☎|🛏|🧑‍🍳|🍽|🛒/);
   assert.doesNotMatch(html, /<strong>Phone<\/strong>|<strong>Room<\/strong>|<strong>Dinner<\/strong>|<strong>Dietary preferences<\/strong>|<strong>Groceries added<\/strong>/);
   assert.match(html, /\.profile-detail-icon \{[^}]*stroke: currentColor[^}]*fill: none/s);
+  assert.match(html, /\.profile-arrival-line \{ color: rgba\(255,255,255,\.76\); display: grid; grid-template-columns: 24px minmax\(0, 1fr\); gap: 10px; align-items: start; line-height: 1\.32; \}/);
+  assert.match(html, /\.person-card-details \.profile-arrival-line \{ margin: 0; \}/);
+  assert.match(html, /\.profile-arrival-line \.profile-detail-icon \{ width: 22px; height: 22px; flex: 0 0 auto; \}/);
   assert.doesNotMatch(html, /\.profile-detail-item \{[^}]*border:/);
   assert.doesNotMatch(html, /id="profileDeparture"/);
   assert.doesNotMatch(html, /id="profileNotes"/);
@@ -1191,6 +1194,8 @@ test('people profiles live in an animated fit-content dashboard tab control', ()
   assert.match(html, /person-summary-icons/);
   assert.match(html, /person-summary-icon/);
   assert.match(html, /personSummaryIcon\('plane','Flight details added',hasSavedFlights\(person, board\)\)/);
+  assert.match(html, /plane:'<path d="M17\.8 19\.2 16 11l3\.5-3\.5c1-\.9[^"]*L13\.5 8\.5 5\.3 6\.7[^"]*3\.4 6\.6z"\/>/);
+  assert.doesNotMatch(html, /plane:'<path d="M3\.8 12\.2l16\.4-6\.4-6\.4 16\.4-2\.5-7\.5-7\.5-2\.5zM11\.3 14\.7l3\.6-3\.6"\/>/);
   assert.match(html, /personSummaryIcon\('phone','Phone number added',hasPhone\(person\)\)/);
   assert.match(html, /personSummaryIcon\('utensils','Dietary preferences added',hasDietaryPreference\(person\)\)/);
   assert.match(html, /personSummaryIcon\('chef','Dinner claimed',hasDinnerAssignment\(person, dinner\)\)/);
@@ -1208,7 +1213,7 @@ test('people profiles live in an animated fit-content dashboard tab control', ()
   assert.match(html, /\.person-summary-icons \{[^}]*display: inline-flex;[^}]*align-items: center;[^}]*gap: 5px/s);
   assert.match(html, /\.person-summary-icon \{[^}]*width: 17px;[^}]*height: 17px;[^}]*stroke: currentColor;[^}]*fill: none/s);
   assert.match(html, /\.person-summary-icon\.is-missing \{[^}]*opacity: \.16/s);
-  assert.match(html, /\.person-card-details \{[^}]*padding: 0 11px 12px/s);
+  assert.match(html, /\.person-card-details \{[^}]*display: grid;[^}]*gap: 16px;[^}]*padding: 0 11px 12px/s);
   assert.doesNotMatch(html, /<span class="person-room">\$\{escapeHtml\(roomSummary\(person\)\)\}<\/span>/);
   assert.doesNotMatch(html, /<span>\$\{escapeHtml\(profileSummary\(person, board, dinner\)\)\}<\/span>/);
   assert.doesNotMatch(html, /data-profile="\$\{escapeHtml\(person\)\}"/);
