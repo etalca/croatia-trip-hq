@@ -1156,6 +1156,8 @@ test('people profiles live in an animated fit-content dashboard tab control', ()
   assert.match(html, /No dietary preferences added yet\./);
   assert.match(html, /id="profileSummaryLine" class="profile-arrival-line">Shared trip details\.<\/p>/);
   assert.doesNotMatch(html, /<article class="profile-detail-item"><strong>Arrival<\/strong>/);
+  assert.match(html, /class="profile-arrival-line">\$\{profileIcon\('plane'\)\}<span>\$\{escapeHtml\(arrivalCountdownLine\(person, board\)\)\}<\/span><\/p>/);
+  assert.doesNotMatch(html, /<p class="profile-arrival-line">\$\{escapeHtml\(arrivalCountdownLine\(person, board\)\)\}<\/p>/);
   assert.match(html, /class="profile-detail-row"[\s\S]*<svg class="profile-detail-icon" data-symbol="phone" aria-hidden="true"[\s\S]*<span id="profilePhone">No phone added yet\.<\/span>/);
   assert.match(html, /class="profile-detail-row"[\s\S]*<svg class="profile-detail-icon" data-symbol="bed" aria-hidden="true"[\s\S]*<span id="profileRoom">Coming soon<\/span>/);
   assert.match(html, /class="profile-detail-row"[\s\S]*<svg class="profile-detail-icon" data-symbol="chef" aria-hidden="true"[\s\S]*<span id="profileDinner">No dinner claimed yet\.<\/span>/);
@@ -1176,6 +1178,7 @@ test('people profiles live in an animated fit-content dashboard tab control', ()
   assert.match(html, /function profilePanelId\(person\)/);
   assert.match(html, /<article class="person-card">/);
   assert.match(html, /function hasPhone\(person\)\{ return Boolean\(phoneNumbers\[person\]\); \}/);
+  assert.match(html, /function hasSavedFlights\(person, board\)\{ return Boolean\(board\[person\]\?\.arrivalDate\); \}/);
   assert.match(html, /function hasRoomAssignment\(person\)\{ return Boolean\(roomAssignment\(person\)\); \}/);
   assert.match(html, /function dinnerSlotFor\(person, dinner\)\{ return \(dinner\.slots \|\| \[\]\)\.find\(slot=>\(slot\.leads \|\| \[\]\)\.includes\(person\)\) \|\| null; \}/);
   assert.match(html, /function hasDinnerAssignment\(person, dinner\)\{ return Boolean\(dinnerSlotFor\(person, dinner\)\); \}/);
@@ -1184,16 +1187,17 @@ test('people profiles live in an animated fit-content dashboard tab control', ()
   assert.match(html, /item\.addedBy===person/);
   assert.match(html, /function groceryLine\(person\)\{ const items=groceryItemsAddedBy\(person\); return items\.length \? formatNameList\(items\.map\(item=>item\.text\)\) : 'No groceries added yet\.'; \}/);
   assert.match(html, /function hasGroceryItemsAdded\(person\)\{ return groceryItemsAddedBy\(person\)\.length>0; \}/);
-  assert.match(html, /function personSummaryIcons\(person, dinner\)/);
+  assert.match(html, /function personSummaryIcons\(person, board, dinner\)/);
   assert.match(html, /person-summary-icons/);
   assert.match(html, /person-summary-icon/);
+  assert.match(html, /personSummaryIcon\('plane','Flight details added',hasSavedFlights\(person, board\)\)/);
   assert.match(html, /personSummaryIcon\('phone','Phone number added',hasPhone\(person\)\)/);
   assert.match(html, /personSummaryIcon\('utensils','Dietary preferences added',hasDietaryPreference\(person\)\)/);
   assert.match(html, /personSummaryIcon\('chef','Dinner claimed',hasDinnerAssignment\(person, dinner\)\)/);
   assert.match(html, /personSummaryIcon\('bed','Room assignment added',hasRoomAssignment\(person\)\)/);
   assert.match(html, /personSummaryIcon\('cart','Groceries added',hasGroceryItemsAdded\(person\)\)/);
   assert.match(html, /<button class="person-card-summary" type="button" data-profile-toggle="\$\{escapeHtml\(person\)\}" aria-expanded="false" aria-controls="\$\{profilePanelId\(person\)\}">/);
-  assert.match(html, /<span class="person-summary-main"><strong>\$\{escapeHtml\(person\)\}<\/strong>\$\{personSummaryIcons\(person, dinner\)\}<\/span>/);
+  assert.match(html, /<span class="person-summary-main"><strong>\$\{escapeHtml\(person\)\}<\/strong>\$\{personSummaryIcons\(person, board, dinner\)\}<\/span>/);
   assert.match(html, /<section class="person-card-details" id="\$\{profilePanelId\(person\)\}" hidden>\$\{profileDetailRows\(person, board, dinner\)\}<\/section>/);
   assert.match(html, /peopleList\.querySelectorAll\('\[data-profile-toggle\]'\)\.forEach/);
   assert.match(html, /const expanded=btn\.getAttribute\('aria-expanded'\)==='true'/);
