@@ -777,7 +777,7 @@
   function readGrocerySeenAt(){ return localStorage.getItem(currentGrocerySeenKey()) || ''; }
   function markGroceriesSeen(){ localStorage.setItem(currentGrocerySeenKey(), new Date().toISOString()); renderTripDashboard(); }
   let activeGroceryUnseenItemIds=new Set();
-  function unseenGroceryItems(){ const seenAt=readGrocerySeenAt(); const person=currentGroceryPerson(); return normalizeGroceries(cachedGroceries).items.filter(item=>item.addedBy!==person && (item.updatedAt||item.createdAt) && (item.updatedAt||item.createdAt)>seenAt); }
+  function unseenGroceryItems(){ const seenAt=readGrocerySeenAt(); const person=currentGroceryPerson(); return normalizeGroceries(cachedGroceries).items.filter(item=>item.addedBy!==person && item.createdAt && item.createdAt>seenAt); }
   function snapshotUnseenGroceryItems(){ activeGroceryUnseenItemIds=new Set(unseenGroceryItems().map(item=>item.id)); }
   function dismissUnseenGroceryItemDot(id){ if(!activeGroceryUnseenItemIds.has(id)) return; activeGroceryUnseenItemIds.delete(id); renderGroceryList(); }
   function groceryItemUnseenDot(id){ return activeGroceryUnseenItemIds.has(id) ? '<span class="grocery-unseen-dot" aria-label="New grocery update"></span>' : ''; }

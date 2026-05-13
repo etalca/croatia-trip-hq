@@ -935,7 +935,8 @@ test('grocery state is shared through the groceries API with local fallback and 
   assert.match(html, /localStorage\.removeItem\(currentGrocerySeenKey\(\)\)/);
   assert.match(html, /await loadRemoteState\(currentGuest\.name\); seedStagingUnreadDemo\(\); seedStagingGroceryUnreadDemo\(\)/);
   assert.match(html, /function unseenGroceryItems\(\)/);
-  assert.match(html, /item\.addedBy!==person && \(item\.updatedAt\|\|item\.createdAt\) && \(item\.updatedAt\|\|item\.createdAt\)>seenAt/);
+  assert.match(html, /item\.addedBy!==person && item\.createdAt && item\.createdAt>seenAt/);
+  assert.doesNotMatch(html, /function unseenGroceryItems\(\)\{[^}]*updatedAt/s);
   assert.match(html, /function groceryUnseenBadge\(\)/);
   assert.match(html, /return count \? `<span class="dashboard-unseen-badge" aria-label="\$\{count\} new grocery update\$\{count===1\?'':'s'\}">\$\{count\}<\/span>` : ''/);
   assert.match(html, /myPrepCard\.querySelector\('\.dashboard-unseen-badge'\)\?\.remove\(\); myPrepCard\.insertAdjacentHTML\('afterbegin',groceryUnseenBadge\(\)\)/);
